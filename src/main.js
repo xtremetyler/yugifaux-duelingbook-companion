@@ -7,6 +7,7 @@
   let matchLauncher;
   let tokenMacros;
   let chainMacros;
+  let customMacros;
 
   async function persistSettings() {
     await storage.set("settings", state.settings);
@@ -29,6 +30,7 @@
     matchLauncher = new MatchLauncher(diagnostics);
     tokenMacros = new TokenMacros(diagnostics, () => state.settings);
     chainMacros = new ChainMacros(diagnostics, () => state.settings);
+    customMacros = new CustomMacros(storage, diagnostics, () => state.settings);
     logObserver = new PublicDuelLogObserver(diagnostics, handlePublicEvent);
     logObserver.start();
 
@@ -39,6 +41,9 @@
           return;
         }
         matchLauncher.open();
+      },
+      openCustomMacros() {
+        customMacros.openEditor();
       },
       preview(cardName, eventType = "effect-declaration") {
         animationPlayer.resetDuel();
@@ -55,9 +60,11 @@
         matchLauncher.close();
         tokenMacros.close();
         chainMacros.close();
+        customMacros.close();
         await persistSettings();
         tokenMacros.refresh();
         chainMacros.refresh();
+        customMacros.refresh();
         diagnostics.warn("safety", "companion disabled by player");
         ui.refresh();
       },
@@ -68,12 +75,14 @@
         await persistSettings();
         tokenMacros.refresh();
         chainMacros.refresh();
+        customMacros.refresh();
         ui.refresh();
       }
     });
     ui.mount();
     tokenMacros.mount();
     chainMacros.mount();
+    await customMacros.mount();
     await reloadConfig();
     diagnostics.info("bootstrap", "companion initialized", { coreVersion: APP.version });
   }

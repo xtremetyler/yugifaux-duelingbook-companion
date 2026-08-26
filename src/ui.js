@@ -9,6 +9,7 @@
     #${APP.ids.panel} .yf-status { margin: 10px 0; padding: 8px; border-radius: 5px; background: #0f172a; }
     #${APP.ids.panel} .yf-diagnostics { max-height: 150px; overflow: auto; white-space: pre-wrap; color: #a7f3d0; font: 11px/1.35 Consolas,monospace; }
     #${APP.ids.panel} .yf-start-match { display: block; width: 100%; margin: 10px 0 7px; border-color: #d6b55b; background: linear-gradient(135deg,#713f12,#9f1239); color: #fff7d6; font-weight: 800; }
+    #${APP.ids.panel} .yf-manage-macros { display: block; width: 100%; margin: 7px 0; border-color: #c4b5fd; background: linear-gradient(135deg,#4c1d95,#1e3a8a); font-weight: 800; }
     #${APP.ids.launcher} { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; box-sizing: border-box; padding: 20px; background: #020617b8; color: #f8fafc; font: 14px/1.4 Arial,sans-serif; pointer-events: auto; }
     #${APP.ids.launcher} * { box-sizing: border-box; }
     #${APP.ids.launcher} .yf-launcher-card { width: min(610px,calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; border: 1px solid #d6b55b; border-radius: 14px; padding: 18px; background: linear-gradient(145deg,#111827fa,#172554fa 58%,#3f1237fa); box-shadow: 0 24px 80px #000d,0 0 30px #d6b55b33; }
@@ -205,8 +206,15 @@
         this.#checkbox("Animations enabled", "animationsEnabled", settings.animationsEnabled),
         this.#checkbox("Mute audio", "muted", settings.muted),
         this.#checkbox("Reduced motion", "reducedMotion", settings.reducedMotion),
+        this.#checkbox("Custom macros enabled", "customMacrosEnabled", settings.customMacrosEnabled),
         this.#checkbox("Diagnostics", "diagnosticsEnabled", settings.diagnosticsEnabled)
       );
+
+      const manageMacros = document.createElement("button");
+      manageMacros.type = "button";
+      manageMacros.className = "yf-manage-macros";
+      manageMacros.textContent = "Manage Custom Macros";
+      manageMacros.addEventListener("click", () => { panel.hidden = true; this.actions.openCustomMacros(); });
 
       const startMatch = document.createElement("button");
       startMatch.type = "button";
@@ -249,7 +257,7 @@
 
       this.diagnosticOutput = document.createElement("div");
       this.diagnosticOutput.className = "yf-diagnostics";
-      panel.append(startMatch, testAsh, testPolyflora, testNoWayOut, testIris, testPepper, testPainfulPreference, reload, disable, this.diagnosticOutput);
+      panel.append(startMatch, manageMacros, testAsh, testPolyflora, testNoWayOut, testIris, testPepper, testPainfulPreference, reload, disable, this.diagnosticOutput);
       button.addEventListener("click", () => { panel.hidden = !panel.hidden; });
       document.body.append(button, panel);
       this.diagnostics.subscribe((entries) => this.#renderDiagnostics(entries));

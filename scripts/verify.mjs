@@ -10,6 +10,7 @@ const observerSource = await readFile(resolve(root, "src/event-observer.js"), "u
 const launcherSource = await readFile(resolve(root, "src/match-launcher.js"), "utf8");
 const tokenMacrosSource = await readFile(resolve(root, "src/token-macros.js"), "utf8");
 const chainMacrosSource = await readFile(resolve(root, "src/chain-macros.js"), "utf8");
+const customMacrosSource = await readFile(resolve(root, "src/custom-macros.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
   `${observerSource}\nglobalThis.observerTests = { classifyPublicLogLine, getNewLogText };`,
@@ -33,6 +34,13 @@ const chainMacroTestContext = {
 vm.runInNewContext(
   `${chainMacrosSource}\nglobalThis.chainMacroTests = { CHAIN_LINKS, chainLinkMessage };`,
   chainMacroTestContext
+);
+const customMacroTestContext = {
+  APP: { ids: { customMacroButton: "test-custom-button", customMacroMenu: "test-custom-menu", customMacroEditor: "test-custom-editor", customMacroToast: "test-custom-toast" } }
+};
+vm.runInNewContext(
+  `${customMacrosSource}\nglobalThis.customMacroTests = { CUSTOM_MACRO_FUNCTIONS, CUSTOM_MACRO_VARIABLES, parseCustomMacroAction, parseCustomMacroDefinitions };`,
+  customMacroTestContext
 );
 
 const failures = [];
@@ -75,6 +83,8 @@ assert(bundle.includes('formatValue: "cu"'), "Custom Cards host format is missin
 assert(bundle.includes('matchTypeValue: "m"'), "2 out of 3 host type is missing from the launcher");
 assert(bundle.includes("class TokenMacros"), "Token macro controller is missing from the bundle");
 assert(bundle.includes("class ChainMacros"), "Chain macro controller is missing from the bundle");
+assert(bundle.includes("class CustomMacros") && bundle.includes("class CustomMacroEngine"), "Custom macro editor or action engine is missing from the bundle");
+assert(bundle.includes("@grant        unsafeWindow"), "Custom macro engine requires the declared unsafeWindow grant");
 assert(bundle.includes("Polyflora Hexbloom"), "Polyflora Token recipe is missing from the bundle");
 assert(bundle.includes("Bloom Token"), "Bloom Token definition is missing from the bundle");
 assert(bundle.includes("#duel .token_btn"), "native DuelingBook Token button integration is missing");
@@ -97,6 +107,10 @@ assert(chainMacrosSource.includes("DuelingBook deliberately sets the native inpu
 assert(chainMacrosSource.includes('new KeyboardEvent("keydown"'), "Chain macros must use DuelingBook's native Enter handler");
 assert(chainMacrosSource.includes('font[message-id]'), "Chain flashes must synchronize from visible public chat messages");
 assert(!chainMacrosSource.includes('document.addEventListener("pointerdown"'), "Chain menu must not be dismissed by DuelingBook pointer event propagation");
+assert(!/\beval\s*\(|\bnew\s+Function\s*\(/.test(customMacrosSource), "Custom macros must never evaluate player-authored code");
+assert(customMacrosSource.includes('this.#page().Send({ action: "Duel", play, ...extra })'), "Custom macro functions must route through the guarded DuelingBook sender");
+assert(customMacrosSource.includes('if (!allowed.has(play))'), "Custom macro DuelingBook play names must be allowlisted");
+assert(!customMacrosSource.includes("document.cookie") && !customMacrosSource.includes("localStorage"), "Custom macros must not access credential-adjacent browser storage");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
 assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
@@ -115,9 +129,18 @@ const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
 const { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier } = launcherTestContext.launcherTests;
 const { BLOOM_TOKEN_VARIANTS, TOKEN_RECIPES, chooseDistinctTokenVariants, tokenCarrierFromUrl } = tokenMacroTestContext.tokenMacroTests;
 const { CHAIN_LINKS, chainLinkMessage } = chainMacroTestContext.chainMacroTests;
+const { CUSTOM_MACRO_FUNCTIONS, CUSTOM_MACRO_VARIABLES, parseCustomMacroAction, parseCustomMacroDefinitions } = customMacroTestContext.customMacroTests;
 assert(JSON.stringify([...CHAIN_LINKS]) === JSON.stringify([1, 2, 3, 4, 5, 6, 7, 8]), "Chain menu must provide links 1 through 8");
 assert(chainLinkMessage(1) === "⛓️ Chain Link 1" && chainLinkMessage(8) === "⛓️ Chain Link 8", "Chain messages must use the approved emoji prefix");
 assert(chainLinkMessage(0) === "" && chainLinkMessage(9) === "", "unsupported Chain Link messages must be rejected");
+const compatibleMacros = parseCustomMacroDefinitions("-- LP\nPay Half | /sub ${halfOfLP}\n-- Deck\nSend Card | ${sendFromDeckToGY(Test Card)} | Done");
+assert(compatibleMacros.errors.length === 0 && compatibleMacros.macros.length === 2, "Custom DB-compatible macro definitions must parse");
+assert(compatibleMacros.groups[0]?.name === "LP" && compatibleMacros.groups[1]?.name === "Deck", "Custom macro categories must be preserved");
+assert(parseCustomMacroAction("${waitInMs(500)}").name === "waitInMs", "Custom macro function syntax must parse without code evaluation");
+assert(parseCustomMacroDefinitions("Bad | ${notAllowed(x)}").errors.some((error) => error.includes("unknown function")), "Unknown custom macro functions must be rejected");
+assert(CUSTOM_MACRO_FUNCTIONS.includes("specialFromDeckInAtk") && CUSTOM_MACRO_FUNCTIONS.includes("overlayMonsters"), "Gameplay macro function registry is incomplete");
+for (const functionName of CUSTOM_MACRO_FUNCTIONS) assert(customMacrosSource.includes(`case "${functionName}"`), `Custom macro function ${functionName} is registered but has no implementation`);
+assert(CUSTOM_MACRO_VARIABLES.includes("currentLP") && CUSTOM_MACRO_VARIABLES.includes("atkAllFaceUpMonsters"), "Custom DB-compatible variables are incomplete");
 assert(validateMatchIdentifier(" YF-2026-001 ").identifier === "YF-2026-001", "valid match identifiers must be normalized");
 assert(validateMatchIdentifier("   ").valid === false, "blank match identifiers must be rejected");
 assert(validateMatchIdentifier("<script>").valid === false, "unsafe match identifier characters must be rejected");

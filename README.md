@@ -8,6 +8,7 @@ The current build:
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
 - adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
+- adds an opt-in, locally stored Custom DB-compatible macro editor and right-side `MACROS` menu with categories, variables, waits, messages, and an allowlisted set of player-triggered duel functions;
 - flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;
 - supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;
 - presents those Tokens to installed companions as `Bloom Token` (Plant/WIND/Level 2/ATK 0/DEF 0) while leaving DuelingBook's authoritative generic Token state untouched;
@@ -20,7 +21,7 @@ The current build:
 - resolves Iris's excavation visually by sending three reflected card backs toward the hand, GY, and face-down banishment;
 - stages a psychedelic concert entrance with rising notes, equalizer bars, spotlights, and beat pulses for `Sgt. Pepper's Lonely Hearts Club Band`;
 - includes animation, mute, reduced-motion, diagnostics, and emergency-disable controls;
-- does not read cookies, inspect hidden zones, alter DuelingBook functions, call its socket sender, or send duel data anywhere; Token summons require player confirmation and player-selected native zones, while Chain messages use DuelingBook's visible chat input and native Enter handler.
+- does not read cookies, alter DuelingBook functions, or transmit data outside DuelingBook; Token summons require player confirmation and player-selected native zones, while Chain messages use DuelingBook's visible chat input. Opt-in custom macros can inspect the current player's own duel arrays and call DuelingBook's native sender only with fixed, allowlisted actions initiated by the player.
 
 ## Install the proof of concept
 
@@ -31,7 +32,7 @@ The current build:
 5. Click the `YF` button near the lower-left corner.
 6. Use the named preview buttons to test any configured animation without entering a duel.
 
-During an active duel, `TOKENS` and `CHAIN` buttons appear along the right side. The Chain menu sends one explicit public declaration per button click; it never uses hidden synchronization messages.
+During an active duel, `TOKENS` and `CHAIN` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain menu sends one explicit public declaration per button click; it never uses hidden synchronization messages.
 
 Tampermonkey checks the repository's built userscript for core updates. League configuration loads independently from the versioned JSON in `config/companion.sample.json`, allowing data changes without reinstalling the script.
 
@@ -62,4 +63,4 @@ There are no runtime or development package dependencies. The build script conca
 
 ## Reference project
 
-Research used [killburne/custom-duelingbook](https://github.com/killburne/custom-duelingbook) as requested. Its userscript header identifies it as MIT-licensed, but the repository root inspected on 2026-08-26 did not show a separate license file. No source code was copied into this project; only general integration lessons were used.
+The macro syntax, function names, and DuelingBook action mappings were implemented for compatibility with the requested [killburne/custom-duelingbook](https://github.com/killburne/custom-duelingbook) reference. Its userscript header identifies it as MIT-licensed. See [ATTRIBUTION.md](ATTRIBUTION.md).

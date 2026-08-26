@@ -21,3 +21,11 @@
 
 - Chain messages rely on DuelingBook's native `#duel .cin_txt` input and Enter-key handler. DuelingBook keeps that native control transparent beneath its custom-rendered chat field, so the companion detects it by active layout presence rather than CSS opacity. If that interface changes, the fixed message remains in the chat box for the player to send manually.
 - The avatar flash is companion-only and is synchronized from the newly rendered public `⛓️ Chain Link N` chat row. Players without the companion still see the ordinary chat declaration.
+
+# Custom macro limitations
+
+- Custom macros intentionally use DuelingBook's page-level player arrays and `Send` function, matching the behavior required for Custom DB-compatible gameplay functions. A DuelingBook internal API change can stop individual functions until their mappings are updated.
+- Macro definitions are stored only in the player's Tampermonkey storage. They do not synchronize between browsers or devices.
+- The parser supports Custom DB's `-- Category` and `Button | action | action` format, the documented variables, `~` argument separator, and the allowlisted functions shown in the editor. It does not execute arbitrary JavaScript.
+- Functions that open DuelingBook's native zone chooser end the remaining macro sequence so the player can finish that interactive action safely.
+- Player-created macros can move multiple cards immediately. Test new gameplay macros in a consenting unrated room before league use.

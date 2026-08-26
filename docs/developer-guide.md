@@ -22,6 +22,7 @@ src/
   match-launcher.js           guarded league host setup and confirmation
   token-macros.js             confirmed custom Token recipes and presentation
   chain-macros.js             fixed visible Chain declarations and avatar flash
+  custom-macros.js            compatible parser, editor, menu, and action engine
   ui.js                       namespaced panel and controls
   main.js                     lifecycle and dependency wiring
   footer.js                   userscript closure
@@ -50,4 +51,4 @@ Core updates use the repository's tracked `dist/yugifaux-companion.user.js` thro
 
 ## Development boundary
 
-Do not hook WebSocket methods, modify DuelingBook action functions, inspect card backs/hand data, enable private-log filters, or send hidden chat messages for synchronization. Player-authorized Chain macros may place a fixed public declaration into DuelingBook's visible duel-chat input and invoke its native Enter handler from the clicked command. The match launcher and Token recipes retain their own explicit confirmation and native-control boundaries. If a public event is unreliable, add a clearly labeled player-initiated companion control instead.
+Do not hook WebSocket methods, modify DuelingBook action functions, enable private-log filters, or send hidden synchronization messages. Player-authorized Chain macros place a fixed public declaration into DuelingBook's duel-chat input. The opt-in custom macro engine may read only the current player's duel arrays and call DuelingBook's native sender with action names constructed by its internal allowlist; macro text must never become an action name, selector, or executable code. The match launcher and Token recipes retain their own explicit confirmation and native-control boundaries.

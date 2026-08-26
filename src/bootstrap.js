@@ -3,7 +3,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.10.4",
+    version: "0.11.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -15,7 +15,11 @@
       tokenToast: "yf-token-macros-toast",
       chainButton: "yf-chain-macros-button",
       chainMenu: "yf-chain-macros-menu",
-      chainToast: "yf-chain-macros-toast"
+      chainToast: "yf-chain-macros-toast",
+      customMacroButton: "yf-custom-macros-button",
+      customMacroMenu: "yf-custom-macros-menu",
+      customMacroEditor: "yf-custom-macros-editor",
+      customMacroToast: "yf-custom-macros-toast"
     })
   });
 
@@ -24,5 +28,6 @@
     animationsEnabled: true,
     muted: true,
     diagnosticsEnabled: false,
+    customMacrosEnabled: false,
     reducedMotion: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
   });
