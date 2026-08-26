@@ -1,0 +1,58 @@
+  const diagnostics = new Diagnostics();
+  const storage = new SafeStorage();
+  const state = { settings: { ...DEFAULT_SETTINGS }, configState: null };
+  let ui;
+  let logObserver;
+  let animationPlayer;
+
+  async function persistSettings() {
+    await storage.set("settings", state.settings);
+  }
+
+  async function reloadConfig() {
+    state.configState = await new ConfigLoader(storage, diagnostics).load();
+    ui?.refresh();
+  }
+
+  function handlePublicEvent(event) {
+    if (!state.settings.enabled) return;
+    animationPlayer.handle(event, state.configState?.config ?? BUNDLED_CONFIG);
+  }
+
+  async function start() {
+    state.settings = { ...DEFAULT_SETTINGS, ...(await storage.get("settings", {})) };
+    diagnostics.setEnabled(state.settings.diagnosticsEnabled);
+    animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
+    logObserver = new PublicDuelLogObserver(diagnostics, handlePublicEvent);
+    logObserver.start();
+
+    ui = new CompanionUI(storage, diagnostics, () => state, {
+      simulate() {
+        animationPlayer.resetDuel();
+        handlePublicEvent({ type: "special-summon", text: "Test Player Special Summoned YugiFaux Test Dragon" });
+      },
+      reloadConfig,
+      async emergencyDisable() {
+        state.settings.enabled = false;
+        state.settings.animationsEnabled = false;
+        document.getElementById(APP.ids.overlay)?.remove();
+        await persistSettings();
+        diagnostics.warn("safety", "companion disabled by player");
+        ui.refresh();
+      },
+      async updateSetting(key, value) {
+        state.settings[key] = value;
+        if (key === "diagnosticsEnabled") diagnostics.setEnabled(value);
+        if (key === "enabled" && !value) document.getElementById(APP.ids.overlay)?.remove();
+        await persistSettings();
+        ui.refresh();
+      }
+    });
+    ui.mount();
+    await reloadConfig();
+    diagnostics.info("bootstrap", "companion initialized", { coreVersion: APP.version });
+  }
+
+  start().catch((error) => {
+    console.warn("YugiFaux Companion failed safely:", error);
+  });

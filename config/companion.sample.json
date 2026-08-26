@@ -1,0 +1,31 @@
+{
+  "$schema": "./companion.schema.json",
+  "schemaVersion": 1,
+  "dataVersion": "poc-2026-08-26.1",
+  "minimumCoreVersion": "0.1.0",
+  "featureFlags": {
+    "panel": true,
+    "eventObserver": true,
+    "animations": true
+  },
+  "allowedAssetHosts": [
+    "raw.githubusercontent.com",
+    "res.cloudinary.com"
+  ],
+  "animations": [
+    {
+      "id": "yf-test-dragon-special-summon",
+      "trigger": {
+        "eventType": "special-summon",
+        "cardName": "YugiFaux Test Dragon"
+      },
+      "presentation": {
+        "title": "YugiFaux Test Dragon",
+        "subtitle": "Special Summon",
+        "theme": "gold",
+        "durationMs": 2600
+      },
+      "frequency": "once-per-duel"
+    }
+  ]
+}

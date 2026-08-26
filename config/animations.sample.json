@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "manifestVersion": "poc-2026-08-26.1",
+  "animations": [
+    {
+      "id": "yf-test-dragon-special-summon",
+      "trigger": {
+        "eventType": "special-summon",
+        "cardName": "YugiFaux Test Dragon"
+      },
+      "presentation": {
+        "kind": "css-title-card",
+        "title": "YugiFaux Test Dragon",
+        "subtitle": "Special Summon",
+        "durationMs": 2600,
+        "audioUrl": null,
+        "assetUrl": null
+      },
+      "frequency": "once-per-duel"
+    }
+  ]
+}
