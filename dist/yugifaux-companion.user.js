@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.6.0
+// @version      0.6.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.6.0",
+    version: "0.6.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -99,8 +99,8 @@
 
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-6",
-    minimumCoreVersion: "0.6.0",
+    dataVersion: "bundled-poc-6.1",
+    minimumCoreVersion: "0.6.1",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com", "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"],
     animations: [
@@ -181,7 +181,7 @@
           preset: "concert-rise-v1",
           assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787769996/sgt._pepper.png",
           title: "Sgt. Pepper's Lonely Hearts Club Band",
-          subtitle: "Live Effect Performance",
+          subtitle: "Effect Declared",
           accentColor: "#facc15",
           durationMs: 4800
         },

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "manifestVersion": "poc-2026-08-26.6",
+  "manifestVersion": "poc-2026-08-26.7",
   "animations": [
     {
       "id": "ash-blossom-lonely-spring-effect",
@@ -113,7 +113,7 @@
         "kind": "css-layered-image",
         "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787769996/sgt._pepper.png",
         "title": "Sgt. Pepper's Lonely Hearts Club Band",
-        "subtitle": "Live Effect Performance",
+        "subtitle": "Effect Declared",
         "accentColor": "#facc15",
         "durationMs": 4800,
         "audioUrl": null,

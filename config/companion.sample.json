@@ -1,8 +1,8 @@
 {
   "$schema": "./companion.schema.json",
   "schemaVersion": 1,
-  "dataVersion": "poc-2026-08-26.8",
-  "minimumCoreVersion": "0.6.0",
+  "dataVersion": "poc-2026-08-26.9",
+  "minimumCoreVersion": "0.6.1",
   "featureFlags": {
     "panel": true,
     "eventObserver": true,
@@ -109,7 +109,7 @@
         "preset": "concert-rise-v1",
         "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787769996/sgt._pepper.png",
         "title": "Sgt. Pepper's Lonely Hearts Club Band",
-        "subtitle": "Live Effect Performance",
+        "subtitle": "Effect Declared",
         "accentColor": "#facc15",
         "durationMs": 4800
       },
