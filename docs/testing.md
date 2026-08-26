@@ -4,11 +4,11 @@ Use two Chrome/Edge profiles or two separate browsers with Tampermonkey installe
 
 ## Before the live test
 
-- [ ] Replace the placeholder card name with the exact first test card name.
+- [ ] Confirm the live custom card name is exactly `Ash Blossom & Lonely Spring`.
 - [ ] Publish valid `companion.sample.json` at the approved GitHub raw URL.
 - [ ] Run `npm test` and install the newly built userscript in both profiles.
 - [ ] Confirm both panels show the same core and data version.
-- [ ] Confirm **Simulate test summon** plays in each profile independently.
+- [ ] Confirm **Preview Ash Blossom overlay** plays in each profile independently.
 - [ ] Confirm mute, reduced motion, animations disabled, and emergency disable work.
 - [ ] Confirm clicking through the animation still reaches no companion overlay (`pointer-events: none`).
 

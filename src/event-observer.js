@@ -1,4 +1,5 @@
   const EVENT_PHRASES = Object.freeze([
+    ["effect-declaration", /(?:\b(?:declare(?:d|s|ing)?|announc(?:ed|es|ing)?)\b.*(?:\beffect\b|$)|\beffect\b.*\bactivate(?:d|s|ing)?\b)/i],
     ["normal-summon", /\bnormal summon(?:ed|s|ing)?\b/i],
     ["special-summon", /\bspecial summon(?:ed|s|ing)?\b/i],
     ["fusion-summon", /\bfusion summon(?:ed|s|ing)?\b/i],

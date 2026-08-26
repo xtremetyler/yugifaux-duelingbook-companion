@@ -1,15 +1,22 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-1",
-    minimumCoreVersion: "0.1.0",
+    dataVersion: "bundled-poc-2",
+    minimumCoreVersion: "0.2.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com"],
     animations: [
       {
-        id: "yf-test-dragon-special-summon",
-        trigger: { eventType: "special-summon", cardName: "YugiFaux Test Dragon" },
-        presentation: { title: "YugiFaux Test Dragon", subtitle: "Special Summon", theme: "gold", durationMs: 2600 },
-        frequency: "once-per-duel"
+        id: "ash-blossom-lonely-spring-effect",
+        trigger: { eventType: "effect-declaration", cardName: "Ash Blossom & Lonely Spring" },
+        presentation: {
+          preset: "petal-bloom-v1",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/f_auto,q_auto/ash_blossomm",
+          title: "Ash Blossom & Lonely Spring",
+          subtitle: "Effect Declared",
+          accentColor: "#f3a6c8",
+          durationMs: 3600
+        },
+        frequency: "every-event"
       }
     ]
   });
@@ -31,6 +38,9 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
+      if (!["title-card-v1", "petal-bloom-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+        errors.push(`animations[${index}].presentation.preset is unsupported.`);
+      }
       if (item?.presentation?.assetUrl) {
         try {
           const url = new URL(item.presentation.assetUrl);

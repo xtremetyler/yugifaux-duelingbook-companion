@@ -1,22 +1,25 @@
 {
   "schemaVersion": 1,
-  "manifestVersion": "poc-2026-08-26.1",
+  "manifestVersion": "poc-2026-08-26.2",
   "animations": [
     {
-      "id": "yf-test-dragon-special-summon",
+      "id": "ash-blossom-lonely-spring-effect",
       "trigger": {
-        "eventType": "special-summon",
-        "cardName": "YugiFaux Test Dragon"
+        "eventType": "effect-declaration",
+        "cardName": "Ash Blossom & Lonely Spring"
       },
       "presentation": {
-        "kind": "css-title-card",
-        "title": "YugiFaux Test Dragon",
-        "subtitle": "Special Summon",
-        "durationMs": 2600,
+        "preset": "petal-bloom-v1",
+        "kind": "css-layered-image",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/f_auto,q_auto/ash_blossomm",
+        "title": "Ash Blossom & Lonely Spring",
+        "subtitle": "Effect Declared",
+        "accentColor": "#f3a6c8",
+        "durationMs": 3600,
         "audioUrl": null,
-        "assetUrl": null
+        "fallback": "skip"
       },
-      "frequency": "once-per-duel"
+      "frequency": "every-event"
     }
   ]
 }

@@ -7,8 +7,8 @@ The current build:
 - adds a small `YF` button and collapsible control panel;
 - loads a versioned JSON configuration and falls back to the last valid cache or bundled defaults;
 - passively observes visible public text added to DuelingBook's duel log;
-- recognizes a placeholder card named `YugiFaux Test Dragon` when its log line is classified as a Special Summon;
-- plays an original CSS title-card animation that never receives pointer input;
+- recognizes `Ash Blossom & Lonely Spring` when a visible public log line is classified as an effect declaration;
+- plays a pink petal-bloom overlay using the approved Cloudinary artwork without receiving pointer input;
 - includes animation, mute, reduced-motion, diagnostics, and emergency-disable controls;
 - does not automate gameplay, read cookies, inspect hidden zones, alter DuelingBook functions, or send duel data anywhere.
 
@@ -19,7 +19,7 @@ The current build:
 3. Approve the installation in Tampermonkey.
 4. Open `https://www.duelingbook.com/`.
 5. Click the `YF` button near the lower-left corner.
-6. Click **Simulate test summon** to test the animation without entering a duel.
+6. Click **Preview Ash Blossom overlay** to test the animation without entering a duel.
 
 Tampermonkey checks the repository's built userscript for core updates. League configuration loads independently from the versioned JSON in `config/companion.sample.json`, allowing data changes without reinstalling the script.
 

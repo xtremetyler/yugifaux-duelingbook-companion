@@ -1,7 +1,7 @@
 # Known limitations
 
 - The repository URLs are configured, but the first push must complete before remote configuration and Tampermonkey update checks can succeed.
-- No real YugiFaux test card, DuelingBook card ID, Cloudinary asset, logo, colors, or audio was provided. The POC uses a placeholder card name and an original CSS-only title animation.
+- The first Cloudinary artwork and card name are configured, but the exact public DuelingBook effect-declaration wording still requires a consenting live-room capture.
 - Exact authenticated duel-log wording has not been captured, so automatic recognition is implemented conservatively but remains unproven in a live duel.
 - Player/player and spectator synchronization have not yet been measured.
 - Once-per-duel state resets manually in the simulation and when the log empties; a reliable public duel-boundary signal still needs validation.

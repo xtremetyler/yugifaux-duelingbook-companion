@@ -29,7 +29,7 @@
     ui = new CompanionUI(storage, diagnostics, () => state, {
       simulate() {
         animationPlayer.resetDuel();
-        handlePublicEvent({ type: "special-summon", text: "Test Player Special Summoned YugiFaux Test Dragon" });
+        handlePublicEvent({ type: "effect-declaration", text: "Test Player declared the effect of Ash Blossom & Lonely Spring" });
       },
       reloadConfig,
       async emergencyDisable() {
