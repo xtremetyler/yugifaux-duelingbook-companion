@@ -1,8 +1,8 @@
 {
   "$schema": "./companion.schema.json",
   "schemaVersion": 1,
-  "dataVersion": "poc-2026-08-26.2",
-  "minimumCoreVersion": "0.2.0",
+  "dataVersion": "poc-2026-08-26.3",
+  "minimumCoreVersion": "0.2.1",
   "featureFlags": {
     "panel": true,
     "eventObserver": true,

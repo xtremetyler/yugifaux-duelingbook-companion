@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.2.0
+// @version      0.2.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.2.0",
+    version: "0.2.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -100,7 +100,7 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
     dataVersion: "bundled-poc-2",
-    minimumCoreVersion: "0.2.0",
+    minimumCoreVersion: "0.2.1",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com"],
     animations: [
@@ -201,7 +201,7 @@
   }
 
   const EVENT_PHRASES = Object.freeze([
-    ["effect-declaration", /(?:\b(?:declare(?:d|s|ing)?|announc(?:ed|es|ing)?)\b.*(?:\beffect\b|$)|\beffect\b.*\bactivate(?:d|s|ing)?\b)/i],
+    ["effect-declaration", /(?:\b(?:declare(?:d|s|ing)?|announc(?:ed|es|ing)?)\b.{0,160}\beffect\b|\beffect\b.{0,160}\bactivate(?:d|s|ing)?\b)/i],
     ["normal-summon", /\bnormal summon(?:ed|s|ing)?\b/i],
     ["special-summon", /\bspecial summon(?:ed|s|ing)?\b/i],
     ["fusion-summon", /\bfusion summon(?:ed|s|ing)?\b/i],
@@ -221,6 +221,26 @@
     return match ? { type: match[0], text: normalized } : null;
   }
 
+  function getNewLogText(previous, current) {
+    if (!current || current === previous) return "";
+    if (!previous) return current;
+    if (current.startsWith(previous)) return current.slice(previous.length);
+    if (current.endsWith(previous)) return current.slice(0, current.length - previous.length);
+
+    let prefixLength = 0;
+    const prefixLimit = Math.min(previous.length, current.length);
+    while (prefixLength < prefixLimit && previous[prefixLength] === current[prefixLength]) prefixLength += 1;
+
+    let suffixLength = 0;
+    const suffixLimit = Math.min(previous.length - prefixLength, current.length - prefixLength);
+    while (
+      suffixLength < suffixLimit &&
+      previous[previous.length - 1 - suffixLength] === current[current.length - 1 - suffixLength]
+    ) suffixLength += 1;
+
+    return current.slice(prefixLength, current.length - suffixLength);
+  }
+
   class PublicDuelLogObserver {
     constructor(diagnostics, onEvent) {
       this.diagnostics = diagnostics;
@@ -228,7 +248,7 @@
       this.logObserver = null;
       this.pageObserver = null;
       this.root = null;
-      this.seen = new Set();
+      this.snapshot = "";
       this.scanQueued = false;
     }
 
@@ -244,7 +264,7 @@
       this.logObserver = null;
       this.pageObserver = null;
       this.root = null;
-      this.seen.clear();
+      this.snapshot = "";
     }
 
     #attachIfAvailable() {
@@ -252,7 +272,7 @@
       if (!nextRoot || nextRoot === this.root) return;
       this.logObserver?.disconnect();
       this.root = nextRoot;
-      this.seen.clear();
+      this.snapshot = "";
       this.#scan(true);
       this.logObserver = new MutationObserver(() => this.#queueScan());
       this.logObserver.observe(nextRoot, { childList: true, characterData: true, subtree: true });
@@ -270,17 +290,16 @@
 
     #scan(seedOnly) {
       if (!this.root) return;
-      const lines = this.root.innerText.split(/\r?\n/).map(normalizeLine).filter(Boolean);
-      if (lines.length === 0) this.seen.clear();
-      const occurrences = new Map();
+      const current = this.root.innerText;
+      if (seedOnly) {
+        this.snapshot = current;
+        return;
+      }
+
+      const addedText = getNewLogText(this.snapshot, current);
+      this.snapshot = current;
+      const lines = addedText.split(/\r?\n/).map(normalizeLine).filter(Boolean);
       for (const line of lines) {
-        const normalizedKey = line.toLocaleLowerCase();
-        const occurrence = (occurrences.get(normalizedKey) ?? 0) + 1;
-        occurrences.set(normalizedKey, occurrence);
-        const fingerprint = `${normalizedKey}::${occurrence}`;
-        if (this.seen.has(fingerprint)) continue;
-        this.seen.add(fingerprint);
-        if (seedOnly) continue;
         const event = classifyPublicLogLine(line);
         if (event) {
           this.diagnostics.info("observer", "public duel event detected", { type: event.type, text: event.text });
