@@ -72,6 +72,7 @@ assert(bundle.includes("#duel .token_btn"), "native DuelingBook Token button int
 assert(!tokenMacrosSource.includes("Send("), "Token macros must not call DuelingBook's socket sender");
 assert(!tokenMacrosSource.includes("view: window"), "sandboxed MouseEvents must not pass Tampermonkey's window wrapper as UIEvent.view");
 assert(!tokenMacrosSource.includes("#field .yf-token-badge"), "field Token badges must not obscure or hang off rotated cards");
+assert(!tokenMacrosSource.includes("#preview_txt.yf-token-preview-details"), "Token details must not override DuelingBook's shared preview styling");
 assert(tokenMacrosSource.includes('document.getElementById("preview_txt")'), "custom Token details must use DuelingBook's readable preview panel");
 assert(tokenMacrosSource.includes("#showTokenInNativePreview"), "custom Token artwork must be applied to DuelingBook's native preview");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");

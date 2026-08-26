@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.9.3
+// @version      0.9.4
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.9.3",
+    version: "0.9.4",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1177,11 +1177,6 @@
     #${APP.ids.tokenModal} .yf-token-primary { border-color: #bbf7d0; background: linear-gradient(135deg,#047857,#4338ca); }
     #${APP.ids.tokenToast} { position: fixed; left: 50%; top: 18px; z-index: 2147483647; width: min(520px,calc(100vw - 32px)); transform: translateX(-50%); border: 1px solid #86efac; border-radius: 9px; background: #052e2bec; color: #ecfdf5; padding: 12px 16px; text-align: center; font: 800 14px/1.4 Arial,sans-serif; box-shadow: 0 10px 28px #000c; }
     #${APP.ids.tokenToast}.yf-token-error { border-color: #f87171; background: #450a0aec; color: #fee2e2; }
-    #preview_txt.yf-token-preview-details { overflow: hidden; border: 1px solid #86efac99; border-radius: 7px; background: linear-gradient(145deg,#052e2be8,#172554e8); color: #f8fafc; padding: 9px 10px; box-shadow: inset 0 0 18px #86efac18; font: 700 14px/1.32 Arial,sans-serif; }
-    #preview_txt.yf-token-preview-details strong { display: block; margin-bottom: 4px; color: #dcfce7; font-size: 17px; }
-    #preview_txt.yf-token-preview-details .yf-token-preview-meta { color: #bae6fd; }
-    #preview_txt.yf-token-preview-details .yf-token-preview-stats { margin: 5px 0; color: #fef3c7; font-weight: 900; }
-    #preview_txt.yf-token-preview-details .yf-token-preview-reminder { color: #e2e8f0; font-size: 12px; font-weight: 600; }
     @media (max-width: 650px) { #${APP.ids.tokenButton} { right: 4px; } #${APP.ids.tokenModal} .yf-token-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } #${APP.ids.tokenModal} .yf-token-pair { grid-template-columns: 1fr; } #${APP.ids.tokenModal} .yf-token-details { grid-template-columns: 1fr 1fr; } }
   `;
 
@@ -1477,7 +1472,7 @@
     }
 
     #handleFieldPreviewRequest(event) {
-      const card = event.target?.closest?.("#field .card");
+      const card = event.target?.closest?.(".card");
       if (!card) return;
       const definition = this.variantByCarrier.get(Number(card.dataset.yfTokenCarrier ?? 0));
       clearTimeout(this.previewTimer);
@@ -1503,20 +1498,18 @@
       for (const defense of preview.querySelectorAll(".def_txt")) defense.textContent = String(token.def);
       for (const effect of preview.querySelectorAll(".effect_txt")) effect.textContent = `This Token was Special Summoned by ${recipe.sourceName}.`;
 
-      details.classList.add("yf-token-preview-details");
+      details.classList.remove("yf-token-preview-details");
       details.replaceChildren();
-      const name = document.createElement("strong");
-      name.textContent = token.name;
-      const meta = document.createElement("div");
-      meta.className = "yf-token-preview-meta";
-      meta.textContent = `${token.attribute} • ${token.monsterType} / Token • Level ${token.level}`;
-      const stats = document.createElement("div");
-      stats.className = "yf-token-preview-stats";
-      stats.textContent = `ATK ${token.atk} / DEF ${token.def} • ${token.position} Position`;
-      const reminder = document.createElement("div");
-      reminder.className = "yf-token-preview-reminder";
-      reminder.textContent = `Special Summoned by ${recipe.sourceName}. Custom artwork and details are visible to players using the YugiFaux Companion.`;
-      details.append(name, meta, stats, reminder);
+      const lines = [
+        token.name,
+        `${token.attribute} • ${token.monsterType} / Token • Level ${token.level}`,
+        `ATK ${token.atk} / DEF ${token.def} • ${token.position} Position`,
+        `Special Summoned by ${recipe.sourceName}.`
+      ];
+      lines.forEach((line, index) => {
+        details.append(document.createTextNode(line));
+        if (index + 1 < lines.length) details.append(document.createElement("br"));
+      });
     }
 
     #showToast(message, error = false) {
