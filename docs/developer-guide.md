@@ -20,6 +20,8 @@ src/
   event-observer.js           passive public-log classifier
   animation-player.js         non-blocking presentation layer
   match-launcher.js           guarded league host setup and confirmation
+  token-macros.js             confirmed custom Token recipes and presentation
+  chain-macros.js             fixed visible Chain declarations and avatar flash
   ui.js                       namespaced panel and controls
   main.js                     lifecycle and dependency wiring
   footer.js                   userscript closure
@@ -48,4 +50,4 @@ Core updates use the repository's tracked `dist/yugifaux-companion.user.js` thro
 
 ## Development boundary
 
-Do not hook WebSocket methods, modify DuelingBook action functions, synthesize gameplay clicks, inspect card backs/hand data, enable private-log filters, or send chat messages for synchronization. The only synthetic DuelingBook action outside passive observation is the explicitly confirmed Host click in the match launcher. If a public event is unreliable, add a clearly labeled player-initiated companion control instead.
+Do not hook WebSocket methods, modify DuelingBook action functions, inspect card backs/hand data, enable private-log filters, or send hidden chat messages for synchronization. Player-authorized Chain macros may place a fixed public declaration into DuelingBook's visible duel-chat input and invoke its native Enter handler from the clicked command. The match launcher and Token recipes retain their own explicit confirmation and native-control boundaries. If a public event is unreliable, add a clearly labeled player-initiated companion control instead.

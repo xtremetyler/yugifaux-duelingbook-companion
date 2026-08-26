@@ -6,6 +6,7 @@
   let animationPlayer;
   let matchLauncher;
   let tokenMacros;
+  let chainMacros;
 
   async function persistSettings() {
     await storage.set("settings", state.settings);
@@ -27,6 +28,7 @@
     animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
     matchLauncher = new MatchLauncher(diagnostics);
     tokenMacros = new TokenMacros(diagnostics, () => state.settings);
+    chainMacros = new ChainMacros(diagnostics, () => state.settings);
     logObserver = new PublicDuelLogObserver(diagnostics, handlePublicEvent);
     logObserver.start();
 
@@ -52,8 +54,10 @@
         document.getElementById(APP.ids.overlay)?.remove();
         matchLauncher.close();
         tokenMacros.close();
+        chainMacros.close();
         await persistSettings();
         tokenMacros.refresh();
+        chainMacros.refresh();
         diagnostics.warn("safety", "companion disabled by player");
         ui.refresh();
       },
@@ -63,11 +67,13 @@
         if (key === "enabled" && !value) document.getElementById(APP.ids.overlay)?.remove();
         await persistSettings();
         tokenMacros.refresh();
+        chainMacros.refresh();
         ui.refresh();
       }
     });
     ui.mount();
     tokenMacros.mount();
+    chainMacros.mount();
     await reloadConfig();
     diagnostics.info("bootstrap", "companion initialized", { coreVersion: APP.version });
   }

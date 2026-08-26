@@ -7,6 +7,8 @@ The current build:
 - adds a small `YF` button and collapsible control panel;
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
+- adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 2` through `⛓️ Chain Link 7` chat declarations;
+- flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;
 - supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;
 - presents those Tokens to installed companions as `Bloom Token` (Plant/WIND/Level 2/ATK 0/DEF 0) while leaving DuelingBook's authoritative generic Token state untouched;
 - loads a versioned JSON configuration and falls back to the last valid cache or bundled defaults;
@@ -18,7 +20,7 @@ The current build:
 - resolves Iris's excavation visually by sending three reflected card backs toward the hand, GY, and face-down banishment;
 - stages a psychedelic concert entrance with rising notes, equalizer bars, spotlights, and beat pulses for `Sgt. Pepper's Lonely Hearts Club Band`;
 - includes animation, mute, reduced-motion, diagnostics, and emergency-disable controls;
-- does not read cookies, inspect hidden zones, alter DuelingBook functions, call its socket sender, or send duel data anywhere; Token summons require a player confirmation and two player-selected native zones.
+- does not read cookies, inspect hidden zones, alter DuelingBook functions, call its socket sender, or send duel data anywhere; Token summons require player confirmation and player-selected native zones, while Chain messages use DuelingBook's visible chat input and native Enter handler.
 
 ## Install the proof of concept
 
@@ -29,7 +31,7 @@ The current build:
 5. Click the `YF` button near the lower-left corner.
 6. Use the named preview buttons to test any configured animation without entering a duel.
 
-During an active duel, the `TOKENS` button appears along the right side. Choose `Polyflora Hexbloom`, review the two locked random artworks, confirm, then click each of the two Monster Zones highlighted by DuelingBook.
+During an active duel, `TOKENS` and `CHAIN` buttons appear along the right side. The Chain menu sends one explicit public declaration per button click; it never uses hidden synchronization messages.
 
 Tampermonkey checks the repository's built userscript for core updates. League configuration loads independently from the versioned JSON in `config/companion.sample.json`, allowing data changes without reinstalling the script.
 

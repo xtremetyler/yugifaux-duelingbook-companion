@@ -16,7 +16,7 @@
 | Malicious remote text/HTML | Remote labels use `textContent`; HTML from configuration is unsupported. |
 | Credential leakage | No cookie, password, token, WebSocket, or login-form access. Diagnostics drop credential-like keys. |
 | Hidden-information advantage | The observer reads only text DuelingBook rendered in the visible duel-log container and never changes `Private Info`. |
-| Accidental gameplay action | No gameplay clicks, macros, chat messages, or page-function replacement. Host creation requires the player to click `Confirm & Host` after reviewing every setting. |
+| Accidental gameplay action | No page-function replacement or direct socket calls. Host creation and Token recipes are explicitly confirmed. A Chain message is sent only by clicking its plainly labeled button, through DuelingBook's visible chat input and native Enter handler. |
 | Network exfiltration | The only userscript request is a GET for public configuration from one declared host. No duel data is uploaded. |
 | UI obstruction | Overlay uses `pointer-events: none`, has a bounded duration, and can be removed by emergency disable. |
 | Host/config outage | Last valid config is cached; otherwise bundled defaults load. DuelingBook does not depend on either. |
@@ -38,9 +38,13 @@ Held only in memory while the launcher is open:
 
 - the player-entered match identifier and reviewed host settings.
 
-Not collected or transmitted:
+Not collected or transmitted by the companion:
 
-- usernames, chat, duel-log text, deck/card-zone contents, match identifiers, credentials, cookies, tokens, analytics, or diagnostics.
+- usernames, chat, duel-log text, deck/card-zone contents, match identifiers, credentials, cookies, tokens, analytics, or diagnostics. Fixed Chain declarations are transmitted by DuelingBook itself as ordinary public duel chat after the player clicks a Chain button.
+
+# Chain macro boundary
+
+Chain macros contain only fixed declarations for Chain Links 2 through 7. They never call DuelingBook's socket sender or page globals. A clicked command uses the visible duel-chat input and native Enter handler. The companion observes newly rendered public chat rows only to display an ephemeral chain emoji over the matching public avatar; it does not store chat text or usernames.
 # Token macro boundary
 
 Token macros are hard-coded, reviewed recipes. They do not accept executable actions from remote configuration and do not call DuelingBook's socket sender. After an explicit confirmation, the companion opens DuelingBook's visible native Token gallery, selects a reserved built-in carrier thumbnail, and leaves each native Monster Zone choice to the player. Companion artwork and metadata are presentation-only.

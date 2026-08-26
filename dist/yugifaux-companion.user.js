@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.9.7
+// @version      0.10.0
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.9.7",
+    version: "0.10.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -31,7 +31,10 @@
       launcher: "yf-match-launcher",
       tokenButton: "yf-token-macros-button",
       tokenModal: "yf-token-macros-modal",
-      tokenToast: "yf-token-macros-toast"
+      tokenToast: "yf-token-macros-toast",
+      chainButton: "yf-chain-macros-button",
+      chainMenu: "yf-chain-macros-menu",
+      chainToast: "yf-chain-macros-toast"
     })
   });
 
@@ -1163,7 +1166,7 @@
   ]);
 
   const TOKEN_MACRO_STYLE = `
-    #${APP.ids.tokenButton} { position: fixed; right: 14px; top: 50%; z-index: 2147483645; transform: translateY(-50%); border: 1px solid #86efac; border-radius: 9px 0 0 9px; background: linear-gradient(145deg,#064e3b,#312e81); color: #f0fdf4; padding: 11px 9px; writing-mode: vertical-rl; letter-spacing: .12em; font: 900 12px/1 Arial,sans-serif; box-shadow: 0 5px 20px #000a,0 0 16px #86efac44; cursor: pointer; }
+    #${APP.ids.tokenButton} { position: fixed; right: 14px; top: calc(50% - 49px); z-index: 2147483645; transform: translateY(-50%); border: 1px solid #86efac; border-radius: 9px 0 0 9px; background: linear-gradient(145deg,#064e3b,#312e81); color: #f0fdf4; padding: 11px 9px; writing-mode: vertical-rl; letter-spacing: .12em; font: 900 12px/1 Arial,sans-serif; box-shadow: 0 5px 20px #000a,0 0 16px #86efac44; cursor: pointer; }
     #${APP.ids.tokenButton}[hidden] { display: none; }
     #${APP.ids.tokenButton}:disabled { cursor: wait; opacity: .65; }
     #${APP.ids.tokenModal} { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; box-sizing: border-box; padding: 18px; background: #020617bd; color: #f8fafc; font: 14px/1.45 Arial,sans-serif; }
@@ -1568,6 +1571,210 @@
     }
   }
 
+  const CHAIN_LINKS = Object.freeze([2, 3, 4, 5, 6, 7]);
+
+  function chainLinkMessage(link) {
+    return CHAIN_LINKS.includes(Number(link)) ? `⛓️ Chain Link ${Number(link)}` : "";
+  }
+
+  const CHAIN_MACRO_STYLE = `
+    #${APP.ids.chainButton} { position: fixed; right: 14px; top: calc(50% + 49px); z-index: 2147483645; transform: translateY(-50%); border: 1px solid #f9a8d4; border-radius: 9px 0 0 9px; background: linear-gradient(145deg,#831843,#312e81); color: #fff1f2; padding: 11px 9px; writing-mode: vertical-rl; letter-spacing: .12em; font: 900 12px/1 Arial,sans-serif; box-shadow: 0 5px 20px #000a,0 0 16px #f472b644; cursor: pointer; }
+    #${APP.ids.chainButton}[hidden] { display: none; }
+    #${APP.ids.chainMenu} { position: fixed; right: 58px; top: 50%; z-index: 2147483646; width: 218px; transform: translateY(-50%); border: 1px solid #f9a8d4; border-radius: 12px; background: linear-gradient(145deg,#190b20f5,#172554f5); color: #fff; padding: 12px; box-shadow: 0 16px 44px #000d,0 0 24px #f472b633; font: 14px/1.3 Arial,sans-serif; }
+    #${APP.ids.chainMenu}[hidden] { display: none; }
+    #${APP.ids.chainMenu} strong { display: block; margin-bottom: 9px; color: #fce7f3; text-align: center; font-size: 16px; }
+    #${APP.ids.chainMenu} .yf-chain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #${APP.ids.chainMenu} button { border: 1px solid #a78bfa; border-radius: 8px; background: linear-gradient(135deg,#4c1d95,#9d174d); color: #fff; padding: 9px 7px; cursor: pointer; font-weight: 850; }
+    #${APP.ids.chainMenu} button:hover, #${APP.ids.chainMenu} button:focus-visible { border-color: #fbcfe8; filter: brightness(1.16); }
+    #${APP.ids.chainToast} { position: fixed; right: 58px; top: calc(50% + 140px); z-index: 2147483647; width: min(330px,calc(100vw - 80px)); border: 1px solid #f9a8d4; border-radius: 9px; background: #500724ee; color: #fff1f2; padding: 10px 12px; text-align: center; font: 750 13px/1.35 Arial,sans-serif; box-shadow: 0 8px 24px #000c; }
+    .duel_avatar > .yf-chain-flash { pointer-events: none; position: absolute; inset: 0; z-index: 9999; display: grid; place-items: center; color: #fff; font-size: 68px; line-height: 1; text-shadow: 0 0 7px #fff,0 0 17px #f472b6,0 0 30px #7c3aed; filter: drop-shadow(0 5px 5px #000b); animation: yf-chain-avatar-flash 1050ms ease-out both; }
+    .duel_avatar > .yf-chain-flash.yf-chain-reduced { animation: yf-chain-avatar-fade 900ms ease-out both; }
+    @keyframes yf-chain-avatar-flash { 0% { opacity: 0; transform: scale(.25) rotate(-25deg); } 22% { opacity: 1; transform: scale(1.24) rotate(8deg); } 45% { transform: scale(.92) rotate(-4deg); } 68% { opacity: 1; transform: scale(1.1) rotate(3deg); } 100% { opacity: 0; transform: scale(.72) rotate(0); } }
+    @keyframes yf-chain-avatar-fade { 0%,100% { opacity: 0; } 20%,70% { opacity: 1; } }
+    @media (max-width: 650px) { #${APP.ids.chainButton} { right: 4px; } #${APP.ids.chainMenu} { right: 48px; } }
+  `;
+
+  class ChainMacros {
+    constructor(diagnostics, getSettings) {
+      this.diagnostics = diagnostics;
+      this.getSettings = getSettings;
+      this.button = null;
+      this.menu = null;
+      this.toast = null;
+      this.chatObserver = null;
+      this.seenMessageIds = new Set();
+    }
+
+    mount() {
+      if (document.getElementById(APP.ids.chainButton)) return;
+      const style = document.createElement("style");
+      style.textContent = CHAIN_MACRO_STYLE;
+      document.head.append(style);
+
+      this.button = document.createElement("button");
+      this.button.id = APP.ids.chainButton;
+      this.button.type = "button";
+      this.button.textContent = "CHAIN";
+      this.button.title = "Open YugiFaux Chain messages";
+      this.button.addEventListener("click", () => this.toggle());
+      document.body.append(this.button);
+
+      this.menu = document.createElement("section");
+      this.menu.id = APP.ids.chainMenu;
+      this.menu.hidden = true;
+      this.menu.setAttribute("aria-label", "Chain messages");
+      const title = document.createElement("strong");
+      title.textContent = "⛓️ Declare Chain Link";
+      const grid = document.createElement("div");
+      grid.className = "yf-chain-grid";
+      for (const link of CHAIN_LINKS) {
+        const command = document.createElement("button");
+        command.type = "button";
+        command.textContent = `Chain Link ${link}`;
+        command.addEventListener("click", () => this.#send(link));
+        grid.append(command);
+      }
+      this.menu.append(title, grid);
+      document.body.append(this.menu);
+
+      document.addEventListener("pointerdown", (event) => {
+        if (this.menu.hidden || this.menu.contains(event.target) || this.button.contains(event.target)) return;
+        this.close();
+      });
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape") this.close(); });
+      this.#observeChat();
+      setInterval(() => this.refresh(), 750);
+      this.refresh();
+    }
+
+    refresh() {
+      if (!this.button) return;
+      const enabled = Boolean(this.getSettings()?.enabled);
+      const canChat = this.#isVisible(document.querySelector("#duel .cin_txt"));
+      this.button.hidden = !enabled || !canChat;
+      if (this.button.hidden) this.close();
+    }
+
+    toggle() {
+      if (!this.menu || this.button?.hidden) return;
+      this.menu.hidden = !this.menu.hidden;
+      this.button.setAttribute("aria-expanded", String(!this.menu.hidden));
+      if (!this.menu.hidden) this.menu.querySelector("button")?.focus();
+    }
+
+    close() {
+      if (!this.menu) return;
+      this.menu.hidden = true;
+      this.button?.setAttribute("aria-expanded", "false");
+    }
+
+    #send(link) {
+      const message = chainLinkMessage(link);
+      const input = document.querySelector("#duel .cin_txt");
+      if (!message || !(input instanceof HTMLInputElement) || !this.#isVisible(input) || input.disabled) {
+        this.#showToast("DuelingBook’s duel chat is unavailable.");
+        return;
+      }
+      if (input.value.trim()) {
+        this.#showToast("Your chat box already contains text. Send or clear it before using a Chain message.");
+        input.focus();
+        return;
+      }
+
+      input.focus();
+      input.value = message;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+        cancelable: true
+      }));
+      this.close();
+      setTimeout(() => {
+        if (input.value !== message) return;
+        this.#showToast("The message is ready in DuelingBook’s chat box. Press Enter to send it.");
+        input.focus();
+      }, 120);
+      this.diagnostics.info("chain-macro", "player requested visible chain message", { link: Number(link) });
+    }
+
+    #observeChat() {
+      const chat = document.querySelector("#duel .cout_txt");
+      if (!chat || this.chatObserver) return;
+      for (const message of chat.querySelectorAll("font[message-id]")) {
+        const id = message.getAttribute("message-id");
+        if (id) this.#rememberMessage(id);
+      }
+      this.chatObserver = new MutationObserver((records) => {
+        for (const record of records) for (const node of record.addedNodes) this.#inspectChatNode(node);
+      });
+      this.chatObserver.observe(chat, { childList: true, subtree: true });
+    }
+
+    #inspectChatNode(node) {
+      if (!(node instanceof Element) || !this.getSettings()?.enabled) return;
+      const rows = [];
+      if (node.matches("span")) rows.push(node);
+      rows.push(...node.querySelectorAll("span"));
+      for (const row of rows) {
+        const messageElement = row.querySelector("font[message-id]");
+        if (!messageElement) continue;
+        const messageId = messageElement.getAttribute("message-id");
+        if (messageId && this.seenMessageIds.has(messageId)) continue;
+        if (messageId) this.#rememberMessage(messageId);
+        const message = messageElement.textContent.trim();
+        if (!/^⛓️\s*Chain Link [2-7]$/iu.test(message)) continue;
+        const username = row.querySelector("b font")?.textContent?.replace(/:\s*$/, "").trim();
+        if (username) this.#flashAvatar(username);
+      }
+    }
+
+    #rememberMessage(messageId) {
+      this.seenMessageIds.add(String(messageId));
+      if (this.seenMessageIds.size <= 150) return;
+      this.seenMessageIds.delete(this.seenMessageIds.values().next().value);
+    }
+
+    #flashAvatar(username) {
+      const normalized = username.trim().toLowerCase();
+      let avatar = null;
+      for (const candidate of document.querySelectorAll("#avatar1, #avatar2, #avatar3, #avatar4")) {
+        const names = (candidate.querySelector(".username_txt")?.textContent ?? "")
+          .split(/\s*(?:&|\/)\s*/)
+          .map((name) => name.trim().toLowerCase());
+        if (names.includes(normalized)) { avatar = candidate; break; }
+      }
+      if (!avatar) return;
+      avatar.querySelector(":scope > .yf-chain-flash")?.remove();
+      const flash = document.createElement("div");
+      flash.className = "yf-chain-flash";
+      if (this.getSettings()?.reducedMotion) flash.classList.add("yf-chain-reduced");
+      flash.textContent = "⛓️";
+      avatar.append(flash);
+      flash.addEventListener("animationend", () => flash.remove(), { once: true });
+      setTimeout(() => flash.remove(), 1400);
+    }
+
+    #showToast(message) {
+      this.toast?.remove();
+      this.toast = document.createElement("div");
+      this.toast.id = APP.ids.chainToast;
+      this.toast.textContent = message;
+      document.body.append(this.toast);
+      const current = this.toast;
+      setTimeout(() => { if (this.toast === current) { current.remove(); this.toast = null; } }, 5200);
+    }
+
+    #isVisible(element) {
+      if (!(element instanceof HTMLElement) || element.hidden) return false;
+      const style = getComputedStyle(element);
+      return style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0" && element.getClientRects().length > 0;
+    }
+  }
+
   const STYLE = `
     #${APP.ids.button} { position: fixed; left: 18px; bottom: 18px; z-index: 2147483645; border: 1px solid #d6b55b; border-radius: 999px; background: #111827; color: #f8e7aa; padding: 9px 13px; font: 700 13px/1 Arial,sans-serif; cursor: pointer; box-shadow: 0 4px 16px #0008; }
     #${APP.ids.panel} { position: fixed; left: 18px; bottom: 62px; z-index: 2147483646; box-sizing: border-box; width: min(350px, calc(100vw - 36px)); max-height: min(570px, calc(100vh - 90px)); overflow: auto; border: 1px solid #d6b55b; border-radius: 10px; background: #111827f5; color: #f8fafc; padding: 14px; font: 13px/1.4 Arial,sans-serif; box-shadow: 0 10px 34px #000b; }
@@ -1865,6 +2072,7 @@
   let animationPlayer;
   let matchLauncher;
   let tokenMacros;
+  let chainMacros;
 
   async function persistSettings() {
     await storage.set("settings", state.settings);
@@ -1886,6 +2094,7 @@
     animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
     matchLauncher = new MatchLauncher(diagnostics);
     tokenMacros = new TokenMacros(diagnostics, () => state.settings);
+    chainMacros = new ChainMacros(diagnostics, () => state.settings);
     logObserver = new PublicDuelLogObserver(diagnostics, handlePublicEvent);
     logObserver.start();
 
@@ -1911,8 +2120,10 @@
         document.getElementById(APP.ids.overlay)?.remove();
         matchLauncher.close();
         tokenMacros.close();
+        chainMacros.close();
         await persistSettings();
         tokenMacros.refresh();
+        chainMacros.refresh();
         diagnostics.warn("safety", "companion disabled by player");
         ui.refresh();
       },
@@ -1922,11 +2133,13 @@
         if (key === "enabled" && !value) document.getElementById(APP.ids.overlay)?.remove();
         await persistSettings();
         tokenMacros.refresh();
+        chainMacros.refresh();
         ui.refresh();
       }
     });
     ui.mount();
     tokenMacros.mount();
+    chainMacros.mount();
     await reloadConfig();
     diagnostics.info("bootstrap", "companion initialized", { coreVersion: APP.version });
   }

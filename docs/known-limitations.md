@@ -16,3 +16,8 @@
 - Players without the companion see DuelingBook's corresponding built-in carrier Token artwork.
 - Bloom artwork variants currently reserve built-in DuelingBook Token IDs 1 through 6 as synchronization carriers. Manually summoning those same carrier images outside the macro can therefore receive a Bloom skin on installed companions.
 - Token macros use DuelingBook's visible Token selector and zone-selection controls. A DuelingBook UI change can safely stop the macro until its selectors are updated.
+
+# Chain macro limitations
+
+- Chain messages rely on DuelingBook's visible `#duel .cin_txt` input and native Enter-key handler. If that interface changes, the fixed message remains in the chat box for the player to send manually.
+- The avatar flash is companion-only and is synchronized from the newly rendered public `⛓️ Chain Link N` chat row. Players without the companion still see the ordinary chat declaration.

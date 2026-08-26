@@ -9,6 +9,7 @@ const manifest = JSON.parse(await readFile(resolve(root, "config/animations.samp
 const observerSource = await readFile(resolve(root, "src/event-observer.js"), "utf8");
 const launcherSource = await readFile(resolve(root, "src/match-launcher.js"), "utf8");
 const tokenMacrosSource = await readFile(resolve(root, "src/token-macros.js"), "utf8");
+const chainMacrosSource = await readFile(resolve(root, "src/chain-macros.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
   `${observerSource}\nglobalThis.observerTests = { classifyPublicLogLine, getNewLogText };`,
@@ -25,6 +26,13 @@ const tokenMacroTestContext = {
 vm.runInNewContext(
   `${tokenMacrosSource}\nglobalThis.tokenMacroTests = { BLOOM_TOKEN_VARIANTS, TOKEN_RECIPES, chooseDistinctTokenVariants, tokenCarrierFromUrl };`,
   tokenMacroTestContext
+);
+const chainMacroTestContext = {
+  APP: { ids: { chainButton: "test-chain-button", chainMenu: "test-chain-menu", chainToast: "test-chain-toast" } }
+};
+vm.runInNewContext(
+  `${chainMacrosSource}\nglobalThis.chainMacroTests = { CHAIN_LINKS, chainLinkMessage };`,
+  chainMacroTestContext
 );
 
 const failures = [];
@@ -66,6 +74,7 @@ assert(bundle.includes("YugiFAUX League Match - DM for info"), "approved league 
 assert(bundle.includes('formatValue: "cu"'), "Custom Cards host format is missing from the launcher");
 assert(bundle.includes('matchTypeValue: "m"'), "2 out of 3 host type is missing from the launcher");
 assert(bundle.includes("class TokenMacros"), "Token macro controller is missing from the bundle");
+assert(bundle.includes("class ChainMacros"), "Chain macro controller is missing from the bundle");
 assert(bundle.includes("Polyflora Hexbloom"), "Polyflora Token recipe is missing from the bundle");
 assert(bundle.includes("Bloom Token"), "Bloom Token definition is missing from the bundle");
 assert(bundle.includes("#duel .token_btn"), "native DuelingBook Token button integration is missing");
@@ -79,6 +88,11 @@ assert(tokenMacrosSource.includes('preview.querySelector("img.pic")'), "custom T
 assert(tokenMacrosSource.includes("[data-overlayscrollbars-viewport]"), "Token details must preserve DuelingBook's native scrollbar viewport");
 assert(tokenMacrosSource.includes('document.addEventListener("mousemove"'), "Token preview must remain synchronized across the full field card");
 assert(tokenMacrosSource.includes("repeat(2,minmax(0,160px))"), "Token confirmation artwork must remain compact");
+assert(!chainMacrosSource.includes("Send("), "Chain macros must not call DuelingBook's socket sender");
+assert(!chainMacrosSource.includes("unsafeWindow"), "Chain macros must not access DuelingBook page globals");
+assert(chainMacrosSource.includes('#duel .cin_txt'), "Chain macros must use DuelingBook's visible duel chat input");
+assert(chainMacrosSource.includes('new KeyboardEvent("keydown"'), "Chain macros must use DuelingBook's native Enter handler");
+assert(chainMacrosSource.includes('font[message-id]'), "Chain flashes must synchronize from visible public chat messages");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
 assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
@@ -96,6 +110,10 @@ const painfulPreferenceActivation = "Yugi Activated \"Painful Preference\".";
 const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
 const { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier } = launcherTestContext.launcherTests;
 const { BLOOM_TOKEN_VARIANTS, TOKEN_RECIPES, chooseDistinctTokenVariants, tokenCarrierFromUrl } = tokenMacroTestContext.tokenMacroTests;
+const { CHAIN_LINKS, chainLinkMessage } = chainMacroTestContext.chainMacroTests;
+assert(JSON.stringify([...CHAIN_LINKS]) === JSON.stringify([2, 3, 4, 5, 6, 7]), "Chain menu must provide links 2 through 7");
+assert(chainLinkMessage(2) === "⛓️ Chain Link 2" && chainLinkMessage(7) === "⛓️ Chain Link 7", "Chain messages must use the approved emoji prefix");
+assert(chainLinkMessage(1) === "" && chainLinkMessage(8) === "", "unsupported Chain Link messages must be rejected");
 assert(validateMatchIdentifier(" YF-2026-001 ").identifier === "YF-2026-001", "valid match identifiers must be normalized");
 assert(validateMatchIdentifier("   ").valid === false, "blank match identifiers must be rejected");
 assert(validateMatchIdentifier("<script>").valid === false, "unsafe match identifier characters must be rejected");
