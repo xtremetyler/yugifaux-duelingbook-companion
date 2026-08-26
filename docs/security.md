@@ -41,3 +41,6 @@ Held only in memory while the launcher is open:
 Not collected or transmitted:
 
 - usernames, chat, duel-log text, deck/card-zone contents, match identifiers, credentials, cookies, tokens, analytics, or diagnostics.
+# Token macro boundary
+
+Token macros are hard-coded, reviewed recipes. They do not accept executable actions from remote configuration and do not call DuelingBook's socket sender. After an explicit confirmation, the companion opens DuelingBook's visible native Token gallery, selects a reserved built-in carrier thumbnail, and leaves each native Monster Zone choice to the player. Companion artwork and metadata are presentation-only.

@@ -8,6 +8,7 @@ const config = JSON.parse(await readFile(resolve(root, "config/companion.sample.
 const manifest = JSON.parse(await readFile(resolve(root, "config/animations.sample.json"), "utf8"));
 const observerSource = await readFile(resolve(root, "src/event-observer.js"), "utf8");
 const launcherSource = await readFile(resolve(root, "src/match-launcher.js"), "utf8");
+const tokenMacrosSource = await readFile(resolve(root, "src/token-macros.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
   `${observerSource}\nglobalThis.observerTests = { classifyPublicLogLine, getNewLogText };`,
@@ -17,6 +18,13 @@ const launcherTestContext = {};
 vm.runInNewContext(
   `${launcherSource}\nglobalThis.launcherTests = { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier };`,
   launcherTestContext
+);
+const tokenMacroTestContext = {
+  APP: { ids: { tokenButton: "test-token-button", tokenModal: "test-token-modal", tokenToast: "test-token-toast" } }
+};
+vm.runInNewContext(
+  `${tokenMacrosSource}\nglobalThis.tokenMacroTests = { BLOOM_TOKEN_VARIANTS, TOKEN_RECIPES, chooseDistinctTokenVariants, tokenCarrierFromUrl };`,
+  tokenMacroTestContext
 );
 
 const failures = [];
@@ -57,6 +65,11 @@ assert(bundle.includes("Confirm & Host"), "launcher confirmation gate is missing
 assert(bundle.includes("YugiFAUX League Match - DM for info"), "approved league duel note is missing from the bundle");
 assert(bundle.includes('formatValue: "cu"'), "Custom Cards host format is missing from the launcher");
 assert(bundle.includes('matchTypeValue: "m"'), "2 out of 3 host type is missing from the launcher");
+assert(bundle.includes("class TokenMacros"), "Token macro controller is missing from the bundle");
+assert(bundle.includes("Polyflora Hexbloom"), "Polyflora Token recipe is missing from the bundle");
+assert(bundle.includes("Bloom Token"), "Bloom Token definition is missing from the bundle");
+assert(bundle.includes("#duel .token_btn"), "native DuelingBook Token button integration is missing");
+assert(!tokenMacrosSource.includes("Send("), "Token macros must not call DuelingBook's socket sender");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
 assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
@@ -73,11 +86,18 @@ const pepperDeclaration = "Yugi declared the effect of Sgt. Pepper's Lonely Hear
 const painfulPreferenceActivation = "Yugi Activated \"Painful Preference\".";
 const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
 const { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier } = launcherTestContext.launcherTests;
+const { BLOOM_TOKEN_VARIANTS, TOKEN_RECIPES, chooseDistinctTokenVariants, tokenCarrierFromUrl } = tokenMacroTestContext.tokenMacroTests;
 assert(validateMatchIdentifier(" YF-2026-001 ").identifier === "YF-2026-001", "valid match identifiers must be normalized");
 assert(validateMatchIdentifier("   ").valid === false, "blank match identifiers must be rejected");
 assert(validateMatchIdentifier("<script>").valid === false, "unsafe match identifier characters must be rejected");
 assert(LEAGUE_MATCH_DEFAULTS.duelNote === "YugiFAUX League Match - DM for info", "league duel note must remain exact");
 assert(LEAGUE_MATCH_DEFAULTS.formatValue === "cu" && LEAGUE_MATCH_DEFAULTS.matchTypeValue === "m", "league format defaults must remain fixed");
+const deterministicVariants = chooseDistinctTokenVariants(BLOOM_TOKEN_VARIANTS, 2, () => 0);
+assert(deterministicVariants.length === 2, "Polyflora must select two Token artworks");
+assert(deterministicVariants[0].carrierId !== deterministicVariants[1].carrierId, "Polyflora Token artwork selection must not contain duplicates");
+assert(TOKEN_RECIPES[0]?.count === 2 && TOKEN_RECIPES[0]?.token?.position === "Defense", "Polyflora must summon exactly two Defense Position Tokens");
+assert(tokenCarrierFromUrl("https://images.duelingbook.com/tokens/6.jpg") === 6, "native Token carrier URLs must be recognized");
+assert(tokenCarrierFromUrl("https://res.cloudinary.com/example/token.jpg") === null, "non-DuelingBook artwork must not be treated as a carrier");
 assert(
   classifyPublicLogLine(getNewLogText(ashDeclaration, `${ashDeclaration}\n${normalSummon}`))?.type === "normal-summon",
   "a summon after Ash Blossom must not replay the Ash overlay"

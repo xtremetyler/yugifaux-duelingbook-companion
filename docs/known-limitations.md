@@ -10,3 +10,9 @@
 - The standalone animation manifest is an example for the next extraction step; Phase 1 embeds its single mapping in the main configuration.
 - The update URL tracks the `main` branch. Tagged release URLs and a release workflow should be considered after the proof of concept stabilizes.
 - Match launching, reminders, introductions, judge tools, streamer mode, and analytics are out of scope for this pass.
+# Token macro limitations
+
+- Custom Token names, artwork, Level, Attribute, Type, and stat labels are companion presentation. DuelingBook still treats each summoned card as a generic Token.
+- Players without the companion see DuelingBook's corresponding built-in carrier Token artwork.
+- Bloom artwork variants currently reserve built-in DuelingBook Token IDs 1 through 6 as synchronization carriers. Manually summoning those same carrier images outside the macro can therefore receive a Bloom skin on installed companions.
+- Token macros use DuelingBook's visible Token selector and zone-selection controls. A DuelingBook UI change can safely stop the macro until its selectors are updated.

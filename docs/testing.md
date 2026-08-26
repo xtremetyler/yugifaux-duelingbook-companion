@@ -41,3 +41,16 @@ Use two Chrome/Edge profiles or two separate browsers with Tampermonkey installe
 ## Evidence to retain
 
 Keep only sanitized results: core/data versions, browser versions, event wording with player names removed, timing measurements, duplicate count, and errors. Do not retain credentials, cookies, hidden cards, private chat, or private-log content.
+# Polyflora Token macro
+
+Use two consenting accounts with version 0.9.0 or newer in an unrated Custom Cards duel.
+
+1. Leave at least two Main Monster Zones open for the initiating player.
+2. Click the right-side **TOKENS** button and choose **Polyflora Hexbloom**.
+3. Confirm that exactly two different Bloom artworks appear and that there is no reroll control.
+4. Close and reopen the popup before summoning; confirm the same draft pair remains selected.
+5. Confirm the summon, then click one of DuelingBook's highlighted Monster Zones for each Token.
+6. Verify both Tokens are in Defense Position and use the selected companion artwork on both installed clients.
+7. Hover each Token and verify its companion label identifies `Bloom Token`, WIND, Level 2, and 0/0.
+8. Repeat with only one open Monster Zone and confirm the workflow stops without summoning either Token.
+9. Repeat on a client without the companion and verify it sees ordinary DuelingBook Token artwork while the authoritative field placement remains correct.

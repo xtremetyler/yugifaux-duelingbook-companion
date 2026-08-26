@@ -12,6 +12,7 @@ const sources = [
   "src/event-observer.js",
   "src/animation-player.js",
   "src/match-launcher.js",
+  "src/token-macros.js",
   "src/ui.js",
   "src/main.js",
   "src/footer.js"

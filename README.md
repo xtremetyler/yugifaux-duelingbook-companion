@@ -6,6 +6,9 @@ The current build:
 
 - adds a small `YF` button and collapsible control panel;
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
+- adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
+- supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;
+- presents those Tokens to installed companions as `Bloom Token` (Plant/WIND/Level 2/ATK 0/DEF 0) while leaving DuelingBook's authoritative generic Token state untouched;
 - loads a versioned JSON configuration and falls back to the last valid cache or bundled defaults;
 - passively observes visible public text added to DuelingBook's duel log;
 - recognizes `Ash Blossom & Lonely Spring` when a visible public log line is classified as an effect declaration;
@@ -15,7 +18,7 @@ The current build:
 - resolves Iris's excavation visually by sending three reflected card backs toward the hand, GY, and face-down banishment;
 - stages a psychedelic concert entrance with rising notes, equalizer bars, spotlights, and beat pulses for `Sgt. Pepper's Lonely Hearts Club Band`;
 - includes animation, mute, reduced-motion, diagnostics, and emergency-disable controls;
-- does not automate gameplay, read cookies, inspect hidden zones, alter DuelingBook functions, or send duel data anywhere.
+- does not read cookies, inspect hidden zones, alter DuelingBook functions, call its socket sender, or send duel data anywhere; Token summons require a player confirmation and two player-selected native zones.
 
 ## Install the proof of concept
 
@@ -25,6 +28,8 @@ The current build:
 4. Open `https://www.duelingbook.com/`.
 5. Click the `YF` button near the lower-left corner.
 6. Use the named preview buttons to test any configured animation without entering a duel.
+
+During an active duel, the `TOKENS` button appears along the right side. Choose `Polyflora Hexbloom`, review the two locked random artworks, confirm, then click each of the two Monster Zones highlighted by DuelingBook.
 
 Tampermonkey checks the repository's built userscript for core updates. League configuration loads independently from the versioned JSON in `config/companion.sample.json`, allowing data changes without reinstalling the script.
 
