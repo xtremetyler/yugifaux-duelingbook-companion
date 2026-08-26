@@ -95,6 +95,7 @@
       const observer = new MutationObserver((records) => this.#observeTokenChanges(records));
       observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
       document.addEventListener("mouseover", (event) => this.#handleFieldPreviewRequest(event), true);
+      document.addEventListener("mousemove", (event) => this.#handleFieldPreviewRequest(event), true);
       document.addEventListener("click", (event) => this.#handleFieldPreviewRequest(event), true);
       this.#scanForTokenCarriers(document);
       setInterval(() => this.refresh(), 750);
@@ -351,7 +352,7 @@
         return;
       }
       // Let DuelingBook populate its normal preview first, then replace only its presentation.
-      this.previewTimer = setTimeout(() => this.#showTokenInNativePreview(definition), 35);
+      this.previewTimer = setTimeout(() => this.#showTokenInNativePreview(definition), 0);
     }
 
     #showTokenInNativePreview(definition) {
@@ -360,16 +361,18 @@
       if (!preview || !details || !definition) return;
       const { recipe, variant } = definition;
       const token = recipe.token;
-      const artwork = preview.querySelector("img.image, .image img");
-      if (artwork instanceof HTMLImageElement) artwork.src = variant.artworkUrl;
+      const artwork = preview.querySelector("img.pic");
+      if (artwork) artwork.setAttribute("src", variant.artworkUrl);
       for (const name of preview.querySelectorAll(".name_txt, .name2_txt")) name.textContent = token.name;
       for (const type of preview.querySelectorAll(".type_txt")) type.textContent = `[${token.monsterType.toUpperCase()} / TOKEN]`;
-      for (const attack of preview.querySelectorAll(".atk_txt")) attack.textContent = String(token.atk);
-      for (const defense of preview.querySelectorAll(".def_txt")) defense.textContent = String(token.def);
+      for (const attack of preview.querySelectorAll(".card_atk_txt")) attack.textContent = String(token.atk);
+      for (const defense of preview.querySelectorAll(".card_def_txt")) defense.textContent = String(token.def);
       for (const effect of preview.querySelectorAll(".effect_txt")) effect.textContent = `This Token was Special Summoned by ${recipe.sourceName}.`;
 
       details.classList.remove("yf-token-preview-details");
-      details.replaceChildren();
+      const scrollViewport = details.querySelector("[data-overlayscrollbars-viewport]");
+      const content = scrollViewport ?? details;
+      content.replaceChildren();
       const lines = [
         token.name,
         `${token.attribute} • ${token.monsterType} / Token • Level ${token.level}`,
@@ -377,9 +380,10 @@
         `Special Summoned by ${recipe.sourceName}.`
       ];
       lines.forEach((line, index) => {
-        details.append(document.createTextNode(line));
-        if (index + 1 < lines.length) details.append(document.createElement("br"));
+        content.append(document.createTextNode(line));
+        if (index + 1 < lines.length) content.append(document.createElement("br"));
       });
+      if (scrollViewport) scrollViewport.scrollTop = 0;
     }
 
     #showToast(message, error = false) {
