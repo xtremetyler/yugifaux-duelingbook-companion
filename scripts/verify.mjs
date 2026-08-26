@@ -78,6 +78,7 @@ assert(tokenMacrosSource.includes("#showTokenInNativePreview"), "custom Token ar
 assert(tokenMacrosSource.includes('preview.querySelector("img.pic")'), "custom Token artwork must target DuelingBook's native preview image");
 assert(tokenMacrosSource.includes("[data-overlayscrollbars-viewport]"), "Token details must preserve DuelingBook's native scrollbar viewport");
 assert(tokenMacrosSource.includes('document.addEventListener("mousemove"'), "Token preview must remain synchronized across the full field card");
+assert(tokenMacrosSource.includes("repeat(2,minmax(0,160px))"), "Token confirmation artwork must remain compact");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
 assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");

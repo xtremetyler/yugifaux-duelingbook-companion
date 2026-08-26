@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.9.5
+// @version      0.9.6
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.9.5",
+    version: "0.9.6",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1156,6 +1156,7 @@
     #${APP.ids.tokenModal} { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; box-sizing: border-box; padding: 18px; background: #020617bd; color: #f8fafc; font: 14px/1.45 Arial,sans-serif; }
     #${APP.ids.tokenModal} * { box-sizing: border-box; }
     #${APP.ids.tokenModal} .yf-token-dialog { width: min(720px,calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; border: 1px solid #86efac; border-radius: 15px; padding: 18px; background: linear-gradient(145deg,#061b17fa,#172554fa 58%,#3b1750fa); box-shadow: 0 24px 80px #000e,0 0 32px #86efac33; }
+    #${APP.ids.tokenModal} .yf-token-dialog.yf-token-recipe-dialog { width: min(600px,calc(100vw - 32px)); }
     #${APP.ids.tokenModal} header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #86efac55; padding-bottom: 10px; }
     #${APP.ids.tokenModal} h2 { margin: 0; color: #ecfdf5; font-family: Georgia,serif; }
     #${APP.ids.tokenModal} p { color: #dbeafe; }
@@ -1166,7 +1167,7 @@
     #${APP.ids.tokenModal} .yf-token-source { display: grid; align-content: start; gap: 7px; width: 100%; min-width: 0; border-color: #86efac88; padding: 7px; text-align: left; background: linear-gradient(145deg,#064e3b99,#312e8199); }
     #${APP.ids.tokenModal} .yf-token-source img { width: 100%; aspect-ratio: 1; border-radius: 6px; object-fit: cover; object-position: center 32%; box-shadow: 0 5px 13px #0009; }
     #${APP.ids.tokenModal} .yf-token-source strong { display: block; min-width: 0; overflow-wrap: anywhere; color: #f0fdf4; font-size: 12px; line-height: 1.2; }
-    #${APP.ids.tokenModal} .yf-token-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+    #${APP.ids.tokenModal} .yf-token-pair { display: grid; grid-template-columns: repeat(2,minmax(0,160px)); justify-content: center; gap: 12px; margin: 14px 0; }
     #${APP.ids.tokenModal} .yf-token-preview { overflow: hidden; border: 1px solid #86efac88; border-radius: 11px; background: #0f172a; }
     #${APP.ids.tokenModal} .yf-token-preview img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
     #${APP.ids.tokenModal} .yf-token-preview span { display: block; padding: 9px; color: #dcfce7; text-align: center; font-weight: 800; }
@@ -1177,7 +1178,7 @@
     #${APP.ids.tokenModal} .yf-token-primary { border-color: #bbf7d0; background: linear-gradient(135deg,#047857,#4338ca); }
     #${APP.ids.tokenToast} { position: fixed; left: 50%; top: 18px; z-index: 2147483647; width: min(520px,calc(100vw - 32px)); transform: translateX(-50%); border: 1px solid #86efac; border-radius: 9px; background: #052e2bec; color: #ecfdf5; padding: 12px 16px; text-align: center; font: 800 14px/1.4 Arial,sans-serif; box-shadow: 0 10px 28px #000c; }
     #${APP.ids.tokenToast}.yf-token-error { border-color: #f87171; background: #450a0aec; color: #fee2e2; }
-    @media (max-width: 650px) { #${APP.ids.tokenButton} { right: 4px; } #${APP.ids.tokenModal} .yf-token-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } #${APP.ids.tokenModal} .yf-token-pair { grid-template-columns: 1fr; } #${APP.ids.tokenModal} .yf-token-details { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 650px) { #${APP.ids.tokenButton} { right: 4px; } #${APP.ids.tokenModal} .yf-token-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } #${APP.ids.tokenModal} .yf-token-pair { grid-template-columns: minmax(0,160px); } #${APP.ids.tokenModal} .yf-token-details { grid-template-columns: 1fr 1fr; } }
   `;
 
   function chooseDistinctTokenVariants(variants, count, random = Math.random) {
@@ -1279,6 +1280,7 @@
       this.close();
       this.modal = this.#createModal(recipe.sourceName);
       const card = this.modal.querySelector(".yf-token-dialog");
+      card.classList.add("yf-token-recipe-dialog");
       const effect = document.createElement("p");
       effect.textContent = recipe.effectText;
       const pair = document.createElement("div");
