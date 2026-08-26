@@ -7,8 +7,8 @@
 // @license      MIT
 // @homepageURL  https://github.com/xtremetyler/yugifaux-duelingbook-companion
 // @supportURL   https://github.com/xtremetyler/yugifaux-duelingbook-companion/issues
-// @updateURL    https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/dist/yugifaux-companion.user.js
-// @downloadURL  https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/dist/yugifaux-companion.user.js
+// @updateURL    https://github.com/xtremetyler/yugifaux-duelingbook-companion/raw/refs/heads/main/dist/yugifaux-companion.user.js
+// @downloadURL  https://github.com/xtremetyler/yugifaux-duelingbook-companion/raw/refs/heads/main/dist/yugifaux-companion.user.js
 // @match        https://www.duelingbook.com/*
 // @run-at       document-idle
 // @grant        GM.getValue

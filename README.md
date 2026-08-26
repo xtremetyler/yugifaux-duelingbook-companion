@@ -23,7 +23,7 @@ The current build:
 ## Install the proof of concept
 
 1. Install Tampermonkey in current Chrome or Edge.
-2. Open the [raw userscript](https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/dist/yugifaux-companion.user.js).
+2. Open the [raw userscript](https://github.com/xtremetyler/yugifaux-duelingbook-companion/raw/refs/heads/main/dist/yugifaux-companion.user.js).
 3. Approve the installation in Tampermonkey.
 4. Open `https://www.duelingbook.com/`.
 5. Click the `YF` button near the lower-left corner.
