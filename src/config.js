@@ -1,7 +1,7 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-2",
-    minimumCoreVersion: "0.2.1",
+    dataVersion: "bundled-poc-3",
+    minimumCoreVersion: "0.3.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com"],
     animations: [
@@ -15,6 +15,19 @@
           subtitle: "Effect Declared",
           accentColor: "#f3a6c8",
           durationMs: 3600
+        },
+        frequency: "every-event"
+      },
+      {
+        id: "polyflora-hexbloom-effect",
+        trigger: { eventType: "effect-declaration", cardName: "Polyflora Hexbloom" },
+        presentation: {
+          preset: "arcane-bloom-v1",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787763973/polyflora.png",
+          title: "Polyflora Hexbloom",
+          subtitle: "Pendulum Effect Declared",
+          accentColor: "#8ee6b0",
+          durationMs: 4600
         },
         frequency: "every-event"
       }
@@ -38,7 +51,7 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
-      if (!["title-card-v1", "petal-bloom-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
         errors.push(`animations[${index}].presentation.preset is unsupported.`);
       }
       if (item?.presentation?.assetUrl) {

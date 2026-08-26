@@ -27,9 +27,9 @@
     logObserver.start();
 
     ui = new CompanionUI(storage, diagnostics, () => state, {
-      simulate() {
+      preview(cardName) {
         animationPlayer.resetDuel();
-        handlePublicEvent({ type: "effect-declaration", text: "Test Player declared the effect of Ash Blossom & Lonely Spring" });
+        handlePublicEvent({ type: "effect-declaration", text: `Test Player declared the effect of ${cardName}` });
       },
       reloadConfig,
       async emergencyDisable() {

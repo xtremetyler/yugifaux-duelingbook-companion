@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "manifestVersion": "poc-2026-08-26.2",
+  "manifestVersion": "poc-2026-08-26.3",
   "animations": [
     {
       "id": "ash-blossom-lonely-spring-effect",
@@ -16,6 +16,25 @@
         "subtitle": "Effect Declared",
         "accentColor": "#f3a6c8",
         "durationMs": 3600,
+        "audioUrl": null,
+        "fallback": "skip"
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "polyflora-hexbloom-effect",
+      "trigger": {
+        "eventType": "effect-declaration",
+        "cardName": "Polyflora Hexbloom"
+      },
+      "presentation": {
+        "preset": "arcane-bloom-v1",
+        "kind": "css-layered-image",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787763973/polyflora.png",
+        "title": "Polyflora Hexbloom",
+        "subtitle": "Pendulum Effect Declared",
+        "accentColor": "#8ee6b0",
+        "durationMs": 4600,
         "audioUrl": null,
         "fallback": "skip"
       },

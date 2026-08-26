@@ -27,7 +27,7 @@
     async #play(animation, settings) {
       document.getElementById(APP.ids.overlay)?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
       const art = presentation.assetUrl ? await this.#loadImage(presentation.assetUrl) : null;
       const overlay = document.createElement("div");
@@ -49,6 +49,46 @@
           petals.append(petal);
         }
         overlay.append(petals);
+      }
+
+      if (preset === "arcane-bloom-v1" && !settings.reducedMotion) {
+        const field = document.createElement("div");
+        field.className = "yf-arcane-field";
+        const colors = ["#86efac", "#f9a8d4", "#fb923c", "#60a5fa", "#c084fc"];
+        for (let index = 0; index < colors.length; index += 1) {
+          const wisp = document.createElement("i");
+          wisp.className = "yf-wisp-ring";
+          wisp.style.setProperty("--yf-color", colors[index]);
+          wisp.style.setProperty("--yf-ring", `${48 + index * 9}vmin`);
+          wisp.style.setProperty("--yf-tilt", `${-34 + index * 17}deg`);
+          wisp.style.setProperty("--yf-delay", `${index * 0.11}s`);
+          field.append(wisp);
+
+          const bloom = document.createElement("b");
+          bloom.className = "yf-magic-bloom";
+          bloom.textContent = "✿";
+          const angle = index * 72 - 90;
+          bloom.style.setProperty("--yf-color", colors[index]);
+          bloom.style.setProperty("--yf-angle", `${angle}deg`);
+          bloom.style.setProperty("--yf-counter-angle", `${-angle}deg`);
+          bloom.style.setProperty("--yf-final-angle", `${angle + 35}deg`);
+          bloom.style.setProperty("--yf-final-counter-angle", `${-(angle + 35)}deg`);
+          bloom.style.setProperty("--yf-delay", `${0.35 + index * 0.13}s`);
+          field.append(bloom);
+        }
+        for (let index = 0; index < 44; index += 1) {
+          const dust = document.createElement("i");
+          dust.className = "yf-fairy-dust";
+          dust.style.setProperty("--yf-color", colors[index % colors.length]);
+          dust.style.setProperty("--yf-x", `${(index * 47) % 100}%`);
+          dust.style.setProperty("--yf-y", `${18 + ((index * 31) % 72)}%`);
+          dust.style.setProperty("--yf-drift-x", `${((index * 29) % 33) - 16}vw`);
+          dust.style.setProperty("--yf-drift-y", `${-12 - ((index * 17) % 38)}vh`);
+          dust.style.setProperty("--yf-delay", `${((index * 19) % 30) / 10}s`);
+          dust.style.setProperty("--yf-size", `${3 + ((index * 7) % 7)}px`);
+          field.append(dust);
+        }
+        overlay.append(field);
       }
 
       const stage = document.createElement("div");

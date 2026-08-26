@@ -1,8 +1,8 @@
 {
   "$schema": "./companion.schema.json",
   "schemaVersion": 1,
-  "dataVersion": "poc-2026-08-26.3",
-  "minimumCoreVersion": "0.2.1",
+  "dataVersion": "poc-2026-08-26.4",
+  "minimumCoreVersion": "0.3.0",
   "featureFlags": {
     "panel": true,
     "eventObserver": true,
@@ -26,6 +26,22 @@
         "subtitle": "Effect Declared",
         "accentColor": "#f3a6c8",
         "durationMs": 3600
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "polyflora-hexbloom-effect",
+      "trigger": {
+        "eventType": "effect-declaration",
+        "cardName": "Polyflora Hexbloom"
+      },
+      "presentation": {
+        "preset": "arcane-bloom-v1",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787763973/polyflora.png",
+        "title": "Polyflora Hexbloom",
+        "subtitle": "Pendulum Effect Declared",
+        "accentColor": "#8ee6b0",
+        "durationMs": 4600
       },
       "frequency": "every-event"
     }
