@@ -29,7 +29,7 @@
       previousOverlay?.querySelector("video")?.pause();
       previousOverlay?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
       const mediaType = presentation.mediaType === "video" ? "video" : "image";
       const media = presentation.assetUrl
@@ -193,6 +193,56 @@
           deck.append(deckCard);
         }
         field.append(deck);
+        overlay.append(field);
+      }
+
+      if (preset === "concert-rise-v1" && !settings.reducedMotion) {
+        const field = document.createElement("div");
+        field.className = "yf-concert-field";
+        const colors = ["#facc15", "#ef4444", "#60a5fa", "#a78bfa", "#34d399", "#f472b6"];
+        const glyphs = ["♪", "♫", "♬", "♩"];
+
+        for (let index = 0; index < 4; index += 1) {
+          const spotlight = document.createElement("i");
+          spotlight.className = "yf-concert-spotlight";
+          spotlight.style.setProperty("--yf-origin-x", `${12 + index * 25}%`);
+          spotlight.style.setProperty("--yf-angle", `${-24 + index * 16}deg`);
+          spotlight.style.setProperty("--yf-color", colors[(index + 2) % colors.length]);
+          spotlight.style.setProperty("--yf-delay", `${index * 0.12}s`);
+          field.append(spotlight);
+        }
+
+        const equalizer = document.createElement("div");
+        equalizer.className = "yf-concert-equalizer";
+        for (let index = 0; index < 28; index += 1) {
+          const bar = document.createElement("i");
+          bar.style.setProperty("--yf-color", colors[index % colors.length]);
+          bar.style.setProperty("--yf-height", `${18 + ((index * 31) % 78)}%`);
+          bar.style.setProperty("--yf-delay", `${-((index * 7) % 16) / 10}s`);
+          equalizer.append(bar);
+        }
+        field.append(equalizer);
+
+        for (let index = 0; index < 34; index += 1) {
+          const note = document.createElement("b");
+          note.className = "yf-music-note";
+          note.textContent = glyphs[index % glyphs.length];
+          note.style.setProperty("--yf-x", `${2 + ((index * 43) % 96)}%`);
+          note.style.setProperty("--yf-color", colors[index % colors.length]);
+          note.style.setProperty("--yf-delay", `${-((index * 17) % 42) / 10}s`);
+          note.style.setProperty("--yf-duration", `${2.4 + ((index * 13) % 21) / 10}s`);
+          note.style.setProperty("--yf-size", `${20 + ((index * 11) % 34)}px`);
+          note.style.setProperty("--yf-drift", `${((index * 29) % 23) - 11}vw`);
+          field.append(note);
+        }
+
+        for (let index = 0; index < 3; index += 1) {
+          const pulse = document.createElement("i");
+          pulse.className = "yf-concert-pulse";
+          pulse.style.setProperty("--yf-delay", `${index * 0.42}s`);
+          pulse.style.setProperty("--yf-color", colors[index]);
+          field.append(pulse);
+        }
         overlay.append(field);
       }
 

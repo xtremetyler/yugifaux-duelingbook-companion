@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "manifestVersion": "poc-2026-08-26.5",
+  "manifestVersion": "poc-2026-08-26.6",
   "animations": [
     {
       "id": "ash-blossom-lonely-spring-effect",
@@ -97,6 +97,25 @@
         "subtitle": "Three Destinies Reflected",
         "accentColor": "#a5f3fc",
         "durationMs": 6200,
+        "audioUrl": null,
+        "fallback": "skip"
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "sgt-peppers-lonely-hearts-club-band-effect",
+      "trigger": {
+        "eventType": "effect-declaration",
+        "cardName": "Sgt. Pepper's Lonely Hearts Club Band"
+      },
+      "presentation": {
+        "preset": "concert-rise-v1",
+        "kind": "css-layered-image",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787769996/sgt._pepper.png",
+        "title": "Sgt. Pepper's Lonely Hearts Club Band",
+        "subtitle": "Live Effect Performance",
+        "accentColor": "#facc15",
+        "durationMs": 4800,
         "audioUrl": null,
         "fallback": "skip"
       },

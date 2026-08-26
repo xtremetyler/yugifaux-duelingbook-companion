@@ -1,8 +1,8 @@
 {
   "$schema": "./companion.schema.json",
   "schemaVersion": 1,
-  "dataVersion": "poc-2026-08-26.7",
-  "minimumCoreVersion": "0.5.1",
+  "dataVersion": "poc-2026-08-26.8",
+  "minimumCoreVersion": "0.6.0",
   "featureFlags": {
     "panel": true,
     "eventObserver": true,
@@ -96,6 +96,22 @@
         "subtitle": "Three Destinies Reflected",
         "accentColor": "#a5f3fc",
         "durationMs": 6200
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "sgt-peppers-lonely-hearts-club-band-effect",
+      "trigger": {
+        "eventType": "effect-declaration",
+        "cardName": "Sgt. Pepper's Lonely Hearts Club Band"
+      },
+      "presentation": {
+        "preset": "concert-rise-v1",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787769996/sgt._pepper.png",
+        "title": "Sgt. Pepper's Lonely Hearts Club Band",
+        "subtitle": "Live Effect Performance",
+        "accentColor": "#facc15",
+        "durationMs": 4800
       },
       "frequency": "every-event"
     }
