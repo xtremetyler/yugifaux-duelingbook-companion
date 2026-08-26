@@ -105,6 +105,12 @@ const deterministicVariants = chooseDistinctTokenVariants(BLOOM_TOKEN_VARIANTS, 
 assert(deterministicVariants.length === 2, "Polyflora must select two Token artworks");
 assert(deterministicVariants[0].carrierId !== deterministicVariants[1].carrierId, "Polyflora Token artwork selection must not contain duplicates");
 assert(TOKEN_RECIPES[0]?.count === 2 && TOKEN_RECIPES[0]?.token?.position === "Defense", "Polyflora must summon exactly two Defense Position Tokens");
+const dragonScrollRecipe = TOKEN_RECIPES.find((recipe) => recipe.sourceName === "The Dragon Scroll");
+assert(dragonScrollRecipe?.count === 1, "The Dragon Scroll must summon exactly one Token");
+assert(dragonScrollRecipe?.token?.name === "Dragon Warrior Token", "The Dragon Scroll Token name is missing");
+assert(dragonScrollRecipe?.token?.level === 1 && dragonScrollRecipe?.token?.attribute === "LIGHT", "Dragon Warrior Token Level or Attribute is incorrect");
+assert(dragonScrollRecipe?.token?.monsterType === "Warrior / Tuner", "Dragon Warrior Token type and Tuner status are incorrect");
+assert(dragonScrollRecipe?.variants?.[0]?.carrierId === 7, "Dragon Warrior Token must use its reserved native carrier");
 assert(tokenCarrierFromUrl("https://images.duelingbook.com/tokens/6.jpg") === 6, "native Token carrier URLs must be recognized");
 assert(tokenCarrierFromUrl("https://res.cloudinary.com/example/token.jpg") === null, "non-DuelingBook artwork must not be treated as a carrier");
 assert(

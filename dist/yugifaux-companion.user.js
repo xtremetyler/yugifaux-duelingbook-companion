@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.9.6
+// @version      0.9.7
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.9.6",
+    version: "0.9.7",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1137,6 +1137,10 @@
     { carrierId: 6, artworkUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787780941/cbfc5a0e-3546-4951-82e0-47515b6903b4.jpg" }
   ]);
 
+  const DRAGON_WARRIOR_TOKEN_VARIANTS = Object.freeze([
+    { carrierId: 7, artworkUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787783783/Gemini_Generated_Image__34.png" }
+  ]);
+
   const TOKEN_RECIPES = Object.freeze([
     Object.freeze({
       id: "polyflora-hexbloom-bloom-token",
@@ -1146,6 +1150,15 @@
       token: Object.freeze({ name: "Bloom Token", level: 2, attribute: "WIND", monsterType: "Plant", atk: 0, def: 0, position: "Defense" }),
       count: 2,
       variants: BLOOM_TOKEN_VARIANTS
+    }),
+    Object.freeze({
+      id: "the-dragon-scroll-dragon-warrior-token",
+      sourceName: "The Dragon Scroll",
+      sourceArtworkUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787783783/Gemini_Generated_Image__34.png",
+      effectText: "During your Main Phase or either players Battle Phase: You can banish this face-up card until the End Phase; Special Summon 1 “Dragon Warrior Token” (Warrior/LIGHT/Tuner/Level 1/ATK 0/DEF 0), then, immediately after this effect resolves, you can Synchro Summon 1 Synchro Monster using that Token you control, and if you do, place 1 Chi Counter on it.",
+      token: Object.freeze({ name: "Dragon Warrior Token", level: 1, attribute: "LIGHT", monsterType: "Warrior / Tuner", atk: 0, def: 0, position: "Attack or Defense" }),
+      count: 1,
+      variants: DRAGON_WARRIOR_TOKEN_VARIANTS
     })
   ]);
 
@@ -1305,7 +1318,8 @@
       }
       const notice = document.createElement("p");
       notice.className = "yf-token-notice";
-      notice.textContent = "After confirmation, DuelingBook will highlight your open Monster Zones twice. Click one zone for each Token. The summon is cancelled unless two zones are available.";
+      const zoneCount = recipe.count === 1 ? "one" : String(recipe.count);
+      notice.textContent = `After confirmation, DuelingBook will highlight your open Monster Zones ${recipe.count === 1 ? "once" : `${recipe.count} times`}. Click one zone for each Token. The summon is cancelled unless ${zoneCount} zone${recipe.count === 1 ? " is" : "s are"} available.${recipe.token.position === "Attack or Defense" ? " DuelingBook initially places native Tokens in Defense Position; use its To ATK action after placement when desired." : ""}`;
       const actions = document.createElement("div");
       actions.className = "yf-token-actions";
       const back = document.createElement("button");
@@ -1370,7 +1384,9 @@
           if (index + 1 < chosen.length) await this.#delay(1050);
         }
         this.drafts.delete(recipe.id);
-        this.#showToast(`${recipe.count} ${recipe.token.name}s summoned with YugiFaux artwork.`);
+        const plural = recipe.count === 1 ? "" : "s";
+        const positionReminder = recipe.token.position === "Attack or Defense" ? " Use DuelingBook’s To ATK action if you want Attack Position." : "";
+        this.#showToast(`${recipe.count} ${recipe.token.name}${plural} summoned with YugiFaux artwork.${positionReminder}`);
         this.diagnostics.info("token-macro", "token recipe completed", { recipe: recipe.id, count: recipe.count });
       } catch (error) {
         this.#cancelNativeSelection();
