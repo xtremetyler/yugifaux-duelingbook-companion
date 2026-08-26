@@ -1,7 +1,7 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-5",
-    minimumCoreVersion: "0.5.0",
+    dataVersion: "bundled-poc-5.1",
+    minimumCoreVersion: "0.5.1",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com", "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"],
     animations: [
