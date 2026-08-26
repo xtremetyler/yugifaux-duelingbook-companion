@@ -43,9 +43,11 @@
               "title": { "type": "string", "minLength": 1 },
               "subtitle": { "type": "string" },
               "theme": { "type": "string" },
-              "preset": { "enum": ["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"] },
+              "preset": { "enum": ["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"] },
+              "mediaType": { "enum": ["image", "video"] },
               "accentColor": { "type": "string" },
               "durationMs": { "type": "integer", "minimum": 500, "maximum": 8000 },
+              "playbackRate": { "type": "number", "minimum": 0.5, "maximum": 3 },
               "assetUrl": { "type": ["string", "null"] },
               "audioUrl": { "type": ["string", "null"] }
             }

@@ -25,11 +25,18 @@
     }
 
     async #play(animation, settings) {
-      document.getElementById(APP.ids.overlay)?.remove();
+      const previousOverlay = document.getElementById(APP.ids.overlay);
+      previousOverlay?.querySelector("video")?.pause();
+      previousOverlay?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
-      const art = presentation.assetUrl ? await this.#loadImage(presentation.assetUrl) : null;
+      const mediaType = presentation.mediaType === "video" ? "video" : "image";
+      const media = presentation.assetUrl
+        ? mediaType === "video"
+          ? await this.#loadVideo(presentation.assetUrl, presentation.playbackRate, settings.muted)
+          : await this.#loadImage(presentation.assetUrl)
+        : null;
       const overlay = document.createElement("div");
       overlay.id = APP.ids.overlay;
       overlay.className = `yf-preset-${preset}${settings.reducedMotion ? " yf-reduced-motion" : ""}`;
@@ -91,12 +98,39 @@
         overlay.append(field);
       }
 
+      if (preset === "trap-chase-v1" && !settings.reducedMotion) {
+        const field = document.createElement("div");
+        field.className = "yf-trap-field";
+        const stamp = document.createElement("b");
+        stamp.className = "yf-trap-stamp";
+        stamp.textContent = "TRAP ACTIVATED";
+        field.append(stamp);
+        for (let index = 0; index < 18; index += 1) {
+          const page = document.createElement("i");
+          page.className = "yf-trap-page";
+          page.style.setProperty("--yf-y", `${8 + ((index * 37) % 78)}%`);
+          page.style.setProperty("--yf-delay", `${((index * 13) % 24) / 10}s`);
+          page.style.setProperty("--yf-duration", `${1.8 + ((index * 17) % 15) / 10}s`);
+          page.style.setProperty("--yf-spin", `${260 + ((index * 43) % 520)}deg`);
+          page.style.setProperty("--yf-curve", `${((index * 29) % 33) - 16}vh`);
+          field.append(page);
+        }
+        const frame = document.createElement("div");
+        frame.className = "yf-trap-frame";
+        field.append(frame);
+        const seal = document.createElement("b");
+        seal.className = "yf-trap-seal";
+        seal.textContent = "NO EXIT";
+        field.append(seal);
+        overlay.append(field);
+      }
+
       const stage = document.createElement("div");
       stage.className = "yf-animation-stage";
-      if (art) {
-        art.className = "yf-animation-art";
-        art.alt = "";
-        stage.append(art);
+      if (media) {
+        media.className = mediaType === "video" ? "yf-animation-video" : "yf-animation-art";
+        if (mediaType === "image") media.alt = "";
+        stage.append(media);
       }
       const nameplate = document.createElement("div");
       nameplate.className = "yf-animation-nameplate";
@@ -106,13 +140,25 @@
       subtitle.textContent = presentation.subtitle ?? "";
       nameplate.append(cardName, subtitle);
       stage.append(nameplate);
+      const duration = settings.reducedMotion ? 1200 : Math.min(Math.max(presentation.durationMs ?? 2400, 500), 8000);
       overlay.style.setProperty("--yf-accent", presentation.accentColor ?? "#f8d36b");
+      overlay.style.setProperty("--yf-overlay-duration", `${duration}ms`);
       overlay.append(stage);
       document.body.append(overlay);
 
-      const duration = settings.reducedMotion ? 1200 : Math.min(Math.max(presentation.durationMs ?? 2400, 500), 8000);
+      if (mediaType === "video" && media && !settings.reducedMotion) {
+        try {
+          await media.play();
+        } catch (error) {
+          if (media.muted) throw error;
+          media.muted = true;
+          await media.play();
+          this.diagnostics.warn("animation", "video audio was muted because the browser blocked autoplay", { id: animation.id });
+        }
+      }
       this.diagnostics.info("animation", "animation played", { id: animation.id, duration });
       await new Promise((resolve) => setTimeout(resolve, duration));
+      if (mediaType === "video" && media) media.pause();
       overlay.remove();
     }
 
@@ -131,6 +177,33 @@
           reject(new Error("Artwork could not be loaded."));
         }, { once: true });
         image.src = url;
+      });
+    }
+
+    #loadVideo(url, playbackRate = 1, muted = true) {
+      return new Promise((resolve, reject) => {
+        const video = document.createElement("video");
+        const safePlaybackRate = Math.min(Math.max(Number(playbackRate) || 1, 0.5), 3);
+        const timeout = setTimeout(() => reject(new Error("Video load timed out.")), 12000);
+        video.preload = "auto";
+        video.playsInline = true;
+        video.muted = Boolean(muted);
+        video.controls = false;
+        video.loop = false;
+        video.disablePictureInPicture = true;
+        video.defaultPlaybackRate = safePlaybackRate;
+        video.referrerPolicy = "no-referrer";
+        video.addEventListener("canplay", () => {
+          clearTimeout(timeout);
+          video.playbackRate = safePlaybackRate;
+          resolve(video);
+        }, { once: true });
+        video.addEventListener("error", () => {
+          clearTimeout(timeout);
+          reject(new Error("Video could not be loaded."));
+        }, { once: true });
+        video.src = url;
+        video.load();
       });
     }
   }

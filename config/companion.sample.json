@@ -1,8 +1,8 @@
 {
   "$schema": "./companion.schema.json",
   "schemaVersion": 1,
-  "dataVersion": "poc-2026-08-26.4",
-  "minimumCoreVersion": "0.3.0",
+  "dataVersion": "poc-2026-08-26.5",
+  "minimumCoreVersion": "0.4.0",
   "featureFlags": {
     "panel": true,
     "eventObserver": true,
@@ -42,6 +42,42 @@
         "subtitle": "Pendulum Effect Declared",
         "accentColor": "#8ee6b0",
         "durationMs": 4600
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "no-way-out-effect-declaration",
+      "trigger": {
+        "eventType": "effect-declaration",
+        "cardName": "No Way Out!"
+      },
+      "presentation": {
+        "preset": "trap-chase-v1",
+        "mediaType": "video",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/video/upload/v1787765186/i_want_to_animate_this_to_have.mp4",
+        "title": "No Way Out!",
+        "subtitle": "Trap Effect Declared",
+        "accentColor": "#f97316",
+        "durationMs": 5900,
+        "playbackRate": 1.75
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "no-way-out-set-activation",
+      "trigger": {
+        "eventType": "activation",
+        "cardName": "No Way Out!"
+      },
+      "presentation": {
+        "preset": "trap-chase-v1",
+        "mediaType": "video",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/video/upload/v1787765186/i_want_to_animate_this_to_have.mp4",
+        "title": "No Way Out!",
+        "subtitle": "Set Trap Activated",
+        "accentColor": "#f97316",
+        "durationMs": 5900,
+        "playbackRate": 1.75
       },
       "frequency": "every-event"
     }

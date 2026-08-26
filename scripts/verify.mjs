@@ -26,11 +26,16 @@ assert(config.schemaVersion === 1, "sample config schemaVersion must be 1");
 assert(Array.isArray(config.animations) && config.animations.length > 0, "sample config needs a test animation");
 assert(config.animations.some((item) => item.trigger?.cardName === "Ash Blossom & Lonely Spring"), "Ash Blossom overlay trigger is missing");
 assert(config.animations.some((item) => item.trigger?.cardName === "Polyflora Hexbloom"), "Polyflora overlay trigger is missing");
+assert(config.animations.some((item) => item.trigger?.cardName === "No Way Out!" && item.trigger.eventType === "effect-declaration"), "No Way Out effect-declaration trigger is missing");
+assert(config.animations.some((item) => item.trigger?.cardName === "No Way Out!" && item.trigger.eventType === "activation"), "No Way Out Set activation trigger is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "petal-bloom-v1"), "petal-bloom preset is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "arcane-bloom-v1"), "arcane-bloom preset is missing");
+assert(config.animations.some((item) => item.presentation?.preset === "trap-chase-v1"), "trap-chase preset is missing");
 assert(bundle.includes("effect-declaration"), "effect declaration classifier is missing from the bundle");
 assert(bundle.includes("res.cloudinary.com/vosvpv50"), "approved Ash Blossom asset is missing from the bundle");
 assert(bundle.includes("v1787763973/polyflora.png"), "approved Polyflora asset is missing from the bundle");
+assert(bundle.includes("v1787765186/i_want_to_animate_this_to_have.mp4"), "approved No Way Out video is missing from the bundle");
+assert(bundle.includes("document.createElement(\"video\")"), "video playback support is missing from the bundle");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
 assert(manifest.animations.every((item) => item.trigger?.cardName), "each animation needs a card trigger");
 
@@ -38,6 +43,8 @@ const ashDeclaration = "Yugi declared the effect of Ash Blossom & Lonely Spring.
 const normalSummon = "Kaiba normal summoned Blue-Eyes White Dragon.";
 const positionChange = "Kaiba changed Blue-Eyes White Dragon to Defense Position.";
 const polyfloraDeclaration = "Yugi declared the effect of Polyflora Hexbloom.";
+const noWayOutDeclaration = "Yugi declared the effect of No Way Out!.";
+const noWayOutSetActivation = "Yugi Activated Set \"No Way Out!\".";
 const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
 assert(
   classifyPublicLogLine(getNewLogText(ashDeclaration, `${ashDeclaration}\n${normalSummon}`))?.type === "normal-summon",
@@ -54,6 +61,14 @@ assert(
 assert(
   classifyPublicLogLine(getNewLogText(ashDeclaration, `${ashDeclaration}\n${polyfloraDeclaration}`))?.type === "effect-declaration",
   "a newly appended Polyflora declaration must remain detectable"
+);
+assert(
+  classifyPublicLogLine(getNewLogText(polyfloraDeclaration, `${polyfloraDeclaration}\n${noWayOutDeclaration}`))?.type === "effect-declaration",
+  "a newly appended No Way Out declaration must remain detectable"
+);
+assert(
+  classifyPublicLogLine(getNewLogText(noWayOutDeclaration, `${noWayOutDeclaration}\n${noWayOutSetActivation}`))?.type === "activation",
+  "an Activated Set No Way Out line must be classified as an activation"
 );
 
 if (failures.length) {

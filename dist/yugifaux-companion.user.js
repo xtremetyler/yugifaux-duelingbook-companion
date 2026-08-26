@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.3.0
+// @version      0.4.0
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.3.0",
+    version: "0.4.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -99,8 +99,8 @@
 
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-3",
-    minimumCoreVersion: "0.3.0",
+    dataVersion: "bundled-poc-4",
+    minimumCoreVersion: "0.4.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com"],
     animations: [
@@ -129,6 +129,36 @@
           durationMs: 4600
         },
         frequency: "every-event"
+      },
+      {
+        id: "no-way-out-effect-declaration",
+        trigger: { eventType: "effect-declaration", cardName: "No Way Out!" },
+        presentation: {
+          preset: "trap-chase-v1",
+          mediaType: "video",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/video/upload/v1787765186/i_want_to_animate_this_to_have.mp4",
+          title: "No Way Out!",
+          subtitle: "Trap Effect Declared",
+          accentColor: "#f97316",
+          durationMs: 5900,
+          playbackRate: 1.75
+        },
+        frequency: "every-event"
+      },
+      {
+        id: "no-way-out-set-activation",
+        trigger: { eventType: "activation", cardName: "No Way Out!" },
+        presentation: {
+          preset: "trap-chase-v1",
+          mediaType: "video",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/video/upload/v1787765186/i_want_to_animate_this_to_have.mp4",
+          title: "No Way Out!",
+          subtitle: "Set Trap Activated",
+          accentColor: "#f97316",
+          durationMs: 5900,
+          playbackRate: 1.75
+        },
+        frequency: "every-event"
       }
     ]
   });
@@ -150,9 +180,17 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
-      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
         errors.push(`animations[${index}].presentation.preset is unsupported.`);
       }
+      if (item?.presentation?.mediaType && !["image", "video"].includes(item.presentation.mediaType)) {
+        errors.push(`animations[${index}].presentation.mediaType is unsupported.`);
+      }
+      if (item?.presentation?.playbackRate !== undefined && (
+        typeof item.presentation.playbackRate !== "number" ||
+        item.presentation.playbackRate < 0.5 ||
+        item.presentation.playbackRate > 3
+      )) errors.push(`animations[${index}].presentation.playbackRate is invalid.`);
       if (item?.presentation?.assetUrl) {
         try {
           const url = new URL(item.presentation.assetUrl);
@@ -349,11 +387,18 @@
     }
 
     async #play(animation, settings) {
-      document.getElementById(APP.ids.overlay)?.remove();
+      const previousOverlay = document.getElementById(APP.ids.overlay);
+      previousOverlay?.querySelector("video")?.pause();
+      previousOverlay?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
-      const art = presentation.assetUrl ? await this.#loadImage(presentation.assetUrl) : null;
+      const mediaType = presentation.mediaType === "video" ? "video" : "image";
+      const media = presentation.assetUrl
+        ? mediaType === "video"
+          ? await this.#loadVideo(presentation.assetUrl, presentation.playbackRate, settings.muted)
+          : await this.#loadImage(presentation.assetUrl)
+        : null;
       const overlay = document.createElement("div");
       overlay.id = APP.ids.overlay;
       overlay.className = `yf-preset-${preset}${settings.reducedMotion ? " yf-reduced-motion" : ""}`;
@@ -415,12 +460,39 @@
         overlay.append(field);
       }
 
+      if (preset === "trap-chase-v1" && !settings.reducedMotion) {
+        const field = document.createElement("div");
+        field.className = "yf-trap-field";
+        const stamp = document.createElement("b");
+        stamp.className = "yf-trap-stamp";
+        stamp.textContent = "TRAP ACTIVATED";
+        field.append(stamp);
+        for (let index = 0; index < 18; index += 1) {
+          const page = document.createElement("i");
+          page.className = "yf-trap-page";
+          page.style.setProperty("--yf-y", `${8 + ((index * 37) % 78)}%`);
+          page.style.setProperty("--yf-delay", `${((index * 13) % 24) / 10}s`);
+          page.style.setProperty("--yf-duration", `${1.8 + ((index * 17) % 15) / 10}s`);
+          page.style.setProperty("--yf-spin", `${260 + ((index * 43) % 520)}deg`);
+          page.style.setProperty("--yf-curve", `${((index * 29) % 33) - 16}vh`);
+          field.append(page);
+        }
+        const frame = document.createElement("div");
+        frame.className = "yf-trap-frame";
+        field.append(frame);
+        const seal = document.createElement("b");
+        seal.className = "yf-trap-seal";
+        seal.textContent = "NO EXIT";
+        field.append(seal);
+        overlay.append(field);
+      }
+
       const stage = document.createElement("div");
       stage.className = "yf-animation-stage";
-      if (art) {
-        art.className = "yf-animation-art";
-        art.alt = "";
-        stage.append(art);
+      if (media) {
+        media.className = mediaType === "video" ? "yf-animation-video" : "yf-animation-art";
+        if (mediaType === "image") media.alt = "";
+        stage.append(media);
       }
       const nameplate = document.createElement("div");
       nameplate.className = "yf-animation-nameplate";
@@ -430,13 +502,25 @@
       subtitle.textContent = presentation.subtitle ?? "";
       nameplate.append(cardName, subtitle);
       stage.append(nameplate);
+      const duration = settings.reducedMotion ? 1200 : Math.min(Math.max(presentation.durationMs ?? 2400, 500), 8000);
       overlay.style.setProperty("--yf-accent", presentation.accentColor ?? "#f8d36b");
+      overlay.style.setProperty("--yf-overlay-duration", `${duration}ms`);
       overlay.append(stage);
       document.body.append(overlay);
 
-      const duration = settings.reducedMotion ? 1200 : Math.min(Math.max(presentation.durationMs ?? 2400, 500), 8000);
+      if (mediaType === "video" && media && !settings.reducedMotion) {
+        try {
+          await media.play();
+        } catch (error) {
+          if (media.muted) throw error;
+          media.muted = true;
+          await media.play();
+          this.diagnostics.warn("animation", "video audio was muted because the browser blocked autoplay", { id: animation.id });
+        }
+      }
       this.diagnostics.info("animation", "animation played", { id: animation.id, duration });
       await new Promise((resolve) => setTimeout(resolve, duration));
+      if (mediaType === "video" && media) media.pause();
       overlay.remove();
     }
 
@@ -457,6 +541,33 @@
         image.src = url;
       });
     }
+
+    #loadVideo(url, playbackRate = 1, muted = true) {
+      return new Promise((resolve, reject) => {
+        const video = document.createElement("video");
+        const safePlaybackRate = Math.min(Math.max(Number(playbackRate) || 1, 0.5), 3);
+        const timeout = setTimeout(() => reject(new Error("Video load timed out.")), 12000);
+        video.preload = "auto";
+        video.playsInline = true;
+        video.muted = Boolean(muted);
+        video.controls = false;
+        video.loop = false;
+        video.disablePictureInPicture = true;
+        video.defaultPlaybackRate = safePlaybackRate;
+        video.referrerPolicy = "no-referrer";
+        video.addEventListener("canplay", () => {
+          clearTimeout(timeout);
+          video.playbackRate = safePlaybackRate;
+          resolve(video);
+        }, { once: true });
+        video.addEventListener("error", () => {
+          clearTimeout(timeout);
+          reject(new Error("Video could not be loaded."));
+        }, { once: true });
+        video.src = url;
+        video.load();
+      });
+    }
   }
 
   const STYLE = `
@@ -473,8 +584,12 @@
     #${APP.ids.overlay}.yf-preset-petal-bloom-v1::before { content: ""; position: absolute; inset: -20%; background: conic-gradient(from 100deg at 50% 50%, transparent, #f9a8d455, transparent 30%, #fbcfe855, transparent 60%); filter: blur(28px); animation: yf-pink-light 3.6s ease-in-out both; }
     #${APP.ids.overlay}.yf-preset-arcane-bloom-v1 { background: radial-gradient(circle at 50% 56%, #ecfccb22 0 18%, transparent 48%), radial-gradient(circle at 24% 35%, #60a5fa2e, transparent 32%), radial-gradient(circle at 78% 38%, #c084fc2b, transparent 34%), linear-gradient(150deg, #04140df2, #0d1230f4 54%, #27103bf2); }
     #${APP.ids.overlay}.yf-preset-arcane-bloom-v1::before { content: ""; position: absolute; width: 105vmin; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 20deg, #86efac00, #86efac4d, #f9a8d44d, #fb923c4d, #60a5fa4d, #c084fc4d, #86efac00); filter: blur(34px); opacity: 0; animation: yf-arcane-aura 4.6s ease-in-out both; }
+    #${APP.ids.overlay}.yf-preset-trap-chase-v1 { background: #020103; }
+    #${APP.ids.overlay}.yf-preset-trap-chase-v1::before { content: ""; position: absolute; inset: 0; z-index: 2; background: repeating-linear-gradient(0deg,#0000 0 4px,#f973160b 5px),radial-gradient(circle at 50% 48%,transparent 38%,#180307a8 76%,#020103f2 100%); mix-blend-mode: screen; animation: yf-trap-flash var(--yf-overlay-duration) ease-out both; }
+    #${APP.ids.overlay}.yf-preset-trap-chase-v1::after { content: ""; position: absolute; inset: 0; z-index: 2; border: 0 solid #050102; box-shadow: inset 0 0 80px 24px #000b; animation: yf-no-escape var(--yf-overlay-duration) cubic-bezier(.7,0,.3,1) both; }
     #${APP.ids.overlay} .yf-animation-stage { position: relative; width: min(1040px, 92vw); height: min(760px, 78vh); display: grid; place-items: center; }
     #${APP.ids.overlay} .yf-animation-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 18px #000a) drop-shadow(0 0 24px color-mix(in srgb, var(--yf-accent) 75%, transparent)); will-change: transform, opacity, filter; animation: yf-art-bloom 3.6s cubic-bezier(.16,.78,.22,1) both; }
+    #${APP.ids.overlay} .yf-animation-video { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; opacity: 0; filter: saturate(1.08) contrast(1.08) brightness(.88); animation: yf-trap-video var(--yf-overlay-duration) ease-in-out both; }
     #${APP.ids.overlay} .yf-animation-nameplate { position: absolute; left: 50%; bottom: 3%; width: min(900px, 88vw); transform: translateX(-50%); border-block: 2px solid var(--yf-accent); padding: 15px 28px; color: white; background: linear-gradient(90deg, transparent, #831843dd 18%, #111827f2 50%, #831843dd 82%, transparent); text-align: center; animation: yf-nameplate 3.6s cubic-bezier(.2,.8,.2,1) both; }
     #${APP.ids.overlay} strong { display: block; color: #fff1f7; font: 800 clamp(25px,4.5vw,54px)/1.05 Georgia,serif; text-shadow: 0 2px 2px #000,0 0 22px var(--yf-accent); }
     #${APP.ids.overlay} span { display: block; margin-top: 10px; color: #ffe4ef; letter-spacing: .25em; text-transform: uppercase; font: 700 14px/1 Arial,sans-serif; }
@@ -487,9 +602,17 @@
     #${APP.ids.overlay}.yf-preset-arcane-bloom-v1 .yf-animation-art { animation: yf-polyflora-unfurl 4.6s cubic-bezier(.16,.84,.22,1) both; transform-origin: 50% 88%; }
     #${APP.ids.overlay}.yf-preset-arcane-bloom-v1 .yf-animation-nameplate { border-image: linear-gradient(90deg,#86efac,#f9a8d4,#fb923c,#60a5fa,#c084fc) 1; background: linear-gradient(90deg,transparent,#064e3bdd 20%,#172554ed 50%,#4c1d95dd 80%,transparent); animation-duration: 4.6s; }
     #${APP.ids.overlay}.yf-preset-arcane-bloom-v1 strong { color: #f0fdf4; text-shadow: 0 2px 2px #000,0 0 12px #86efac,0 0 28px #c084fc; }
+    #${APP.ids.overlay}.yf-preset-trap-chase-v1 .yf-animation-stage { width: 100vw; height: 100vh; }
+    #${APP.ids.overlay}.yf-preset-trap-chase-v1 .yf-animation-nameplate { z-index: 4; bottom: 4%; border-block-color: #fb923c; background: linear-gradient(90deg,transparent,#431407ed 16%,#111827f4 50%,#431407ed 84%,transparent); animation-duration: var(--yf-overlay-duration); }
+    #${APP.ids.overlay}.yf-preset-trap-chase-v1 strong { color: #fff7ed; letter-spacing: .035em; text-shadow: 0 3px 2px #000,0 0 12px #f97316,0 0 30px #dc2626; }
+    #${APP.ids.overlay} .yf-trap-field { position: absolute; inset: 0; z-index: 3; overflow: hidden; }
+    #${APP.ids.overlay} .yf-trap-stamp { position: absolute; top: 7%; left: 50%; transform: translateX(-50%) rotate(-3deg); border: 4px double #fb923c; padding: 8px 18px; color: #fff7ed; background: #450a0ae8; box-shadow: 0 0 18px #f97316, inset 0 0 14px #7f1d1d; opacity: 0; letter-spacing: .26em; font: 900 clamp(15px,2.2vw,28px)/1 Arial,sans-serif; animation: yf-trap-stamp var(--yf-overlay-duration) cubic-bezier(.2,.8,.2,1) both; }
+    #${APP.ids.overlay} .yf-trap-page { position: absolute; left: -12vw; top: var(--yf-y); width: 38px; height: 26px; border: 1px solid #7c5b36; background: repeating-linear-gradient(0deg,#ead9ae 0 5px,#8b6b4538 6px); box-shadow: 0 2px 8px #0008,0 0 9px #fb923c66; opacity: 0; animation: yf-trap-page var(--yf-duration) linear var(--yf-delay) infinite; }
+    #${APP.ids.overlay} .yf-trap-frame { position: absolute; inset: 2.4vmin; border: 2px solid #fb923c80; background: linear-gradient(90deg,#fb923c 0 9%,transparent 9% 91%,#fb923c 91%) top/100% 4px no-repeat,linear-gradient(90deg,#fb923c 0 9%,transparent 9% 91%,#fb923c 91%) bottom/100% 4px no-repeat,linear-gradient(#fb923c 0 14%,transparent 14% 86%,#fb923c 86%) left/4px 100% no-repeat,linear-gradient(#fb923c 0 14%,transparent 14% 86%,#fb923c 86%) right/4px 100% no-repeat; box-shadow: inset 0 0 42px #7f1d1d66,0 0 18px #f9731666; animation: yf-trap-frame var(--yf-overlay-duration) ease-in-out both; }
+    #${APP.ids.overlay} .yf-trap-seal { position: absolute; right: 2.3%; bottom: 4.2%; display: grid; place-items: center; width: 78px; aspect-ratio: 1; border: 4px double #fed7aa; border-radius: 50%; color: #fff7ed; background: radial-gradient(circle,#991b1b 0 48%,#450a0a 52% 66%,#f97316 69% 73%,#450a0a 76%); box-shadow: 0 0 15px #000,0 0 24px #f97316; opacity: 0; transform: rotate(12deg) scale(1.8); text-align: center; letter-spacing: .08em; font: 900 12px/1 Arial,sans-serif; animation: yf-trap-seal var(--yf-overlay-duration) cubic-bezier(.2,.8,.2,1) both; }
     #${APP.ids.overlay}.yf-reduced-motion { animation: none; background: #020617dd; }
-    #${APP.ids.overlay}.yf-reduced-motion .yf-animation-art, #${APP.ids.overlay}.yf-reduced-motion .yf-animation-nameplate { animation: none; }
-    #${APP.ids.overlay}.yf-reduced-motion .yf-arcane-field { display: none; }
+    #${APP.ids.overlay}.yf-reduced-motion .yf-animation-art, #${APP.ids.overlay}.yf-reduced-motion .yf-animation-video, #${APP.ids.overlay}.yf-reduced-motion .yf-animation-nameplate { animation: none; opacity: 1; }
+    #${APP.ids.overlay}.yf-reduced-motion .yf-arcane-field, #${APP.ids.overlay}.yf-reduced-motion .yf-trap-field { display: none; }
     @keyframes yf-overlay-in { from { opacity: 0 } to { opacity: 1 } }
     @keyframes yf-art-bloom { 0% { opacity: 0; transform: translate3d(0,12vh,0) scale(.64) rotate(-4deg); filter: blur(12px) brightness(1.8) } 18% { opacity: 1 } 42%,76% { opacity: 1; transform: translate3d(0,-1vh,0) scale(1.02) rotate(0); filter: blur(0) brightness(1.08) } 100% { opacity: 0; transform: translate3d(0,-3vh,0) scale(1.08); filter: blur(2px) brightness(1.25) } }
     @keyframes yf-nameplate { 0%,18% { opacity: 0; transform: translate3d(-50%,28px,0) scaleX(.72) } 32%,78% { opacity: 1; transform: translate3d(-50%,0,0) scaleX(1) } 100% { opacity: 0; transform: translate3d(-50%,-10px,0) scaleX(1.02) } }
@@ -500,6 +623,13 @@
     @keyframes yf-magic-flower { 0%,14% { opacity: 0; transform: translate(-50%,-50%) rotate(var(--yf-angle)) translateY(-8vmin) rotate(var(--yf-counter-angle)) scale(.1) } 38%,72% { opacity: .95; transform: translate(-50%,-50%) rotate(var(--yf-angle)) translateY(-29vmin) rotate(var(--yf-counter-angle)) scale(1) } 100% { opacity: 0; transform: translate(-50%,-50%) rotate(var(--yf-final-angle)) translateY(-36vmin) rotate(var(--yf-final-counter-angle)) scale(1.3) } }
     @keyframes yf-fairy-rise { 0% { opacity: 0; transform: translate3d(0,4vh,0) scale(.2) } 28%,70% { opacity: .95 } 100% { opacity: 0; transform: translate3d(var(--yf-drift-x),var(--yf-drift-y),0) scale(1.5) } }
     @keyframes yf-polyflora-unfurl { 0% { opacity: 0; transform: translate3d(0,25vh,0) scale(.18,.05); filter: blur(15px) brightness(2) } 22% { opacity: .92; transform: translate3d(0,4vh,0) scale(.78,1.05); filter: blur(2px) brightness(1.45) } 42%,78% { opacity: 1; transform: translate3d(0,-1vh,0) scale(1); filter: blur(0) brightness(1.08) drop-shadow(0 0 24px #86efac) } 100% { opacity: 0; transform: translate3d(0,-5vh,0) scale(1.08); filter: blur(3px) brightness(1.35) } }
+    @keyframes yf-trap-video { 0% { opacity: 0; transform: scale(1.08); filter: saturate(.8) contrast(1.25) brightness(.35) } 7%,88% { opacity: 1; transform: scale(1); filter: saturate(1.08) contrast(1.08) brightness(.9) } 96% { opacity: 1; filter: saturate(.7) contrast(1.3) brightness(.62) } 100% { opacity: 0; transform: scale(1.035); filter: saturate(.2) contrast(1.4) brightness(.18) } }
+    @keyframes yf-trap-flash { 0% { opacity: 0 } 3% { opacity: 1; background-color: #fff7ed99 } 8%,84% { opacity: .56; background-color: transparent } 90% { opacity: .9; background-color: #7f1d1d55 } 100% { opacity: 0 } }
+    @keyframes yf-no-escape { 0%,78% { border-width: 0; opacity: .55 } 92% { border-width: 7vmin; opacity: .88 } 100% { border-width: 28vmin; opacity: 1 } }
+    @keyframes yf-trap-stamp { 0%,5% { opacity: 0; transform: translateX(-50%) rotate(-8deg) scale(2.4) } 11%,66% { opacity: .96; transform: translateX(-50%) rotate(-3deg) scale(1) } 75%,100% { opacity: 0; transform: translateX(-50%) rotate(2deg) scale(.9) } }
+    @keyframes yf-trap-page { 0% { opacity: 0; transform: translate3d(-8vw,0,0) rotate(0) } 10%,82% { opacity: .82 } 100% { opacity: 0; transform: translate3d(122vw,var(--yf-curve),0) rotate(var(--yf-spin)) } }
+    @keyframes yf-trap-frame { 0% { opacity: 0; transform: scale(1.14) } 9%,82% { opacity: .8; transform: scale(1) } 94% { opacity: 1; transform: scale(.96) } 100% { opacity: 0; transform: scale(.82) } }
+    @keyframes yf-trap-seal { 0%,12% { opacity: 0; transform: rotate(35deg) scale(2.1) } 18%,82% { opacity: .96; transform: rotate(12deg) scale(1) } 94%,100% { opacity: 0; transform: rotate(-6deg) scale(.72) } }
   `;
 
   class CompanionUI {
@@ -549,11 +679,15 @@
       const testAsh = document.createElement("button");
       testAsh.type = "button";
       testAsh.textContent = "Preview Ash Blossom";
-      testAsh.addEventListener("click", () => this.actions.preview("Ash Blossom & Lonely Spring"));
+      testAsh.addEventListener("click", () => { panel.hidden = true; this.actions.preview("Ash Blossom & Lonely Spring"); });
       const testPolyflora = document.createElement("button");
       testPolyflora.type = "button";
       testPolyflora.textContent = "Preview Polyflora";
-      testPolyflora.addEventListener("click", () => this.actions.preview("Polyflora Hexbloom"));
+      testPolyflora.addEventListener("click", () => { panel.hidden = true; this.actions.preview("Polyflora Hexbloom"); });
+      const testNoWayOut = document.createElement("button");
+      testNoWayOut.type = "button";
+      testNoWayOut.textContent = "Preview No Way Out!";
+      testNoWayOut.addEventListener("click", () => { panel.hidden = true; this.actions.preview("No Way Out!"); });
       const reload = document.createElement("button");
       reload.type = "button";
       reload.textContent = "Check league data";
@@ -565,7 +699,7 @@
 
       this.diagnosticOutput = document.createElement("div");
       this.diagnosticOutput.className = "yf-diagnostics";
-      panel.append(testAsh, testPolyflora, reload, disable, this.diagnosticOutput);
+      panel.append(testAsh, testPolyflora, testNoWayOut, reload, disable, this.diagnosticOutput);
       button.addEventListener("click", () => { panel.hidden = !panel.hidden; });
       document.body.append(button, panel);
       this.diagnostics.subscribe((entries) => this.#renderDiagnostics(entries));

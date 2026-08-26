@@ -10,6 +10,7 @@ The current build:
 - recognizes `Ash Blossom & Lonely Spring` when a visible public log line is classified as an effect declaration;
 - plays a pink petal-bloom overlay using the approved Cloudinary artwork without receiving pointer input;
 - plays a five-color magical wisp, flower, and fairy-dust overlay for `Polyflora Hexbloom`;
+- plays a speed-adjusted cinematic trap chase with warning flashes, flying pages, and a closing frame for `No Way Out!`;
 - includes animation, mute, reduced-motion, diagnostics, and emergency-disable controls;
 - does not automate gameplay, read cookies, inspect hidden zones, alter DuelingBook functions, or send duel data anywhere.
 
@@ -20,7 +21,7 @@ The current build:
 3. Approve the installation in Tampermonkey.
 4. Open `https://www.duelingbook.com/`.
 5. Click the `YF` button near the lower-left corner.
-6. Click **Preview Ash Blossom** or **Preview Polyflora** to test either animation without entering a duel.
+6. Use **Preview Ash Blossom**, **Preview Polyflora**, or **Preview No Way Out!** to test an animation without entering a duel.
 
 Tampermonkey checks the repository's built userscript for core updates. League configuration loads independently from the versioned JSON in `config/companion.sample.json`, allowing data changes without reinstalling the script.
 

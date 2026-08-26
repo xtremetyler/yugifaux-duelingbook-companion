@@ -1,7 +1,7 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-3",
-    minimumCoreVersion: "0.3.0",
+    dataVersion: "bundled-poc-4",
+    minimumCoreVersion: "0.4.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com"],
     animations: [
@@ -30,6 +30,36 @@
           durationMs: 4600
         },
         frequency: "every-event"
+      },
+      {
+        id: "no-way-out-effect-declaration",
+        trigger: { eventType: "effect-declaration", cardName: "No Way Out!" },
+        presentation: {
+          preset: "trap-chase-v1",
+          mediaType: "video",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/video/upload/v1787765186/i_want_to_animate_this_to_have.mp4",
+          title: "No Way Out!",
+          subtitle: "Trap Effect Declared",
+          accentColor: "#f97316",
+          durationMs: 5900,
+          playbackRate: 1.75
+        },
+        frequency: "every-event"
+      },
+      {
+        id: "no-way-out-set-activation",
+        trigger: { eventType: "activation", cardName: "No Way Out!" },
+        presentation: {
+          preset: "trap-chase-v1",
+          mediaType: "video",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/video/upload/v1787765186/i_want_to_animate_this_to_have.mp4",
+          title: "No Way Out!",
+          subtitle: "Set Trap Activated",
+          accentColor: "#f97316",
+          durationMs: 5900,
+          playbackRate: 1.75
+        },
+        frequency: "every-event"
       }
     ]
   });
@@ -51,9 +81,17 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
-      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
         errors.push(`animations[${index}].presentation.preset is unsupported.`);
       }
+      if (item?.presentation?.mediaType && !["image", "video"].includes(item.presentation.mediaType)) {
+        errors.push(`animations[${index}].presentation.mediaType is unsupported.`);
+      }
+      if (item?.presentation?.playbackRate !== undefined && (
+        typeof item.presentation.playbackRate !== "number" ||
+        item.presentation.playbackRate < 0.5 ||
+        item.presentation.playbackRate > 3
+      )) errors.push(`animations[${index}].presentation.playbackRate is invalid.`);
       if (item?.presentation?.assetUrl) {
         try {
           const url = new URL(item.presentation.assetUrl);
