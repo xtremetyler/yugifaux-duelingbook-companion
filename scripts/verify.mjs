@@ -70,6 +70,7 @@ assert(bundle.includes("Polyflora Hexbloom"), "Polyflora Token recipe is missing
 assert(bundle.includes("Bloom Token"), "Bloom Token definition is missing from the bundle");
 assert(bundle.includes("#duel .token_btn"), "native DuelingBook Token button integration is missing");
 assert(!tokenMacrosSource.includes("Send("), "Token macros must not call DuelingBook's socket sender");
+assert(!tokenMacrosSource.includes("view: window"), "sandboxed MouseEvents must not pass Tampermonkey's window wrapper as UIEvent.view");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
 assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");

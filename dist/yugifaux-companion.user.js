@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.9.0
+// @version      0.9.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.9.0",
+    version: "0.9.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1162,10 +1162,10 @@
     #${APP.ids.tokenModal} button { border: 1px solid #64748b; border-radius: 8px; background: #1e293b; color: #fff; padding: 9px 13px; cursor: pointer; font-weight: 750; }
     #${APP.ids.tokenModal} button:disabled { cursor: wait; opacity: .62; }
     #${APP.ids.tokenModal} .yf-token-close { border: 0; background: transparent; padding: 1px 7px; color: #cbd5e1; font-size: 28px; line-height: 1; }
-    #${APP.ids.tokenModal} .yf-token-gallery { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 14px; margin-top: 16px; }
-    #${APP.ids.tokenModal} .yf-token-source { display: grid; gap: 9px; width: 100%; border-color: #86efac88; padding: 10px; text-align: left; background: linear-gradient(145deg,#064e3b99,#312e8199); }
-    #${APP.ids.tokenModal} .yf-token-source img { width: 100%; aspect-ratio: 4/3; border-radius: 8px; object-fit: cover; object-position: center 32%; box-shadow: 0 7px 18px #0009; }
-    #${APP.ids.tokenModal} .yf-token-source strong { color: #f0fdf4; font-size: 16px; }
+    #${APP.ids.tokenModal} .yf-token-gallery { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px; margin-top: 16px; }
+    #${APP.ids.tokenModal} .yf-token-source { display: grid; align-content: start; gap: 7px; width: 100%; min-width: 0; border-color: #86efac88; padding: 7px; text-align: left; background: linear-gradient(145deg,#064e3b99,#312e8199); }
+    #${APP.ids.tokenModal} .yf-token-source img { width: 100%; aspect-ratio: 1; border-radius: 6px; object-fit: cover; object-position: center 32%; box-shadow: 0 5px 13px #0009; }
+    #${APP.ids.tokenModal} .yf-token-source strong { display: block; min-width: 0; overflow-wrap: anywhere; color: #f0fdf4; font-size: 12px; line-height: 1.2; }
     #${APP.ids.tokenModal} .yf-token-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
     #${APP.ids.tokenModal} .yf-token-preview { overflow: hidden; border: 1px solid #86efac88; border-radius: 11px; background: #0f172a; }
     #${APP.ids.tokenModal} .yf-token-preview img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
@@ -1179,7 +1179,7 @@
     #${APP.ids.tokenToast}.yf-token-error { border-color: #f87171; background: #450a0aec; color: #fee2e2; }
     #field .yf-token-badge { pointer-events: none; position: absolute; left: 7%; right: 7%; bottom: 5%; z-index: 40; border: 2px solid #bbf7d0; border-radius: 9px; background: #052e2be8; color: #f0fdf4; padding: 5px 7px; text-align: center; text-shadow: 0 2px 2px #000; box-shadow: 0 0 12px #86efacaa; font: 900 24px/1.08 Arial,sans-serif; }
     #field .yf-token-badge small { display: block; margin-top: 3px; color: #dbeafe; font-size: 18px; }
-    @media (max-width: 650px) { #${APP.ids.tokenButton} { right: 4px; } #${APP.ids.tokenModal} .yf-token-pair { grid-template-columns: 1fr; } #${APP.ids.tokenModal} .yf-token-details { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 650px) { #${APP.ids.tokenButton} { right: 4px; } #${APP.ids.tokenModal} .yf-token-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } #${APP.ids.tokenModal} .yf-token-pair { grid-template-columns: 1fr; } #${APP.ids.tokenModal} .yf-token-details { grid-template-columns: 1fr 1fr; } }
   `;
 
   function chooseDistinctTokenVariants(variants, count, random = Math.random) {
@@ -1381,7 +1381,7 @@
     async #beginNativeTokenSummon(carrierId, requiredOpenZones) {
       const nativeButton = document.querySelector("#duel .token_btn");
       if (!this.#isVisible(nativeButton)) throw new Error("DuelingBook’s native Token button is unavailable.");
-      nativeButton.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, cancelable: true, view: window }));
+      nativeButton.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, cancelable: true }));
       if (!await this.#waitFor(() => this.#isVisible(document.querySelector("#token_select")), 4000)) throw new Error("DuelingBook did not open its native Token selector.");
       if (!await this.#waitFor(() => this.#findCarrierThumbnail(carrierId), 4000)) throw new Error(`DuelingBook Token carrier ${carrierId} is unavailable.`);
       this.#findCarrierThumbnail(carrierId).click();
