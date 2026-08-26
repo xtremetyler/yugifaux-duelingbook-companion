@@ -7,7 +7,7 @@ The current build:
 - adds a small `YF` button and collapsible control panel;
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
-- adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 2` through `⛓️ Chain Link 7` chat declarations;
+- adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
 - flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;
 - supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;
 - presents those Tokens to installed companions as `Bloom Token` (Plant/WIND/Level 2/ATK 0/DEF 0) while leaving DuelingBook's authoritative generic Token state untouched;

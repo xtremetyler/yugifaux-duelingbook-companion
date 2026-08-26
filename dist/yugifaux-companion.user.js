@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.10.3
+// @version      0.10.4
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.10.3",
+    version: "0.10.4",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1571,7 +1571,7 @@
     }
   }
 
-  const CHAIN_LINKS = Object.freeze([2, 3, 4, 5, 6, 7]);
+  const CHAIN_LINKS = Object.freeze([1, 2, 3, 4, 5, 6, 7, 8]);
 
   function chainLinkMessage(link) {
     return CHAIN_LINKS.includes(Number(link)) ? `⛓️ Chain Link ${Number(link)}` : "";
@@ -1746,7 +1746,7 @@
         if (messageId && this.seenMessageIds.has(messageId)) continue;
         if (messageId) this.#rememberMessage(messageId);
         const message = messageElement.textContent.trim();
-        if (!/^⛓️\s*Chain Link [2-7]$/iu.test(message)) continue;
+        if (!/^⛓️\s*Chain Link [1-8]$/iu.test(message)) continue;
         const username = row.querySelector("b font")?.textContent?.replace(/:\s*$/, "").trim();
         if (username) this.#flashAvatar(username);
       }
