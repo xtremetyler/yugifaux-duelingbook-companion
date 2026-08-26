@@ -1,7 +1,7 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-6.1",
-    minimumCoreVersion: "0.6.1",
+    dataVersion: "bundled-poc-7",
+    minimumCoreVersion: "0.7.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com", "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"],
     animations: [
@@ -87,6 +87,19 @@
           durationMs: 4800
         },
         frequency: "every-event"
+      },
+      {
+        id: "painful-preference-activation",
+        trigger: { eventType: "activation", cardName: "Painful Preference" },
+        presentation: {
+          preset: "ice-cream-choice-v1",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787771135/painfulpref.png",
+          title: "Painful Preference",
+          subtitle: "Spell Activated",
+          accentColor: "#f9a8d4",
+          durationMs: 5200
+        },
+        frequency: "every-event"
       }
     ]
   });
@@ -108,7 +121,7 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
-      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1", "ice-cream-choice-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
         errors.push(`animations[${index}].presentation.preset is unsupported.`);
       }
       if (item?.presentation?.mediaType && !["image", "video"].includes(item.presentation.mediaType)) {

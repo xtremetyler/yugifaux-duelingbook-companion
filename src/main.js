@@ -27,9 +27,12 @@
     logObserver.start();
 
     ui = new CompanionUI(storage, diagnostics, () => state, {
-      preview(cardName) {
+      preview(cardName, eventType = "effect-declaration") {
         animationPlayer.resetDuel();
-        handlePublicEvent({ type: "effect-declaration", text: `Test Player declared the effect of ${cardName}` });
+        const text = eventType === "activation"
+          ? `Test Player Activated "${cardName}"`
+          : `Test Player declared the effect of ${cardName}`;
+        handlePublicEvent({ type: eventType, text });
       },
       reloadConfig,
       async emergencyDisable() {

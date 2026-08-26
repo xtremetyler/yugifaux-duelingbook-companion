@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.6.1
+// @version      0.7.0
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.6.1",
+    version: "0.7.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -99,8 +99,8 @@
 
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-6.1",
-    minimumCoreVersion: "0.6.1",
+    dataVersion: "bundled-poc-7",
+    minimumCoreVersion: "0.7.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com", "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"],
     animations: [
@@ -186,6 +186,19 @@
           durationMs: 4800
         },
         frequency: "every-event"
+      },
+      {
+        id: "painful-preference-activation",
+        trigger: { eventType: "activation", cardName: "Painful Preference" },
+        presentation: {
+          preset: "ice-cream-choice-v1",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787771135/painfulpref.png",
+          title: "Painful Preference",
+          subtitle: "Spell Activated",
+          accentColor: "#f9a8d4",
+          durationMs: 5200
+        },
+        frequency: "every-event"
       }
     ]
   });
@@ -207,7 +220,7 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
-      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1", "ice-cream-choice-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
         errors.push(`animations[${index}].presentation.preset is unsupported.`);
       }
       if (item?.presentation?.mediaType && !["image", "video"].includes(item.presentation.mediaType)) {
@@ -419,7 +432,7 @@
       previousOverlay?.querySelector("video")?.pause();
       previousOverlay?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1", "ice-cream-choice-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
       const mediaType = presentation.mediaType === "video" ? "video" : "image";
       const media = presentation.assetUrl
@@ -636,6 +649,50 @@
         overlay.append(field);
       }
 
+      if (preset === "ice-cream-choice-v1" && !settings.reducedMotion) {
+        const field = document.createElement("div");
+        field.className = "yf-ice-cream-field";
+        const flavors = [
+          ["vanilla", "VANILLA", "#fff7d6", "-24vw", "-7deg", "5deg"],
+          ["chocolate", "CHOCOLATE", "#7c3f22", "0vw", "0deg", "-5deg"],
+          ["strawberry", "STRAWBERRY", "#f9a8c4", "24vw", "7deg", "-5deg"]
+        ];
+
+        for (const [flavor, labelText, color, x, tilt, rock] of flavors) {
+          const choice = document.createElement("div");
+          choice.className = `yf-flavor-choice yf-flavor-${flavor}`;
+          choice.style.setProperty("--yf-flavor", color);
+          choice.style.setProperty("--yf-choice-x", x);
+          choice.style.setProperty("--yf-choice-tilt", tilt);
+          choice.style.setProperty("--yf-choice-rock", rock);
+          const scoop = document.createElement("i");
+          scoop.className = "yf-ice-cream-scoop";
+          const label = document.createElement("b");
+          label.textContent = labelText;
+          choice.append(scoop, label);
+          field.append(choice);
+        }
+
+        const dilemma = document.createElement("b");
+        dilemma.className = "yf-flavor-dilemma";
+        dilemma.textContent = "?";
+        field.append(dilemma);
+
+        const sprinkleColors = ["#fff7d6", "#7c3f22", "#f9a8c4", "#60a5fa", "#facc15"];
+        for (let index = 0; index < 42; index += 1) {
+          const sprinkle = document.createElement("i");
+          sprinkle.className = "yf-sprinkle";
+          sprinkle.style.setProperty("--yf-x", `${(index * 47) % 100}%`);
+          sprinkle.style.setProperty("--yf-color", sprinkleColors[index % sprinkleColors.length]);
+          sprinkle.style.setProperty("--yf-delay", `${-((index * 17) % 38) / 10}s`);
+          sprinkle.style.setProperty("--yf-duration", `${2.2 + ((index * 13) % 18) / 10}s`);
+          sprinkle.style.setProperty("--yf-drift", `${((index * 29) % 19) - 9}vw`);
+          sprinkle.style.setProperty("--yf-spin", `${240 + ((index * 31) % 420)}deg`);
+          field.append(sprinkle);
+        }
+        overlay.append(field);
+      }
+
       const stage = document.createElement("div");
       stage.className = "yf-animation-stage";
       if (media) {
@@ -741,6 +798,8 @@
     #${APP.ids.overlay}.yf-preset-celestial-excavate-v1::after { content: ""; position: absolute; left: 50%; top: 43%; width: min(76vmin,760px); height: min(33vmin,330px); border: 3px solid #a5f3fc99; border-radius: 50%; box-shadow: 0 0 22px #67e8f9,inset 0 0 30px #c084fc66,0 0 70px #818cf866; opacity: 0; transform: translate(-50%,-50%) scale(.2); animation: yf-celestial-eye 6.2s ease-in-out both; }
     #${APP.ids.overlay}.yf-preset-concert-rise-v1 { background: radial-gradient(circle at 50% 48%,#facc1530 0 12%,transparent 44%),radial-gradient(circle at 20% 28%,#2563eb38,transparent 32%),radial-gradient(circle at 80% 28%,#dc262638,transparent 32%),linear-gradient(145deg,#070719cc,#1e1b4bcc 52%,#310a36c9); }
     #${APP.ids.overlay}.yf-preset-concert-rise-v1::before { content: ""; position: absolute; inset: 0; background: repeating-radial-gradient(ellipse at 50% 100%,transparent 0 8vmin,#facc1509 8.4vmin 8.8vmin); opacity: 0; animation: yf-concert-house-lights 4.8s ease-in-out both; }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 { background: radial-gradient(circle at 50% 43%,#fff7d62b 0 15%,transparent 46%),radial-gradient(circle at 18% 34%,#7c3f2238,transparent 32%),radial-gradient(circle at 82% 34%,#f9a8c43d,transparent 32%),linear-gradient(145deg,#422006c7,#4c1d45c9 52%,#164e63c4); }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1::before { content: ""; position: absolute; inset: -12%; background: conic-gradient(from -25deg at 50% 48%,transparent 0 8%,#fff7d61f 10% 13%,transparent 15% 30%,#f9a8c424 32% 35%,transparent 37% 54%,#7c3f222d 56% 60%,transparent 62%); filter: blur(8px); opacity: 0; animation: yf-flavor-rays 5.2s ease-in-out both; }
     #${APP.ids.overlay} .yf-animation-stage { position: relative; width: min(1040px, 92vw); height: min(760px, 78vh); display: grid; place-items: center; }
     #${APP.ids.overlay} .yf-animation-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 18px #000a) drop-shadow(0 0 24px color-mix(in srgb, var(--yf-accent) 75%, transparent)); will-change: transform, opacity, filter; animation: yf-art-bloom 3.6s cubic-bezier(.16,.78,.22,1) both; }
     #${APP.ids.overlay} .yf-animation-video { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; opacity: 0; filter: saturate(1.08) contrast(1.08) brightness(.88); animation: yf-trap-video var(--yf-overlay-duration) ease-in-out both; }
@@ -795,6 +854,20 @@
     #${APP.ids.overlay} .yf-concert-equalizer i { flex: 1 1 0; min-width: 3px; height: var(--yf-height); border-radius: 4px 4px 0 0; background: linear-gradient(to top,var(--yf-color),#fff); box-shadow: 0 0 8px var(--yf-color),0 0 18px color-mix(in srgb,var(--yf-color) 70%,transparent); transform-origin: 50% 100%; animation: yf-equalizer-beat .62s ease-in-out var(--yf-delay) infinite alternate; }
     #${APP.ids.overlay} .yf-music-note { position: absolute; left: var(--yf-x); bottom: -10vh; color: var(--yf-color); text-shadow: 0 2px 2px #000,0 0 8px #fff,0 0 18px var(--yf-color); opacity: 0; font: 800 var(--yf-size)/1 Georgia,serif; animation: yf-note-rise var(--yf-duration) ease-in var(--yf-delay) infinite; }
     #${APP.ids.overlay} .yf-concert-pulse { position: absolute; left: 50%; top: 59%; width: 20vmin; aspect-ratio: 1; border: 4px solid var(--yf-color); border-radius: 50%; box-shadow: 0 0 16px var(--yf-color),inset 0 0 12px var(--yf-color); opacity: 0; transform: translate(-50%,-50%) scale(.2); animation: yf-concert-pulse 1.3s ease-out var(--yf-delay) infinite; }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 .yf-animation-stage { z-index: auto; width: 100vw; height: 100vh; }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 .yf-animation-art { inset: 1vh 22vw 14vh; z-index: 2; width: 56vw; height: 82vh; transform-origin: 50% 66%; animation: yf-painful-choice 5.2s cubic-bezier(.16,.84,.22,1) both; }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 .yf-animation-nameplate { z-index: 7; bottom: 1.8%; width: min(980px,94vw); border-image: linear-gradient(90deg,#fff7d6,#7c3f22,#f9a8c4,#fff7d6) 1; background: linear-gradient(90deg,transparent,#713f12e8 14%,#4c1d45f2 50%,#9d174de8 86%,transparent); animation-duration: 5.2s; }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 strong { color: #fff7ed; font-size: clamp(24px,4.2vw,52px); text-shadow: 0 3px 2px #3f1d12,0 0 12px #f9a8c4,0 0 26px #fff7d6; }
+    #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 span { color: #fff7d6; }
+    #${APP.ids.overlay} .yf-ice-cream-field { position: absolute; inset: 0; z-index: 4; overflow: hidden; perspective: 900px; }
+    #${APP.ids.overlay} .yf-flavor-choice { position: absolute; left: 50%; top: 47%; width: clamp(90px,10vw,145px); height: clamp(170px,25vh,250px); opacity: 0; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) rotate(var(--yf-choice-tilt)); animation: yf-flavor-choice 5.2s cubic-bezier(.18,.85,.2,1) both; }
+    #${APP.ids.overlay} .yf-ice-cream-scoop { position: absolute; left: 50%; top: 0; width: 78%; aspect-ratio: 1; transform: translateX(-50%); border: 3px solid #fff8; border-radius: 48% 52% 46% 54%; background: radial-gradient(circle at 32% 25%,#fff9 0 7%,transparent 18%),radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--yf-flavor) 65%,#fff),var(--yf-flavor) 62%,color-mix(in srgb,var(--yf-flavor) 72%,#3f1d12)); box-shadow: 0 7px 0 color-mix(in srgb,var(--yf-flavor) 76%,#3f1d12),0 0 18px var(--yf-flavor),0 10px 20px #0008; }
+    #${APP.ids.overlay} .yf-ice-cream-scoop::after { content: ""; position: absolute; left: 50%; top: 78%; width: 72%; height: 128%; transform: translateX(-50%); clip-path: polygon(0 0,100% 0,50% 100%); background: repeating-linear-gradient(55deg,#d8954a 0 4px,#f4c16d 5px 10px); filter: drop-shadow(0 8px 6px #0008); }
+    #${APP.ids.overlay} .yf-flavor-choice b { position: absolute; left: 50%; top: 88%; width: max-content; transform: translateX(-50%); border: 1px solid var(--yf-flavor); border-radius: 999px; padding: 5px 9px; color: #fff; background: #3f1d12c9; box-shadow: 0 0 12px var(--yf-flavor); letter-spacing: .12em; font: 900 clamp(9px,1vw,13px)/1 Arial,sans-serif; text-shadow: 0 2px 2px #000; }
+    #${APP.ids.overlay} .yf-flavor-chocolate { animation-delay: .12s; }
+    #${APP.ids.overlay} .yf-flavor-strawberry { animation-delay: .24s; }
+    #${APP.ids.overlay} .yf-flavor-dilemma { position: absolute; left: 50%; top: 10%; color: #fff7d6; opacity: 0; transform: translateX(-50%); font: 900 clamp(70px,12vw,170px)/1 Georgia,serif; text-shadow: 0 4px 3px #3f1d12,0 0 16px #f9a8c4,0 0 42px #fff7d6; animation: yf-flavor-dilemma 5.2s ease-in-out both; }
+    #${APP.ids.overlay} .yf-sprinkle { position: absolute; left: var(--yf-x); bottom: -5vh; width: 5px; height: 17px; border-radius: 4px; background: var(--yf-color); box-shadow: 0 0 6px var(--yf-color); opacity: 0; animation: yf-sprinkle-pop var(--yf-duration) linear var(--yf-delay) infinite; }
     #${APP.ids.overlay} .yf-trap-field { position: absolute; inset: 0; z-index: 3; overflow: hidden; }
     #${APP.ids.overlay} .yf-trap-stamp { position: absolute; top: 7%; left: 50%; transform: translateX(-50%) rotate(-3deg); border: 4px double #fb923c; padding: 8px 18px; color: #fff7ed; background: #450a0ae8; box-shadow: 0 0 18px #f97316, inset 0 0 14px #7f1d1d; opacity: 0; letter-spacing: .26em; font: 900 clamp(15px,2.2vw,28px)/1 Arial,sans-serif; animation: yf-trap-stamp var(--yf-overlay-duration) cubic-bezier(.2,.8,.2,1) both; }
     #${APP.ids.overlay} .yf-trap-page { position: absolute; left: -12vw; top: var(--yf-y); width: 38px; height: 26px; border: 1px solid #7c5b36; background: repeating-linear-gradient(0deg,#ead9ae 0 5px,#8b6b4538 6px); box-shadow: 0 2px 8px #0008,0 0 9px #fb923c66; opacity: 0; animation: yf-trap-page var(--yf-duration) linear var(--yf-delay) infinite; }
@@ -802,7 +875,7 @@
     #${APP.ids.overlay} .yf-trap-seal { position: absolute; right: 2.3%; bottom: 4.2%; display: grid; place-items: center; width: 78px; aspect-ratio: 1; border: 4px double #fed7aa; border-radius: 50%; color: #fff7ed; background: radial-gradient(circle,#991b1b 0 48%,#450a0a 52% 66%,#f97316 69% 73%,#450a0a 76%); box-shadow: 0 0 15px #000,0 0 24px #f97316; opacity: 0; transform: rotate(12deg) scale(1.8); text-align: center; letter-spacing: .08em; font: 900 12px/1 Arial,sans-serif; animation: yf-trap-seal var(--yf-overlay-duration) cubic-bezier(.2,.8,.2,1) both; }
     #${APP.ids.overlay}.yf-reduced-motion { animation: none; background: #020617dd; }
     #${APP.ids.overlay}.yf-reduced-motion .yf-animation-art, #${APP.ids.overlay}.yf-reduced-motion .yf-animation-video, #${APP.ids.overlay}.yf-reduced-motion .yf-animation-nameplate { animation: none; opacity: 1; }
-    #${APP.ids.overlay}.yf-reduced-motion .yf-arcane-field, #${APP.ids.overlay}.yf-reduced-motion .yf-trap-field, #${APP.ids.overlay}.yf-reduced-motion .yf-celestial-field, #${APP.ids.overlay}.yf-reduced-motion .yf-concert-field { display: none; }
+    #${APP.ids.overlay}.yf-reduced-motion .yf-arcane-field, #${APP.ids.overlay}.yf-reduced-motion .yf-trap-field, #${APP.ids.overlay}.yf-reduced-motion .yf-celestial-field, #${APP.ids.overlay}.yf-reduced-motion .yf-concert-field, #${APP.ids.overlay}.yf-reduced-motion .yf-ice-cream-field { display: none; }
     @keyframes yf-overlay-in { from { opacity: 0 } to { opacity: 1 } }
     @keyframes yf-art-bloom { 0% { opacity: 0; transform: translate3d(0,12vh,0) scale(.64) rotate(-4deg); filter: blur(12px) brightness(1.8) } 18% { opacity: 1 } 42%,76% { opacity: 1; transform: translate3d(0,-1vh,0) scale(1.02) rotate(0); filter: blur(0) brightness(1.08) } 100% { opacity: 0; transform: translate3d(0,-3vh,0) scale(1.08); filter: blur(2px) brightness(1.25) } }
     @keyframes yf-nameplate { 0%,18% { opacity: 0; transform: translate3d(-50%,28px,0) scaleX(.72) } 32%,78% { opacity: 1; transform: translate3d(-50%,0,0) scaleX(1) } 100% { opacity: 0; transform: translate3d(-50%,-10px,0) scaleX(1.02) } }
@@ -841,6 +914,11 @@
     @keyframes yf-equalizer-beat { from { transform: scaleY(.2); filter: brightness(.75) } to { transform: scaleY(1); filter: brightness(1.4) } }
     @keyframes yf-note-rise { 0% { opacity: 0; transform: translate3d(0,8vh,0) rotate(-18deg) scale(.35) } 12%,78% { opacity: .92 } 100% { opacity: 0; transform: translate3d(var(--yf-drift),-118vh,0) rotate(42deg) scale(1.18) } }
     @keyframes yf-concert-pulse { 0% { opacity: .8; transform: translate(-50%,-50%) scale(.15) } 100% { opacity: 0; transform: translate(-50%,-50%) scale(5.2) } }
+    @keyframes yf-flavor-rays { 0% { opacity: 0; transform: rotate(-18deg) scale(.65) } 22%,78% { opacity: 1; transform: rotate(7deg) scale(1) } 100% { opacity: 0; transform: rotate(20deg) scale(1.18) } }
+    @keyframes yf-painful-choice { 0% { opacity: 0; transform: translateY(16vh) scale(.55); filter: blur(12px) saturate(1.6) brightness(1.5) } 19% { opacity: 1; transform: translateY(-1vh) scale(1.04); filter: blur(0) saturate(1.2) brightness(1.14) } 34%,76% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) saturate(1.08) brightness(1.04) drop-shadow(0 0 22px #f9a8c4) } 84% { transform: translateX(-1.1vw) rotate(-.5deg) } 90% { transform: translateX(1.1vw) rotate(.5deg) } 100% { opacity: 0; transform: translateY(-3vh) scale(1.06); filter: blur(3px) brightness(1.3) } }
+    @keyframes yf-flavor-choice { 0%,8% { opacity: 0; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(24vh) rotate(var(--yf-choice-tilt)) scale(.35) } 26%,70% { opacity: .96; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(0) rotate(var(--yf-choice-tilt)) scale(1) } 78% { transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(-2vh) rotate(var(--yf-choice-rock)) scale(1.08) } 100% { opacity: 0; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(-18vh) rotate(var(--yf-choice-tilt)) scale(.72) } }
+    @keyframes yf-flavor-dilemma { 0%,14% { opacity: 0; transform: translateX(-50%) scale(2.2) rotate(-14deg) } 27%,72% { opacity: .9; transform: translateX(-50%) scale(1) rotate(0) } 80% { transform: translateX(-50%) scale(1.15) rotate(8deg) } 100% { opacity: 0; transform: translateX(-50%) scale(.7) rotate(-12deg) } }
+    @keyframes yf-sprinkle-pop { 0% { opacity: 0; transform: translate3d(0,6vh,0) rotate(0) } 12%,78% { opacity: .9 } 100% { opacity: 0; transform: translate3d(var(--yf-drift),-112vh,0) rotate(var(--yf-spin)) } }
   `;
 
   class CompanionUI {
@@ -907,6 +985,10 @@
       testPepper.type = "button";
       testPepper.textContent = "Preview Sgt. Pepper";
       testPepper.addEventListener("click", () => { panel.hidden = true; this.actions.preview("Sgt. Pepper's Lonely Hearts Club Band"); });
+      const testPainfulPreference = document.createElement("button");
+      testPainfulPreference.type = "button";
+      testPainfulPreference.textContent = "Preview Painful Preference";
+      testPainfulPreference.addEventListener("click", () => { panel.hidden = true; this.actions.preview("Painful Preference", "activation"); });
       const reload = document.createElement("button");
       reload.type = "button";
       reload.textContent = "Check league data";
@@ -918,7 +1000,7 @@
 
       this.diagnosticOutput = document.createElement("div");
       this.diagnosticOutput.className = "yf-diagnostics";
-      panel.append(testAsh, testPolyflora, testNoWayOut, testIris, testPepper, reload, disable, this.diagnosticOutput);
+      panel.append(testAsh, testPolyflora, testNoWayOut, testIris, testPepper, testPainfulPreference, reload, disable, this.diagnosticOutput);
       button.addEventListener("click", () => { panel.hidden = !panel.hidden; });
       document.body.append(button, panel);
       this.diagnostics.subscribe((entries) => this.#renderDiagnostics(entries));
@@ -985,9 +1067,12 @@
     logObserver.start();
 
     ui = new CompanionUI(storage, diagnostics, () => state, {
-      preview(cardName) {
+      preview(cardName, eventType = "effect-declaration") {
         animationPlayer.resetDuel();
-        handlePublicEvent({ type: "effect-declaration", text: `Test Player declared the effect of ${cardName}` });
+        const text = eventType === "activation"
+          ? `Test Player Activated "${cardName}"`
+          : `Test Player declared the effect of ${cardName}`;
+        handlePublicEvent({ type: eventType, text });
       },
       reloadConfig,
       async emergencyDisable() {

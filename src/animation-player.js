@@ -29,7 +29,7 @@
       previousOverlay?.querySelector("video")?.pause();
       previousOverlay?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1", "concert-rise-v1", "ice-cream-choice-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
       const mediaType = presentation.mediaType === "video" ? "video" : "image";
       const media = presentation.assetUrl
@@ -242,6 +242,50 @@
           pulse.style.setProperty("--yf-delay", `${index * 0.42}s`);
           pulse.style.setProperty("--yf-color", colors[index]);
           field.append(pulse);
+        }
+        overlay.append(field);
+      }
+
+      if (preset === "ice-cream-choice-v1" && !settings.reducedMotion) {
+        const field = document.createElement("div");
+        field.className = "yf-ice-cream-field";
+        const flavors = [
+          ["vanilla", "VANILLA", "#fff7d6", "-24vw", "-7deg", "5deg"],
+          ["chocolate", "CHOCOLATE", "#7c3f22", "0vw", "0deg", "-5deg"],
+          ["strawberry", "STRAWBERRY", "#f9a8c4", "24vw", "7deg", "-5deg"]
+        ];
+
+        for (const [flavor, labelText, color, x, tilt, rock] of flavors) {
+          const choice = document.createElement("div");
+          choice.className = `yf-flavor-choice yf-flavor-${flavor}`;
+          choice.style.setProperty("--yf-flavor", color);
+          choice.style.setProperty("--yf-choice-x", x);
+          choice.style.setProperty("--yf-choice-tilt", tilt);
+          choice.style.setProperty("--yf-choice-rock", rock);
+          const scoop = document.createElement("i");
+          scoop.className = "yf-ice-cream-scoop";
+          const label = document.createElement("b");
+          label.textContent = labelText;
+          choice.append(scoop, label);
+          field.append(choice);
+        }
+
+        const dilemma = document.createElement("b");
+        dilemma.className = "yf-flavor-dilemma";
+        dilemma.textContent = "?";
+        field.append(dilemma);
+
+        const sprinkleColors = ["#fff7d6", "#7c3f22", "#f9a8c4", "#60a5fa", "#facc15"];
+        for (let index = 0; index < 42; index += 1) {
+          const sprinkle = document.createElement("i");
+          sprinkle.className = "yf-sprinkle";
+          sprinkle.style.setProperty("--yf-x", `${(index * 47) % 100}%`);
+          sprinkle.style.setProperty("--yf-color", sprinkleColors[index % sprinkleColors.length]);
+          sprinkle.style.setProperty("--yf-delay", `${-((index * 17) % 38) / 10}s`);
+          sprinkle.style.setProperty("--yf-duration", `${2.2 + ((index * 13) % 18) / 10}s`);
+          sprinkle.style.setProperty("--yf-drift", `${((index * 29) % 19) - 9}vw`);
+          sprinkle.style.setProperty("--yf-spin", `${240 + ((index * 31) % 420)}deg`);
+          field.append(sprinkle);
         }
         overlay.append(field);
       }

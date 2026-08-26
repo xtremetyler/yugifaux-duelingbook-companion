@@ -30,11 +30,13 @@ assert(config.animations.some((item) => item.trigger?.cardName === "No Way Out!"
 assert(config.animations.some((item) => item.trigger?.cardName === "No Way Out!" && item.trigger.eventType === "activation"), "No Way Out Set activation trigger is missing");
 assert(config.animations.some((item) => item.trigger?.cardName === "Iris the Radiant, the Celestial Eye of Infinite Reflections" && item.trigger.eventType === "effect-declaration"), "Iris effect-declaration trigger is missing");
 assert(config.animations.some((item) => item.trigger?.cardName === "Sgt. Pepper's Lonely Hearts Club Band" && item.trigger.eventType === "effect-declaration"), "Sgt. Pepper effect-declaration trigger is missing");
+assert(config.animations.some((item) => item.trigger?.cardName === "Painful Preference" && item.trigger.eventType === "activation"), "Painful Preference activation trigger is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "petal-bloom-v1"), "petal-bloom preset is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "arcane-bloom-v1"), "arcane-bloom preset is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "trap-chase-v1"), "trap-chase preset is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "celestial-excavate-v1"), "celestial-excavate preset is missing");
 assert(config.animations.some((item) => item.presentation?.preset === "concert-rise-v1"), "concert-rise preset is missing");
+assert(config.animations.some((item) => item.presentation?.preset === "ice-cream-choice-v1"), "ice-cream-choice preset is missing");
 assert(bundle.includes("effect-declaration"), "effect declaration classifier is missing from the bundle");
 assert(bundle.includes("res.cloudinary.com/vosvpv50"), "approved Ash Blossom asset is missing from the bundle");
 assert(bundle.includes("v1787763973/polyflora.png"), "approved Polyflora asset is missing from the bundle");
@@ -43,6 +45,7 @@ assert(bundle.includes("document.createElement(\"video\")"), "video playback sup
 assert(bundle.includes("v1787768161/iriseff.png"), "approved Iris asset is missing from the bundle");
 assert(bundle.includes("dhh7m81-c2929be0-8eda-42d9-840b-2ceb6ef6c44b.png"), "Iris card-back asset is missing from the bundle");
 assert(bundle.includes("v1787769996/sgt._pepper.png"), "approved Sgt. Pepper asset is missing from the bundle");
+assert(bundle.includes("v1787771135/painfulpref.png"), "approved Painful Preference asset is missing from the bundle");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
 assert(manifest.animations.every((item) => item.trigger?.cardName), "each animation needs a card trigger");
 
@@ -54,6 +57,7 @@ const noWayOutDeclaration = "Yugi declared the effect of No Way Out!.";
 const noWayOutSetActivation = "Yugi Activated Set \"No Way Out!\".";
 const irisDeclaration = "Yugi declared the effect of Iris the Radiant, the Celestial Eye of Infinite Reflections.";
 const pepperDeclaration = "Yugi declared the effect of Sgt. Pepper's Lonely Hearts Club Band.";
+const painfulPreferenceActivation = "Yugi Activated \"Painful Preference\".";
 const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
 assert(
   classifyPublicLogLine(getNewLogText(ashDeclaration, `${ashDeclaration}\n${normalSummon}`))?.type === "normal-summon",
@@ -86,6 +90,10 @@ assert(
 assert(
   classifyPublicLogLine(getNewLogText(irisDeclaration, `${irisDeclaration}\n${pepperDeclaration}`))?.type === "effect-declaration",
   "a newly appended Sgt. Pepper declaration must remain detectable"
+);
+assert(
+  classifyPublicLogLine(getNewLogText(pepperDeclaration, `${pepperDeclaration}\n${painfulPreferenceActivation}`))?.type === "activation",
+  "an Activated Painful Preference line must be classified as an activation"
 );
 
 if (failures.length) {

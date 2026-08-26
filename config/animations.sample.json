@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "manifestVersion": "poc-2026-08-26.7",
+  "manifestVersion": "poc-2026-08-26.8",
   "animations": [
     {
       "id": "ash-blossom-lonely-spring-effect",
@@ -116,6 +116,25 @@
         "subtitle": "Effect Declared",
         "accentColor": "#facc15",
         "durationMs": 4800,
+        "audioUrl": null,
+        "fallback": "skip"
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "painful-preference-activation",
+      "trigger": {
+        "eventType": "activation",
+        "cardName": "Painful Preference"
+      },
+      "presentation": {
+        "preset": "ice-cream-choice-v1",
+        "kind": "css-layered-image",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787771135/painfulpref.png",
+        "title": "Painful Preference",
+        "subtitle": "Spell Activated",
+        "accentColor": "#f9a8d4",
+        "durationMs": 5200,
         "audioUrl": null,
         "fallback": "skip"
       },

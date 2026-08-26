@@ -1,8 +1,8 @@
 {
   "$schema": "./companion.schema.json",
   "schemaVersion": 1,
-  "dataVersion": "poc-2026-08-26.9",
-  "minimumCoreVersion": "0.6.1",
+  "dataVersion": "poc-2026-08-26.10",
+  "minimumCoreVersion": "0.7.0",
   "featureFlags": {
     "panel": true,
     "eventObserver": true,
@@ -112,6 +112,22 @@
         "subtitle": "Effect Declared",
         "accentColor": "#facc15",
         "durationMs": 4800
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "painful-preference-activation",
+      "trigger": {
+        "eventType": "activation",
+        "cardName": "Painful Preference"
+      },
+      "presentation": {
+        "preset": "ice-cream-choice-v1",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787771135/painfulpref.png",
+        "title": "Painful Preference",
+        "subtitle": "Spell Activated",
+        "accentColor": "#f9a8d4",
+        "durationMs": 5200
       },
       "frequency": "every-event"
     }
