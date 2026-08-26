@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.9.2
+// @version      0.9.3
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.9.2",
+    version: "0.9.3",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1177,8 +1177,11 @@
     #${APP.ids.tokenModal} .yf-token-primary { border-color: #bbf7d0; background: linear-gradient(135deg,#047857,#4338ca); }
     #${APP.ids.tokenToast} { position: fixed; left: 50%; top: 18px; z-index: 2147483647; width: min(520px,calc(100vw - 32px)); transform: translateX(-50%); border: 1px solid #86efac; border-radius: 9px; background: #052e2bec; color: #ecfdf5; padding: 12px 16px; text-align: center; font: 800 14px/1.4 Arial,sans-serif; box-shadow: 0 10px 28px #000c; }
     #${APP.ids.tokenToast}.yf-token-error { border-color: #f87171; background: #450a0aec; color: #fee2e2; }
-    #field .yf-token-badge { pointer-events: none; position: absolute; left: 7%; right: 7%; bottom: 5%; z-index: 40; border: 2px solid #bbf7d0; border-radius: 9px; background: #052e2be8; color: #f0fdf4; padding: 5px 7px; text-align: center; text-shadow: 0 2px 2px #000; box-shadow: 0 0 12px #86efacaa; font: 900 24px/1.08 Arial,sans-serif; }
-    #field .yf-token-badge small { display: block; margin-top: 3px; color: #dbeafe; font-size: 18px; }
+    #preview_txt.yf-token-preview-details { overflow: hidden; border: 1px solid #86efac99; border-radius: 7px; background: linear-gradient(145deg,#052e2be8,#172554e8); color: #f8fafc; padding: 9px 10px; box-shadow: inset 0 0 18px #86efac18; font: 700 14px/1.32 Arial,sans-serif; }
+    #preview_txt.yf-token-preview-details strong { display: block; margin-bottom: 4px; color: #dcfce7; font-size: 17px; }
+    #preview_txt.yf-token-preview-details .yf-token-preview-meta { color: #bae6fd; }
+    #preview_txt.yf-token-preview-details .yf-token-preview-stats { margin: 5px 0; color: #fef3c7; font-weight: 900; }
+    #preview_txt.yf-token-preview-details .yf-token-preview-reminder { color: #e2e8f0; font-size: 12px; font-weight: 600; }
     @media (max-width: 650px) { #${APP.ids.tokenButton} { right: 4px; } #${APP.ids.tokenModal} .yf-token-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } #${APP.ids.tokenModal} .yf-token-pair { grid-template-columns: 1fr; } #${APP.ids.tokenModal} .yf-token-details { grid-template-columns: 1fr 1fr; } }
   `;
 
@@ -1208,6 +1211,7 @@
       this.active = false;
       this.drafts = new Map();
       this.variantByCarrier = new Map();
+      this.previewTimer = null;
       for (const recipe of TOKEN_RECIPES) for (const variant of recipe.variants) this.variantByCarrier.set(variant.carrierId, { recipe, variant });
     }
 
@@ -1225,6 +1229,8 @@
       document.body.append(this.button);
       const observer = new MutationObserver((records) => this.#observeTokenChanges(records));
       observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
+      document.addEventListener("mouseover", (event) => this.#handleFieldPreviewRequest(event), true);
+      document.addEventListener("click", (event) => this.#handleFieldPreviewRequest(event), true);
       this.#scanForTokenCarriers(document);
       setInterval(() => this.refresh(), 750);
       this.refresh();
@@ -1467,16 +1473,50 @@
       const art = card.querySelector("img.image") ?? [...card.querySelectorAll("img")].find((image) => tokenCarrierFromUrl(image.src) !== null) ?? card.querySelector("img");
       if (art && art.src !== variant.artworkUrl) art.src = variant.artworkUrl;
       card.title = `${recipe.token.name} — ${recipe.token.monsterType}/${recipe.token.attribute}/Level ${recipe.token.level} — ATK ${recipe.token.atk}/DEF ${recipe.token.def}`;
-      let badge = card.querySelector(":scope > .yf-token-badge");
-      if (!badge) {
-        badge = document.createElement("div");
-        badge.className = "yf-token-badge";
-        card.append(badge);
+      card.querySelector(":scope > .yf-token-badge")?.remove();
+    }
+
+    #handleFieldPreviewRequest(event) {
+      const card = event.target?.closest?.("#field .card");
+      if (!card) return;
+      const definition = this.variantByCarrier.get(Number(card.dataset.yfTokenCarrier ?? 0));
+      clearTimeout(this.previewTimer);
+      if (!definition) {
+        document.getElementById("preview_txt")?.classList.remove("yf-token-preview-details");
+        return;
       }
-      badge.textContent = recipe.token.name;
-      const details = document.createElement("small");
-      details.textContent = `${recipe.token.attribute} • LV ${recipe.token.level} • ${recipe.token.atk}/${recipe.token.def}`;
-      badge.append(details);
+      // Let DuelingBook populate its normal preview first, then replace only its presentation.
+      this.previewTimer = setTimeout(() => this.#showTokenInNativePreview(definition), 35);
+    }
+
+    #showTokenInNativePreview(definition) {
+      const preview = document.getElementById("preview");
+      const details = document.getElementById("preview_txt");
+      if (!preview || !details || !definition) return;
+      const { recipe, variant } = definition;
+      const token = recipe.token;
+      const artwork = preview.querySelector("img.image, .image img");
+      if (artwork instanceof HTMLImageElement) artwork.src = variant.artworkUrl;
+      for (const name of preview.querySelectorAll(".name_txt, .name2_txt")) name.textContent = token.name;
+      for (const type of preview.querySelectorAll(".type_txt")) type.textContent = `[${token.monsterType.toUpperCase()} / TOKEN]`;
+      for (const attack of preview.querySelectorAll(".atk_txt")) attack.textContent = String(token.atk);
+      for (const defense of preview.querySelectorAll(".def_txt")) defense.textContent = String(token.def);
+      for (const effect of preview.querySelectorAll(".effect_txt")) effect.textContent = `This Token was Special Summoned by ${recipe.sourceName}.`;
+
+      details.classList.add("yf-token-preview-details");
+      details.replaceChildren();
+      const name = document.createElement("strong");
+      name.textContent = token.name;
+      const meta = document.createElement("div");
+      meta.className = "yf-token-preview-meta";
+      meta.textContent = `${token.attribute} • ${token.monsterType} / Token • Level ${token.level}`;
+      const stats = document.createElement("div");
+      stats.className = "yf-token-preview-stats";
+      stats.textContent = `ATK ${token.atk} / DEF ${token.def} • ${token.position} Position`;
+      const reminder = document.createElement("div");
+      reminder.className = "yf-token-preview-reminder";
+      reminder.textContent = `Special Summoned by ${recipe.sourceName}. Custom artwork and details are visible to players using the YugiFaux Companion.`;
+      details.append(name, meta, stats, reminder);
     }
 
     #showToast(message, error = false) {
