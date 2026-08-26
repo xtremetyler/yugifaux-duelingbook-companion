@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.10.1
+// @version      0.10.2
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT

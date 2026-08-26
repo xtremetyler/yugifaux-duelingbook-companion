@@ -92,8 +92,8 @@
 
     #send(link) {
       const message = chainLinkMessage(link);
-      const input = document.querySelector("#duel .cin_txt");
-      if (!message || !(input instanceof HTMLInputElement) || !this.#isVisible(input) || input.disabled) {
+      const input = this.#findChatInput();
+      if (!message || !input) {
         this.#showToast("DuelingBook’s duel chat is unavailable.");
         return;
       }
@@ -121,6 +121,27 @@
         input.focus();
       }, 120);
       this.diagnostics.info("chain-macro", "player requested visible chain message", { link: Number(link) });
+    }
+
+    #findChatInput() {
+      const selectors = [
+        "#duel #cin_txt",
+        "#duel .cin_txt",
+        "#cin_txt",
+        ".cin_txt"
+      ];
+      const candidates = [];
+      for (const selector of selectors) {
+        for (const candidate of document.querySelectorAll(selector)) {
+          if (!candidates.includes(candidate)) candidates.push(candidate);
+        }
+      }
+      return candidates.find((candidate) =>
+        (candidate instanceof HTMLInputElement || candidate instanceof HTMLTextAreaElement)
+        && this.#isVisible(candidate)
+        && !candidate.disabled
+        && !candidate.readOnly
+      ) ?? null;
     }
 
     #observeChat() {
