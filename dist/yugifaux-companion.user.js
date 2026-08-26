@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.10.2
+// @version      0.10.3
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.10.2",
+    version: "0.10.3",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1709,12 +1709,16 @@
           if (!candidates.includes(candidate)) candidates.push(candidate);
         }
       }
-      return candidates.find((candidate) =>
-        (candidate instanceof HTMLInputElement || candidate instanceof HTMLTextAreaElement)
-        && this.#isVisible(candidate)
-        && !candidate.disabled
-        && !candidate.readOnly
-      ) ?? null;
+      return candidates.find((candidate) => this.#isUsableChatInput(candidate)) ?? null;
+    }
+
+    #isUsableChatInput(candidate) {
+      if (!(candidate instanceof Element) || !candidate.matches('input[type="text"], textarea')) return false;
+      if (candidate.disabled || candidate.readOnly || candidate.getClientRects().length === 0) return false;
+      const style = getComputedStyle(candidate);
+      // DuelingBook deliberately sets the native input's opacity to zero and
+      // renders the visible white chat field through its custom UI layer.
+      return style.display !== "none" && style.visibility !== "hidden";
     }
 
     #observeChat() {

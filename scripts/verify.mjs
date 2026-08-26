@@ -91,7 +91,9 @@ assert(tokenMacrosSource.includes("repeat(2,minmax(0,160px))"), "Token confirmat
 assert(!chainMacrosSource.includes("Send("), "Chain macros must not call DuelingBook's socket sender");
 assert(!chainMacrosSource.includes("unsafeWindow"), "Chain macros must not access DuelingBook page globals");
 assert(chainMacrosSource.includes('#duel .cin_txt') && chainMacrosSource.includes('#duel #cin_txt'), "Chain macros must support DuelingBook's class- and ID-based duel chat inputs");
-assert(chainMacrosSource.includes('HTMLTextAreaElement'), "Chain macros must support input and textarea chat controls");
+assert(chainMacrosSource.includes('input[type="text"], textarea'), "Chain macros must support input and textarea chat controls");
+assert(chainMacrosSource.includes("#isUsableChatInput") && chainMacrosSource.includes("getClientRects().length === 0"), "Chain macros must detect DuelingBook's transparent native chat input by layout presence");
+assert(chainMacrosSource.includes("DuelingBook deliberately sets the native input's opacity to zero"), "Chain input detection must document DuelingBook's transparent-control behavior");
 assert(chainMacrosSource.includes('new KeyboardEvent("keydown"'), "Chain macros must use DuelingBook's native Enter handler");
 assert(chainMacrosSource.includes('font[message-id]'), "Chain flashes must synchronize from visible public chat messages");
 assert(!chainMacrosSource.includes('document.addEventListener("pointerdown"'), "Chain menu must not be dismissed by DuelingBook pointer event propagation");
