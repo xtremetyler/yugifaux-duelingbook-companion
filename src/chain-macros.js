@@ -64,10 +64,6 @@
       this.menu.append(title, grid);
       document.body.append(this.menu);
 
-      document.addEventListener("pointerdown", (event) => {
-        if (this.menu.hidden || this.menu.contains(event.target) || this.button.contains(event.target)) return;
-        this.close();
-      });
       document.addEventListener("keydown", (event) => { if (event.key === "Escape") this.close(); });
       this.#observeChat();
       setInterval(() => this.refresh(), 750);
@@ -77,8 +73,8 @@
     refresh() {
       if (!this.button) return;
       const enabled = Boolean(this.getSettings()?.enabled);
-      const canChat = this.#isVisible(document.querySelector("#duel .cin_txt"));
-      this.button.hidden = !enabled || !canChat;
+      const inDuel = this.#isVisible(document.querySelector("#duel"));
+      this.button.hidden = !enabled || !inDuel;
       if (this.button.hidden) this.close();
     }
 
@@ -86,7 +82,6 @@
       if (!this.menu || this.button?.hidden) return;
       this.menu.hidden = !this.menu.hidden;
       this.button.setAttribute("aria-expanded", String(!this.menu.hidden));
-      if (!this.menu.hidden) this.menu.querySelector("button")?.focus();
     }
 
     close() {

@@ -93,6 +93,7 @@ assert(!chainMacrosSource.includes("unsafeWindow"), "Chain macros must not acces
 assert(chainMacrosSource.includes('#duel .cin_txt'), "Chain macros must use DuelingBook's visible duel chat input");
 assert(chainMacrosSource.includes('new KeyboardEvent("keydown"'), "Chain macros must use DuelingBook's native Enter handler");
 assert(chainMacrosSource.includes('font[message-id]'), "Chain flashes must synchronize from visible public chat messages");
+assert(!chainMacrosSource.includes('document.addEventListener("pointerdown"'), "Chain menu must not be dismissed by DuelingBook pointer event propagation");
 assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
 assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
