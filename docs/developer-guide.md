@@ -19,6 +19,7 @@ src/
   config.js                   validation, remote load, and cache fallback
   event-observer.js           passive public-log classifier
   animation-player.js         non-blocking presentation layer
+  match-launcher.js           guarded league host setup and confirmation
   ui.js                       namespaced panel and controls
   main.js                     lifecycle and dependency wiring
   footer.js                   userscript closure
@@ -30,6 +31,8 @@ dist/                         generated installable userscript
 At `document-idle`, the companion restores settings, attaches a narrow observer to `#duel_log .log_txt`, mounts its own UI, and requests configuration. Existing log lines are marked as seen but never replayed. New visible lines are normalized and assigned an occurrence number, which prevents a DuelingBook re-render from replaying the same event while still allowing identical actions to occur more than once.
 
 An event must pass two gates: a conservative public-log phrase classifier and an exact case-insensitive configured card-name match. The animation overlay uses `pointer-events: none`. On any load or playback failure, it is skipped and the duel remains untouched.
+
+The match launcher runs only after a player opens it and confirms a review screen. It may open the Duel Room, selects semantic option values for Custom Cards and a 2-out-of-3 match, applies the approved note and an empty password, and clicks DuelingBook's Host control only from the player's `Confirm & Host` action. Match identifiers stay in memory for the open launcher and are neither persisted nor transmitted.
 
 ## Configuration rules
 
@@ -45,4 +48,4 @@ Core updates use the repository's tracked `dist/yugifaux-companion.user.js` thro
 
 ## Development boundary
 
-Do not hook WebSocket methods, modify DuelingBook action functions, synthesize gameplay clicks, inspect card backs/hand data, enable private-log filters, or send chat messages for synchronization. If a public event is unreliable, add a clearly labeled player-initiated companion control instead.
+Do not hook WebSocket methods, modify DuelingBook action functions, synthesize gameplay clicks, inspect card backs/hand data, enable private-log filters, or send chat messages for synchronization. The only synthetic DuelingBook action outside passive observation is the explicitly confirmed Host click in the match launcher. If a public event is unreliable, add a clearly labeled player-initiated companion control instead.

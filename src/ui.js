@@ -8,6 +8,32 @@
     #${APP.ids.panel} button { margin: 7px 6px 0 0; border: 1px solid #64748b; border-radius: 5px; background: #1e293b; color: #fff; padding: 7px 9px; cursor: pointer; }
     #${APP.ids.panel} .yf-status { margin: 10px 0; padding: 8px; border-radius: 5px; background: #0f172a; }
     #${APP.ids.panel} .yf-diagnostics { max-height: 150px; overflow: auto; white-space: pre-wrap; color: #a7f3d0; font: 11px/1.35 Consolas,monospace; }
+    #${APP.ids.panel} .yf-start-match { display: block; width: 100%; margin: 10px 0 7px; border-color: #d6b55b; background: linear-gradient(135deg,#713f12,#9f1239); color: #fff7d6; font-weight: 800; }
+    #${APP.ids.launcher} { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; box-sizing: border-box; padding: 20px; background: #020617b8; color: #f8fafc; font: 14px/1.4 Arial,sans-serif; pointer-events: auto; }
+    #${APP.ids.launcher} * { box-sizing: border-box; }
+    #${APP.ids.launcher} .yf-launcher-card { width: min(610px,calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; border: 1px solid #d6b55b; border-radius: 14px; padding: 18px; background: linear-gradient(145deg,#111827fa,#172554fa 58%,#3f1237fa); box-shadow: 0 24px 80px #000d,0 0 30px #d6b55b33; }
+    #${APP.ids.launcher} header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #d6b55b66; padding-bottom: 10px; }
+    #${APP.ids.launcher} h2 { margin: 0; color: #fff7d6; font: 800 clamp(21px,4vw,30px)/1.1 Georgia,serif; }
+    #${APP.ids.launcher} button { border: 1px solid #64748b; border-radius: 7px; background: #1e293b; color: #fff; padding: 9px 13px; cursor: pointer; font-weight: 700; }
+    #${APP.ids.launcher} button:disabled { cursor: wait; opacity: .62; }
+    #${APP.ids.launcher} .yf-launcher-close { border: 0; background: transparent; padding: 1px 7px; color: #cbd5e1; font-size: 28px; line-height: 1; }
+    #${APP.ids.launcher} .yf-launcher-intro { margin: 14px 0; color: #cbd5e1; }
+    #${APP.ids.launcher} .yf-launcher-form { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    #${APP.ids.launcher} .yf-launcher-form > label:not(.yf-launcher-check) { display: grid; gap: 6px; color: #f8e7aa; font-weight: 700; }
+    #${APP.ids.launcher} input[type="text"], #${APP.ids.launcher} select { width: 100%; border: 1px solid #64748b; border-radius: 6px; background: #0f172a; color: #fff; padding: 9px; font: inherit; }
+    #${APP.ids.launcher} .yf-launcher-check { display: flex; align-items: center; gap: 8px; border: 1px solid #334155; border-radius: 7px; padding: 9px; color: #e2e8f0; }
+    #${APP.ids.launcher} .yf-launcher-summary { grid-column: 1/-1; display: grid; grid-template-columns: minmax(110px,.7fr) 1.5fr; gap: 0; margin: 2px 0; border: 1px solid #334155; border-radius: 8px; overflow: hidden; }
+    #${APP.ids.launcher} .yf-launcher-summary dt, #${APP.ids.launcher} .yf-launcher-summary dd { margin: 0; border-bottom: 1px solid #334155; padding: 8px 10px; overflow-wrap: anywhere; }
+    #${APP.ids.launcher} .yf-launcher-summary dt { color: #f8e7aa; background: #0f172a99; font-weight: 700; }
+    #${APP.ids.launcher} .yf-launcher-summary dd { color: #f8fafc; }
+    #${APP.ids.launcher} .yf-launcher-summary > :nth-last-child(-n+2) { border-bottom: 0; }
+    #${APP.ids.launcher} .yf-launcher-review { margin: 14px 0; }
+    #${APP.ids.launcher} .yf-launcher-error { grid-column: 1/-1; margin: 0; border: 1px solid #f87171; border-radius: 7px; background: #7f1d1d88; color: #fee2e2; padding: 9px; }
+    #${APP.ids.launcher} .yf-launcher-error[hidden] { display: none; }
+    #${APP.ids.launcher} .yf-launcher-ready { margin: 14px 0 8px; border: 1px solid #34d39988; border-radius: 7px; background: #064e3b88; color: #d1fae5; padding: 10px; }
+    #${APP.ids.launcher} .yf-launcher-actions { grid-column: 1/-1; display: flex; justify-content: flex-end; gap: 9px; margin-top: 4px; }
+    #${APP.ids.launcher} .yf-primary { border-color: #f8e7aa; background: linear-gradient(135deg,#92400e,#9f1239); color: #fff7d6; }
+    @media (max-width: 560px) { #${APP.ids.launcher} .yf-launcher-form { grid-template-columns: 1fr; } #${APP.ids.launcher} .yf-launcher-summary { grid-template-columns: 1fr; } #${APP.ids.launcher} .yf-launcher-summary dt, #${APP.ids.launcher} .yf-launcher-summary dd { border-bottom: 1px solid #334155; } }
     #${APP.ids.overlay} { --yf-accent: #f8d36b; pointer-events: none; position: fixed; inset: 0; z-index: 2147483644; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--yf-accent) 28%, transparent) 0, #020617e8 66%); animation: yf-overlay-in .3s ease-out both; }
     #${APP.ids.overlay}.yf-preset-petal-bloom-v1::before { content: ""; position: absolute; inset: -20%; background: conic-gradient(from 100deg at 50% 50%, transparent, #f9a8d455, transparent 30%, #fbcfe855, transparent 60%); filter: blur(28px); animation: yf-pink-light 3.6s ease-in-out both; }
     #${APP.ids.overlay}.yf-preset-arcane-bloom-v1 { background: radial-gradient(circle at 50% 56%, #ecfccb22 0 18%, transparent 48%), radial-gradient(circle at 24% 35%, #60a5fa2e, transparent 32%), radial-gradient(circle at 78% 38%, #c084fc2b, transparent 34%), linear-gradient(150deg, #04140df2, #0d1230f4 54%, #27103bf2); }
@@ -168,7 +194,7 @@
       const heading = document.createElement("h2");
       heading.textContent = APP.name;
       const intro = document.createElement("p");
-      intro.textContent = "Phase 1 passive event-observation proof of concept.";
+      intro.textContent = "League presentation and guided match tools.";
       this.status = document.createElement("div");
       this.status.className = "yf-status";
       panel.append(heading, intro, this.status);
@@ -181,6 +207,12 @@
         this.#checkbox("Reduced motion", "reducedMotion", settings.reducedMotion),
         this.#checkbox("Diagnostics", "diagnosticsEnabled", settings.diagnosticsEnabled)
       );
+
+      const startMatch = document.createElement("button");
+      startMatch.type = "button";
+      startMatch.className = "yf-start-match";
+      startMatch.textContent = "Start YugiFAUX Match";
+      startMatch.addEventListener("click", () => { panel.hidden = true; this.actions.startLeagueMatch(); });
 
       const testAsh = document.createElement("button");
       testAsh.type = "button";
@@ -217,7 +249,7 @@
 
       this.diagnosticOutput = document.createElement("div");
       this.diagnosticOutput.className = "yf-diagnostics";
-      panel.append(testAsh, testPolyflora, testNoWayOut, testIris, testPepper, testPainfulPreference, reload, disable, this.diagnosticOutput);
+      panel.append(startMatch, testAsh, testPolyflora, testNoWayOut, testIris, testPepper, testPainfulPreference, reload, disable, this.diagnosticOutput);
       button.addEventListener("click", () => { panel.hidden = !panel.hidden; });
       document.body.append(button, panel);
       this.diagnostics.subscribe((entries) => this.#renderDiagnostics(entries));

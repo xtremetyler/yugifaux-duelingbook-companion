@@ -11,6 +11,7 @@ const sources = [
   "src/config.js",
   "src/event-observer.js",
   "src/animation-player.js",
+  "src/match-launcher.js",
   "src/ui.js",
   "src/main.js",
   "src/footer.js"

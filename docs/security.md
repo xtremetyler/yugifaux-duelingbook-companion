@@ -16,7 +16,7 @@
 | Malicious remote text/HTML | Remote labels use `textContent`; HTML from configuration is unsupported. |
 | Credential leakage | No cookie, password, token, WebSocket, or login-form access. Diagnostics drop credential-like keys. |
 | Hidden-information advantage | The observer reads only text DuelingBook rendered in the visible duel-log container and never changes `Private Info`. |
-| Accidental gameplay action | No synthetic DuelingBook clicks, macros, chat messages, or page-function replacement. |
+| Accidental gameplay action | No gameplay clicks, macros, chat messages, or page-function replacement. Host creation requires the player to click `Confirm & Host` after reviewing every setting. |
 | Network exfiltration | The only userscript request is a GET for public configuration from one declared host. No duel data is uploaded. |
 | UI obstruction | Overlay uses `pointer-events: none`, has a bounded duration, and can be removed by emergency disable. |
 | Host/config outage | Last valid config is cached; otherwise bundled defaults load. DuelingBook does not depend on either. |
@@ -33,6 +33,10 @@ Stored locally through Tampermonkey:
 
 - companion enable/mute/reduced-motion/diagnostics settings;
 - the last valid public configuration and its fetch time.
+
+Held only in memory while the launcher is open:
+
+- the player-entered match identifier and reviewed host settings.
 
 Not collected or transmitted:
 

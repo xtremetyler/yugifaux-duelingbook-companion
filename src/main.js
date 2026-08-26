@@ -4,6 +4,7 @@
   let ui;
   let logObserver;
   let animationPlayer;
+  let matchLauncher;
 
   async function persistSettings() {
     await storage.set("settings", state.settings);
@@ -23,10 +24,18 @@
     state.settings = { ...DEFAULT_SETTINGS, ...(await storage.get("settings", {})) };
     diagnostics.setEnabled(state.settings.diagnosticsEnabled);
     animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
+    matchLauncher = new MatchLauncher(diagnostics);
     logObserver = new PublicDuelLogObserver(diagnostics, handlePublicEvent);
     logObserver.start();
 
     ui = new CompanionUI(storage, diagnostics, () => state, {
+      startLeagueMatch() {
+        if (!state.settings.enabled) {
+          diagnostics.warn("launcher", "match launcher unavailable while companion is disabled");
+          return;
+        }
+        matchLauncher.open();
+      },
       preview(cardName, eventType = "effect-declaration") {
         animationPlayer.resetDuel();
         const text = eventType === "activation"
@@ -39,6 +48,7 @@
         state.settings.enabled = false;
         state.settings.animationsEnabled = false;
         document.getElementById(APP.ids.overlay)?.remove();
+        matchLauncher.close();
         await persistSettings();
         diagnostics.warn("safety", "companion disabled by player");
         ui.refresh();

@@ -8,9 +8,11 @@ Observed against the current public page on 2026-08-26. Treat every item as vers
 | `#start` | Intro/start screen | Detection evidence only | Top-level screen ID. |
 | `#front_page` | Login/front page | Detection evidence only | Never inspect form values. |
 | `#main_menu` | Main menu screen | Future screen status | Observe visibility only if needed. |
-| `#duel_room` | Room and format selection | Future launcher | Guide/highlight only until safely tested. |
-| `#cu` | Custom Cards format option | Future launcher candidate | Confirm semantic label during authenticated testing. |
-| `#host`, `#hosting`, `#joining` | Room workflow containers | Future launcher candidates | No Phase 1 writes. |
+| `#duel_room` | Room and format selection | Guided launcher scope | Must be visibly active before host fields are changed. |
+| `#cu` | Custom Cards format option | Semantic evidence | Launcher selects the host form's `cu` option by value and verifies it exists. |
+| `#host`, `#hosting`, `#joining` | Room workflow containers | Guided host workflow | Abort while already hosting/joining; change only reviewed host fields. |
+| `#room_btn` | Main-menu Duel Room control | Guided navigation | Click only after the player starts the launcher. |
+| `#decklist_cb` | Current deck selector | Preflight validation | Read selected option label/value only; never inspect deck contents. |
 | `#duel` | Duel screen | Presence evidence only | Never infer that hidden children are public. |
 | `#duel_log` | Duel-log panel | Scope boundary | No checkbox or search mutations. |
 | `#duel_log .log_txt` | Rendered log text | **Read-only Phase 1 observer** | Scoped `MutationObserver`; missing node fails open. |

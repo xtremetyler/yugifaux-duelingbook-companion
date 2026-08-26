@@ -1,10 +1,11 @@
 # YugiFaux DuelingBook Companion
 
-This repository contains the Phase 1 technical proof of concept for a player-controlled Tampermonkey companion on DuelingBook.
+This repository contains a player-controlled Tampermonkey companion for YugiFAUX league matches on DuelingBook.
 
 The current build:
 
 - adds a small `YF` button and collapsible control panel;
+- provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - loads a versioned JSON configuration and falls back to the last valid cache or bundled defaults;
 - passively observes visible public text added to DuelingBook's duel log;
 - recognizes `Ash Blossom & Lonely Spring` when a visible public log line is classified as an effect declaration;

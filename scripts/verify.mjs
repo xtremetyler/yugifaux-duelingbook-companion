@@ -7,10 +7,16 @@ const bundle = await readFile(resolve(root, "dist/yugifaux-companion.user.js"), 
 const config = JSON.parse(await readFile(resolve(root, "config/companion.sample.json"), "utf8"));
 const manifest = JSON.parse(await readFile(resolve(root, "config/animations.sample.json"), "utf8"));
 const observerSource = await readFile(resolve(root, "src/event-observer.js"), "utf8");
+const launcherSource = await readFile(resolve(root, "src/match-launcher.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
   `${observerSource}\nglobalThis.observerTests = { classifyPublicLogLine, getNewLogText };`,
   observerTests
+);
+const launcherTestContext = {};
+vm.runInNewContext(
+  `${launcherSource}\nglobalThis.launcherTests = { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier };`,
+  launcherTestContext
 );
 
 const failures = [];
@@ -46,6 +52,13 @@ assert(bundle.includes("v1787768161/iriseff.png"), "approved Iris asset is missi
 assert(bundle.includes("dhh7m81-c2929be0-8eda-42d9-840b-2ceb6ef6c44b.png"), "Iris card-back asset is missing from the bundle");
 assert(bundle.includes("v1787769996/sgt._pepper.png"), "approved Sgt. Pepper asset is missing from the bundle");
 assert(bundle.includes("v1787771135/painfulpref.png"), "approved Painful Preference asset is missing from the bundle");
+assert(bundle.includes("class MatchLauncher"), "guided match launcher is missing from the bundle");
+assert(bundle.includes("Confirm & Host"), "launcher confirmation gate is missing from the bundle");
+assert(bundle.includes("YugiFAUX League Match - DM for info"), "approved league duel note is missing from the bundle");
+assert(bundle.includes('formatValue: "cu"'), "Custom Cards host format is missing from the launcher");
+assert(bundle.includes('matchTypeValue: "m"'), "2 out of 3 host type is missing from the launcher");
+assert(!launcherSource.includes("GM."), "match launcher must not persist or transmit match identifiers");
+assert(!launcherSource.includes("storage."), "match launcher must keep match identifiers out of storage");
 assert(manifest.schemaVersion === 1, "sample animation manifest schemaVersion must be 1");
 assert(manifest.animations.every((item) => item.trigger?.cardName), "each animation needs a card trigger");
 
@@ -59,6 +72,12 @@ const irisDeclaration = "Yugi declared the effect of Iris the Radiant, the Celes
 const pepperDeclaration = "Yugi declared the effect of Sgt. Pepper's Lonely Hearts Club Band.";
 const painfulPreferenceActivation = "Yugi Activated \"Painful Preference\".";
 const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
+const { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier } = launcherTestContext.launcherTests;
+assert(validateMatchIdentifier(" YF-2026-001 ").identifier === "YF-2026-001", "valid match identifiers must be normalized");
+assert(validateMatchIdentifier("   ").valid === false, "blank match identifiers must be rejected");
+assert(validateMatchIdentifier("<script>").valid === false, "unsafe match identifier characters must be rejected");
+assert(LEAGUE_MATCH_DEFAULTS.duelNote === "YugiFAUX League Match - DM for info", "league duel note must remain exact");
+assert(LEAGUE_MATCH_DEFAULTS.formatValue === "cu" && LEAGUE_MATCH_DEFAULTS.matchTypeValue === "m", "league format defaults must remain fixed");
 assert(
   classifyPublicLogLine(getNewLogText(ashDeclaration, `${ashDeclaration}\n${normalSummon}`))?.type === "normal-summon",
   "a summon after Ash Blossom must not replay the Ash overlay"
