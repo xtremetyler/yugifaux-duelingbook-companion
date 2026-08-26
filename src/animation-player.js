@@ -249,25 +249,26 @@
       if (preset === "ice-cream-choice-v1" && !settings.reducedMotion) {
         const field = document.createElement("div");
         field.className = "yf-ice-cream-field";
-        const flavors = [
-          ["vanilla", "VANILLA", "#fff7d6", "-24vw", "-7deg", "5deg"],
-          ["chocolate", "CHOCOLATE", "#7c3f22", "0vw", "0deg", "-5deg"],
-          ["strawberry", "STRAWBERRY", "#f9a8c4", "24vw", "7deg", "-5deg"]
+        const questions = [
+          ["18%", "26%", "#fff7d6", "-12deg", "0s", "76px"],
+          ["82%", "28%", "#f9a8c4", "14deg", ".12s", "88px"],
+          ["26%", "63%", "#7c3f22", "9deg", ".24s", "64px"],
+          ["74%", "65%", "#fff7d6", "-10deg", ".36s", "70px"],
+          ["8%", "48%", "#f9a8c4", "16deg", ".18s", "58px"],
+          ["92%", "51%", "#7c3f22", "-15deg", ".3s", "62px"]
         ];
 
-        for (const [flavor, labelText, color, x, tilt, rock] of flavors) {
-          const choice = document.createElement("div");
-          choice.className = `yf-flavor-choice yf-flavor-${flavor}`;
-          choice.style.setProperty("--yf-flavor", color);
-          choice.style.setProperty("--yf-choice-x", x);
-          choice.style.setProperty("--yf-choice-tilt", tilt);
-          choice.style.setProperty("--yf-choice-rock", rock);
-          const scoop = document.createElement("i");
-          scoop.className = "yf-ice-cream-scoop";
-          const label = document.createElement("b");
-          label.textContent = labelText;
-          choice.append(scoop, label);
-          field.append(choice);
+        for (const [x, y, color, tilt, delay, size] of questions) {
+          const question = document.createElement("b");
+          question.className = "yf-flavor-question";
+          question.textContent = "?";
+          question.style.setProperty("--yf-x", x);
+          question.style.setProperty("--yf-y", y);
+          question.style.setProperty("--yf-color", color);
+          question.style.setProperty("--yf-tilt", tilt);
+          question.style.setProperty("--yf-delay", delay);
+          question.style.setProperty("--yf-size", size);
+          field.append(question);
         }
 
         const dilemma = document.createElement("b");

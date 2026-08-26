@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.7.0
+// @version      0.7.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -22,7 +22,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.7.0",
+    version: "0.7.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -99,8 +99,8 @@
 
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-7",
-    minimumCoreVersion: "0.7.0",
+    dataVersion: "bundled-poc-7.1",
+    minimumCoreVersion: "0.7.1",
     featureFlags: { panel: true, eventObserver: true, animations: true },
     allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com", "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"],
     animations: [
@@ -652,25 +652,26 @@
       if (preset === "ice-cream-choice-v1" && !settings.reducedMotion) {
         const field = document.createElement("div");
         field.className = "yf-ice-cream-field";
-        const flavors = [
-          ["vanilla", "VANILLA", "#fff7d6", "-24vw", "-7deg", "5deg"],
-          ["chocolate", "CHOCOLATE", "#7c3f22", "0vw", "0deg", "-5deg"],
-          ["strawberry", "STRAWBERRY", "#f9a8c4", "24vw", "7deg", "-5deg"]
+        const questions = [
+          ["18%", "26%", "#fff7d6", "-12deg", "0s", "76px"],
+          ["82%", "28%", "#f9a8c4", "14deg", ".12s", "88px"],
+          ["26%", "63%", "#7c3f22", "9deg", ".24s", "64px"],
+          ["74%", "65%", "#fff7d6", "-10deg", ".36s", "70px"],
+          ["8%", "48%", "#f9a8c4", "16deg", ".18s", "58px"],
+          ["92%", "51%", "#7c3f22", "-15deg", ".3s", "62px"]
         ];
 
-        for (const [flavor, labelText, color, x, tilt, rock] of flavors) {
-          const choice = document.createElement("div");
-          choice.className = `yf-flavor-choice yf-flavor-${flavor}`;
-          choice.style.setProperty("--yf-flavor", color);
-          choice.style.setProperty("--yf-choice-x", x);
-          choice.style.setProperty("--yf-choice-tilt", tilt);
-          choice.style.setProperty("--yf-choice-rock", rock);
-          const scoop = document.createElement("i");
-          scoop.className = "yf-ice-cream-scoop";
-          const label = document.createElement("b");
-          label.textContent = labelText;
-          choice.append(scoop, label);
-          field.append(choice);
+        for (const [x, y, color, tilt, delay, size] of questions) {
+          const question = document.createElement("b");
+          question.className = "yf-flavor-question";
+          question.textContent = "?";
+          question.style.setProperty("--yf-x", x);
+          question.style.setProperty("--yf-y", y);
+          question.style.setProperty("--yf-color", color);
+          question.style.setProperty("--yf-tilt", tilt);
+          question.style.setProperty("--yf-delay", delay);
+          question.style.setProperty("--yf-size", size);
+          field.append(question);
         }
 
         const dilemma = document.createElement("b");
@@ -860,12 +861,7 @@
     #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 strong { color: #fff7ed; font-size: clamp(24px,4.2vw,52px); text-shadow: 0 3px 2px #3f1d12,0 0 12px #f9a8c4,0 0 26px #fff7d6; }
     #${APP.ids.overlay}.yf-preset-ice-cream-choice-v1 span { color: #fff7d6; }
     #${APP.ids.overlay} .yf-ice-cream-field { position: absolute; inset: 0; z-index: 4; overflow: hidden; perspective: 900px; }
-    #${APP.ids.overlay} .yf-flavor-choice { position: absolute; left: 50%; top: 47%; width: clamp(90px,10vw,145px); height: clamp(170px,25vh,250px); opacity: 0; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) rotate(var(--yf-choice-tilt)); animation: yf-flavor-choice 5.2s cubic-bezier(.18,.85,.2,1) both; }
-    #${APP.ids.overlay} .yf-ice-cream-scoop { position: absolute; left: 50%; top: 0; width: 78%; aspect-ratio: 1; transform: translateX(-50%); border: 3px solid #fff8; border-radius: 48% 52% 46% 54%; background: radial-gradient(circle at 32% 25%,#fff9 0 7%,transparent 18%),radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--yf-flavor) 65%,#fff),var(--yf-flavor) 62%,color-mix(in srgb,var(--yf-flavor) 72%,#3f1d12)); box-shadow: 0 7px 0 color-mix(in srgb,var(--yf-flavor) 76%,#3f1d12),0 0 18px var(--yf-flavor),0 10px 20px #0008; }
-    #${APP.ids.overlay} .yf-ice-cream-scoop::after { content: ""; position: absolute; left: 50%; top: 78%; width: 72%; height: 128%; transform: translateX(-50%); clip-path: polygon(0 0,100% 0,50% 100%); background: repeating-linear-gradient(55deg,#d8954a 0 4px,#f4c16d 5px 10px); filter: drop-shadow(0 8px 6px #0008); }
-    #${APP.ids.overlay} .yf-flavor-choice b { position: absolute; left: 50%; top: 88%; width: max-content; transform: translateX(-50%); border: 1px solid var(--yf-flavor); border-radius: 999px; padding: 5px 9px; color: #fff; background: #3f1d12c9; box-shadow: 0 0 12px var(--yf-flavor); letter-spacing: .12em; font: 900 clamp(9px,1vw,13px)/1 Arial,sans-serif; text-shadow: 0 2px 2px #000; }
-    #${APP.ids.overlay} .yf-flavor-chocolate { animation-delay: .12s; }
-    #${APP.ids.overlay} .yf-flavor-strawberry { animation-delay: .24s; }
+    #${APP.ids.overlay} .yf-flavor-question { position: absolute; left: var(--yf-x); top: var(--yf-y); color: var(--yf-color); opacity: 0; transform: translate(-50%,-50%) rotate(var(--yf-tilt)); font: 900 clamp(40px,var(--yf-size),96px)/1 Georgia,serif; text-shadow: 0 3px 2px #3f1d12,0 0 9px #fff,0 0 25px var(--yf-color); animation: yf-flavor-question 5.2s cubic-bezier(.18,.85,.2,1) var(--yf-delay) both; }
     #${APP.ids.overlay} .yf-flavor-dilemma { position: absolute; left: 50%; top: 10%; color: #fff7d6; opacity: 0; transform: translateX(-50%); font: 900 clamp(70px,12vw,170px)/1 Georgia,serif; text-shadow: 0 4px 3px #3f1d12,0 0 16px #f9a8c4,0 0 42px #fff7d6; animation: yf-flavor-dilemma 5.2s ease-in-out both; }
     #${APP.ids.overlay} .yf-sprinkle { position: absolute; left: var(--yf-x); bottom: -5vh; width: 5px; height: 17px; border-radius: 4px; background: var(--yf-color); box-shadow: 0 0 6px var(--yf-color); opacity: 0; animation: yf-sprinkle-pop var(--yf-duration) linear var(--yf-delay) infinite; }
     #${APP.ids.overlay} .yf-trap-field { position: absolute; inset: 0; z-index: 3; overflow: hidden; }
@@ -916,7 +912,7 @@
     @keyframes yf-concert-pulse { 0% { opacity: .8; transform: translate(-50%,-50%) scale(.15) } 100% { opacity: 0; transform: translate(-50%,-50%) scale(5.2) } }
     @keyframes yf-flavor-rays { 0% { opacity: 0; transform: rotate(-18deg) scale(.65) } 22%,78% { opacity: 1; transform: rotate(7deg) scale(1) } 100% { opacity: 0; transform: rotate(20deg) scale(1.18) } }
     @keyframes yf-painful-choice { 0% { opacity: 0; transform: translateY(16vh) scale(.55); filter: blur(12px) saturate(1.6) brightness(1.5) } 19% { opacity: 1; transform: translateY(-1vh) scale(1.04); filter: blur(0) saturate(1.2) brightness(1.14) } 34%,76% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) saturate(1.08) brightness(1.04) drop-shadow(0 0 22px #f9a8c4) } 84% { transform: translateX(-1.1vw) rotate(-.5deg) } 90% { transform: translateX(1.1vw) rotate(.5deg) } 100% { opacity: 0; transform: translateY(-3vh) scale(1.06); filter: blur(3px) brightness(1.3) } }
-    @keyframes yf-flavor-choice { 0%,8% { opacity: 0; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(24vh) rotate(var(--yf-choice-tilt)) scale(.35) } 26%,70% { opacity: .96; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(0) rotate(var(--yf-choice-tilt)) scale(1) } 78% { transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(-2vh) rotate(var(--yf-choice-rock)) scale(1.08) } 100% { opacity: 0; transform: translate(-50%,-50%) translateX(var(--yf-choice-x)) translateY(-18vh) rotate(var(--yf-choice-tilt)) scale(.72) } }
+    @keyframes yf-flavor-question { 0%,10% { opacity: 0; transform: translate(-50%,-50%) translateY(15vh) rotate(var(--yf-tilt)) scale(.25) } 25%,68% { opacity: .86; transform: translate(-50%,-50%) translateY(0) rotate(var(--yf-tilt)) scale(1) } 78% { opacity: 1; transform: translate(-50%,-50%) translateY(-2vh) rotate(calc(var(--yf-tilt) + 12deg)) scale(1.18) } 100% { opacity: 0; transform: translate(-50%,-50%) translateY(-18vh) rotate(calc(var(--yf-tilt) - 10deg)) scale(.65) } }
     @keyframes yf-flavor-dilemma { 0%,14% { opacity: 0; transform: translateX(-50%) scale(2.2) rotate(-14deg) } 27%,72% { opacity: .9; transform: translateX(-50%) scale(1) rotate(0) } 80% { transform: translateX(-50%) scale(1.15) rotate(8deg) } 100% { opacity: 0; transform: translateX(-50%) scale(.7) rotate(-12deg) } }
     @keyframes yf-sprinkle-pop { 0% { opacity: 0; transform: translate3d(0,6vh,0) rotate(0) } 12%,78% { opacity: .9 } 100% { opacity: 0; transform: translate3d(var(--yf-drift),-112vh,0) rotate(var(--yf-spin)) } }
   `;
