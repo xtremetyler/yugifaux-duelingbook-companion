@@ -29,7 +29,7 @@
       previousOverlay?.querySelector("video")?.pause();
       previousOverlay?.remove();
       const presentation = animation.presentation;
-      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"]);
+      const supportedPresets = new Set(["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1"]);
       const preset = supportedPresets.has(presentation.preset) ? presentation.preset : "title-card-v1";
       const mediaType = presentation.mediaType === "video" ? "video" : "image";
       const media = presentation.assetUrl
@@ -37,6 +37,7 @@
           ? await this.#loadVideo(presentation.assetUrl, presentation.playbackRate, settings.muted)
           : await this.#loadImage(presentation.assetUrl)
         : null;
+      const cardBack = presentation.cardBackUrl ? await this.#loadImage(presentation.cardBackUrl) : null;
       const overlay = document.createElement("div");
       overlay.id = APP.ids.overlay;
       overlay.className = `yf-preset-${preset}${settings.reducedMotion ? " yf-reduced-motion" : ""}`;
@@ -122,6 +123,76 @@
         seal.className = "yf-trap-seal";
         seal.textContent = "NO EXIT";
         field.append(seal);
+        overlay.append(field);
+      }
+
+      if (preset === "celestial-excavate-v1" && !settings.reducedMotion && cardBack) {
+        const field = document.createElement("div");
+        field.className = "yf-celestial-field";
+
+        const halo = document.createElement("div");
+        halo.className = "yf-celestial-halo";
+        field.append(halo);
+
+        if (mediaType === "image" && media) {
+          for (const side of ["left", "right"]) {
+            const reflection = media.cloneNode();
+            reflection.className = `yf-iris-reflection yf-iris-reflection-${side}`;
+            reflection.alt = "";
+            field.append(reflection);
+          }
+        }
+
+        for (let index = 0; index < 14; index += 1) {
+          const shard = document.createElement("i");
+          shard.className = "yf-mirror-shard";
+          const radius = 25 + (index % 3) * 6;
+          shard.style.setProperty("--yf-angle", `${index * (360 / 14)}deg`);
+          shard.style.setProperty("--yf-radius", `${-radius}vmin`);
+          shard.style.setProperty("--yf-near-radius", `${-(radius * 0.35)}vmin`);
+          shard.style.setProperty("--yf-far-radius", `${-(radius * 1.12)}vmin`);
+          shard.style.setProperty("--yf-delay", `${(index % 5) * 0.08}s`);
+          field.append(shard);
+        }
+
+        for (let index = 0; index < 36; index += 1) {
+          const star = document.createElement("i");
+          star.className = "yf-celestial-star";
+          star.style.setProperty("--yf-x", `${(index * 41) % 98}%`);
+          star.style.setProperty("--yf-y", `${(index * 67) % 92}%`);
+          star.style.setProperty("--yf-delay", `${((index * 13) % 24) / 10}s`);
+          star.style.setProperty("--yf-size", `${2 + ((index * 7) % 6)}px`);
+          field.append(star);
+        }
+
+        const destinations = [
+          ["hand", "ADD TO HAND"],
+          ["graveyard", "SEND TO GY"],
+          ["banished", "BANISH FACE-DOWN"]
+        ];
+        for (const [path, labelText] of destinations) {
+          const destination = document.createElement("div");
+          destination.className = `yf-card-destination yf-destination-${path}`;
+          const label = document.createElement("span");
+          label.textContent = labelText;
+          destination.append(label);
+          field.append(destination);
+
+          const excavated = cardBack.cloneNode();
+          excavated.className = `yf-excavate-card yf-excavate-${path}`;
+          excavated.alt = "";
+          field.append(excavated);
+        }
+
+        const deck = document.createElement("div");
+        deck.className = "yf-excavate-deck";
+        for (let index = 0; index < 4; index += 1) {
+          const deckCard = cardBack.cloneNode();
+          deckCard.alt = "";
+          deckCard.style.setProperty("--yf-stack", `${index * -3}px`);
+          deck.append(deckCard);
+        }
+        field.append(deck);
         overlay.append(field);
       }
 

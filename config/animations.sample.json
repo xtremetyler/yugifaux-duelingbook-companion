@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "manifestVersion": "poc-2026-08-26.4",
+  "manifestVersion": "poc-2026-08-26.5",
   "animations": [
     {
       "id": "ash-blossom-lonely-spring-effect",
@@ -77,6 +77,26 @@
         "accentColor": "#f97316",
         "durationMs": 5900,
         "playbackRate": 1.75,
+        "audioUrl": null,
+        "fallback": "skip"
+      },
+      "frequency": "every-event"
+    },
+    {
+      "id": "iris-radiant-infinite-reflections-effect",
+      "trigger": {
+        "eventType": "effect-declaration",
+        "cardName": "Iris the Radiant, the Celestial Eye of Infinite Reflections"
+      },
+      "presentation": {
+        "preset": "celestial-excavate-v1",
+        "kind": "css-layered-multi-image",
+        "assetUrl": "https://res.cloudinary.com/vosvpv50/image/upload/v1787768161/iriseff.png",
+        "cardBackUrl": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3bf2e45d-2253-4b84-a45b-fbdec02fcd49/dhh7m81-c2929be0-8eda-42d9-840b-2ceb6ef6c44b.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi8zYmYyZTQ1ZC0yMjUzLTRiODQtYTQ1Yi1mYmRlYzAyZmNkNDkvZGhoN204MS1jMjkyOWJlMC04ZWRhLTQyZDktODQwYi0yY2ViNmVmNmM0NGIucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.okP0PGZmLu95xid1AOM3L6jquPM7gfyxle4iIfDsxog",
+        "title": "Iris the Radiant, the Celestial Eye of Infinite Reflections",
+        "subtitle": "Three Destinies Reflected",
+        "accentColor": "#a5f3fc",
+        "durationMs": 6200,
         "audioUrl": null,
         "fallback": "skip"
       },

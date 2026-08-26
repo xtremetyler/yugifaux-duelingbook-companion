@@ -1,9 +1,9 @@
   const BUNDLED_CONFIG = Object.freeze({
     schemaVersion: 1,
-    dataVersion: "bundled-poc-4",
-    minimumCoreVersion: "0.4.0",
+    dataVersion: "bundled-poc-5",
+    minimumCoreVersion: "0.5.0",
     featureFlags: { panel: true, eventObserver: true, animations: true },
-    allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com"],
+    allowedAssetHosts: ["raw.githubusercontent.com", "res.cloudinary.com", "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"],
     animations: [
       {
         id: "ash-blossom-lonely-spring-effect",
@@ -60,6 +60,20 @@
           playbackRate: 1.75
         },
         frequency: "every-event"
+      },
+      {
+        id: "iris-radiant-infinite-reflections-effect",
+        trigger: { eventType: "effect-declaration", cardName: "Iris the Radiant, the Celestial Eye of Infinite Reflections" },
+        presentation: {
+          preset: "celestial-excavate-v1",
+          assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787768161/iriseff.png",
+          cardBackUrl: "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3bf2e45d-2253-4b84-a45b-fbdec02fcd49/dhh7m81-c2929be0-8eda-42d9-840b-2ceb6ef6c44b.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi8zYmYyZTQ1ZC0yMjUzLTRiODQtYTQ1Yi1mYmRlYzAyZmNkNDkvZGhoN204MS1jMjkyOWJlMC04ZWRhLTQyZDktODQwYi0yY2ViNmVmNmM0NGIucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.okP0PGZmLu95xid1AOM3L6jquPM7gfyxle4iIfDsxog",
+          title: "Iris the Radiant, the Celestial Eye of Infinite Reflections",
+          subtitle: "Three Destinies Reflected",
+          accentColor: "#a5f3fc",
+          durationMs: 6200
+        },
+        frequency: "every-event"
       }
     ]
   });
@@ -81,7 +95,7 @@
       if (typeof item?.trigger?.eventType !== "string") errors.push(`animations[${index}].trigger.eventType is required.`);
       if (typeof item?.trigger?.cardName !== "string") errors.push(`animations[${index}].trigger.cardName is required.`);
       if (!isPlainObject(item?.presentation)) errors.push(`animations[${index}].presentation is required.`);
-      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
+      if (!["title-card-v1", "petal-bloom-v1", "arcane-bloom-v1", "trap-chase-v1", "celestial-excavate-v1"].includes(item?.presentation?.preset ?? "title-card-v1")) {
         errors.push(`animations[${index}].presentation.preset is unsupported.`);
       }
       if (item?.presentation?.mediaType && !["image", "video"].includes(item.presentation.mediaType)) {
@@ -92,14 +106,15 @@
         item.presentation.playbackRate < 0.5 ||
         item.presentation.playbackRate > 3
       )) errors.push(`animations[${index}].presentation.playbackRate is invalid.`);
-      if (item?.presentation?.assetUrl) {
+      for (const assetKey of ["assetUrl", "cardBackUrl"]) {
+        if (!item?.presentation?.[assetKey]) continue;
         try {
-          const url = new URL(item.presentation.assetUrl);
+          const url = new URL(item.presentation[assetKey]);
           if (url.protocol !== "https:" || !(value.allowedAssetHosts ?? []).includes(url.hostname)) {
             errors.push(`animations[${index}] uses an unapproved asset host.`);
           }
         } catch {
-          errors.push(`animations[${index}].presentation.assetUrl is invalid.`);
+          errors.push(`animations[${index}].presentation.${assetKey} is invalid.`);
         }
       }
     }
