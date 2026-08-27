@@ -128,6 +128,7 @@ assert(markersSource.includes('marker.statusId === "return-end-phase"') && marke
 assert(markersSource.includes("yf-marker-tooltip") && markersSource.includes('data-orientation="defense"'), "Compact Marker medallions, hover details, or orientation layouts are missing");
 assert(!markersSource.includes("yf-marker-medallion-in"), "Marker medallions must not replay a flashing entrance animation");
 assert(markersSource.includes("stack.dataset.signature") && markersSource.includes("#cardFrontElement"), "Marker badges must persist and position from the visible card frame");
+assert(markersSource.includes("(entry.visualElement ?? entry.element).classList.add"), "Marker selection must highlight the visible card instead of its zone wrapper");
 assert(!/\beval\s*\(|\bnew\s+Function\s*\(/.test(customMacrosSource), "Custom macros must never evaluate player-authored code");
 assert(customMacrosSource.includes('this.#page().Send({ action: "Duel", play, ...extra })'), "Custom macro functions must route through the guarded DuelingBook sender");
 assert(customMacrosSource.includes('if (!allowed.has(play))'), "Custom macro DuelingBook play names must be allowlisted");
@@ -160,6 +161,8 @@ const publicMarker = { controller: "TestPlayer", zone: "M3", cardName: "Iris —
 const publicMarkerMessage = formatMarkerChatMessage(publicMarker);
 const parsedPublicMarker = parseMarkerChatMessage(publicMarkerMessage);
 assert(parsedPublicMarker?.action === "apply" && parsedPublicMarker.cardName === publicMarker.cardName && parsedPublicMarker.expiration === "end-phase", "public marker messages must round-trip safely");
+assert(publicMarkerMessage === "‼️ Iris — Infinite Reflections — Effect Negated (Until End Phase)", "public marker messages must use the concise player-facing format");
+assert(parseMarkerChatMessage(formatMarkerChatMessage({ ...publicMarker, includeLocation: true }))?.zone === "M3", "duplicate-card marker messages must retain location disambiguation");
 assert(parseMarkerChatMessage(formatMarkerChatMessage(publicMarker, "clear"))?.action === "clear", "public marker clear messages must parse");
 const compatibleMacros = parseCustomMacroDefinitions("-- LP\nPay Half | /sub ${halfOfLP}\n-- Deck\nSend Card | ${sendFromDeckToGY(Test Card)} | Done");
 assert(compatibleMacros.errors.length === 0 && compatibleMacros.macros.length === 2, "Custom DB-compatible macro definitions must parse");

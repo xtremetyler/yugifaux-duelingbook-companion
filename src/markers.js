@@ -21,31 +21,34 @@
     const cardName = normalizeMarkerText(marker?.cardName, 120, false);
     const label = normalizeMarkerText(marker?.label, 60);
     if (!controller || !/^(?:M[1-5]|S[1-5]|F|EL|ER)$/.test(zone) || !cardName || !label) return "";
-    if (action === "clear") return `✅ YF Marker Cleared — ${controller} / ${zone} / ${cardName} — ${label}`;
+    const location = marker?.includeLocation ? ` [${controller} ${zone}]` : "";
+    if (action === "clear") return `✅ ${cardName}${location} — ${label} (Cleared)`;
     const expiration = marker?.expiration === "end-phase" ? "Until End Phase" : "Manual";
-    return `🏷️ YF Marker — ${controller} / ${zone} / ${cardName} — ${label} (${expiration})`;
+    return `‼️ ${cardName}${location} — ${label} (${expiration})`;
   }
 
   function parseMarkerChatMessage(value) {
     const text = String(value ?? "").replace(/\s+/g, " ").trim();
-    const applied = text.match(/^🏷️ YF Marker — ([^/]{1,40}) \/ (M[1-5]|S[1-5]|F|EL|ER) \/ (.+) — (.{1,60}) \((Until End Phase|Manual)\)$/u);
-    if (applied) {
+    const appliedLocated = text.match(/^‼️ (.+) \[([^\]]{1,40}) (M[1-5]|S[1-5]|F|EL|ER)\] — (.{1,60}) \((Until End Phase|Manual)\)$/u);
+    const appliedSimple = appliedLocated ? null : text.match(/^‼️ (.+) — (.{1,60}) \((Until End Phase|Manual)\)$/u);
+    if (appliedLocated || appliedSimple) {
       return {
         action: "apply",
-        controller: applied[1].trim(),
-        zone: applied[2],
-        cardName: applied[3].trim(),
-        label: applied[4].trim(),
-        expiration: applied[5] === "Until End Phase" ? "end-phase" : "manual"
+        cardName: (appliedLocated?.[1] ?? appliedSimple[1]).trim(),
+        controller: appliedLocated?.[2]?.trim() ?? "",
+        zone: appliedLocated?.[3] ?? "",
+        label: (appliedLocated?.[4] ?? appliedSimple[2]).trim(),
+        expiration: (appliedLocated?.[5] ?? appliedSimple[3]) === "Until End Phase" ? "end-phase" : "manual"
       };
     }
-    const cleared = text.match(/^✅ YF Marker Cleared — ([^/]{1,40}) \/ (M[1-5]|S[1-5]|F|EL|ER) \/ (.+) — (.{1,60})$/u);
-    return cleared ? {
+    const clearedLocated = text.match(/^✅ (.+) \[([^\]]{1,40}) (M[1-5]|S[1-5]|F|EL|ER)\] — (.{1,60}) \(Cleared\)$/u);
+    const clearedSimple = clearedLocated ? null : text.match(/^✅ (.+) — (.{1,60}) \(Cleared\)$/u);
+    return clearedLocated || clearedSimple ? {
       action: "clear",
-      controller: cleared[1].trim(),
-      zone: cleared[2],
-      cardName: cleared[3].trim(),
-      label: cleared[4].trim(),
+      cardName: (clearedLocated?.[1] ?? clearedSimple[1]).trim(),
+      controller: clearedLocated?.[2]?.trim() ?? "",
+      zone: clearedLocated?.[3] ?? "",
+      label: (clearedLocated?.[4] ?? clearedSimple[2]).trim(),
       expiration: "manual"
     } : null;
   }
@@ -331,7 +334,7 @@
       const entries = this.#fieldEntries();
       if (!entries.length) return this.#showToast("No face-up field cards are available to mark.", true);
       this.selecting = true;
-      for (const entry of entries) entry.element.classList.add("yf-marker-selectable");
+      for (const entry of entries) (entry.visualElement ?? entry.element).classList.add("yf-marker-selectable");
       this.#showToast("Click a face-up card on the field.");
       this.#renderPanel();
     }
@@ -373,7 +376,8 @@
         label,
         expiration: preset.id === "return-end-phase" ? "end-phase" : this.draftExpiration,
         public: this.draftPublic,
-        offField: false
+        offField: false,
+        includeLocation: this.#fieldEntries().filter((candidate) => candidate.cardName.toLowerCase() === entry.cardName.toLowerCase()).length > 1
       };
       if (marker.public && !this.#sendChatLine(formatMarkerChatMessage(marker))) return;
       this.#upsertMarker(marker);
@@ -534,12 +538,12 @@
     }
 
     #applyPublicMarker(parsed) {
-      const entry = this.#fieldEntries().find((candidate) =>
-        candidate.controller.toLowerCase() === parsed.controller.toLowerCase() &&
-        candidate.zone === parsed.zone &&
-        candidate.cardName.toLowerCase() === parsed.cardName.toLowerCase()
+      let candidates = this.#fieldEntries().filter((candidate) => candidate.cardName.toLowerCase() === parsed.cardName.toLowerCase());
+      if (parsed.controller && parsed.zone) candidates = candidates.filter((candidate) =>
+        candidate.controller.toLowerCase() === parsed.controller.toLowerCase() && candidate.zone === parsed.zone
       );
-      if (!entry) return this.diagnostics.warn("markers", "public marker did not match a visible field card", { controller: parsed.controller, zone: parsed.zone, cardName: parsed.cardName });
+      if (candidates.length !== 1) return this.diagnostics.warn("markers", "public marker did not uniquely match a visible field card", { controller: parsed.controller, zone: parsed.zone, cardName: parsed.cardName, matches: candidates.length });
+      const entry = candidates[0];
       const preset = MARKER_PRESETS.find((candidate) => candidate.label.toLowerCase() === parsed.label.toLowerCase()) ?? MARKER_PRESETS.at(-1);
       this.#upsertMarker({
         ...entry,
@@ -549,7 +553,8 @@
         label: parsed.label,
         expiration: parsed.expiration,
         public: true,
-        offField: false
+        offField: false,
+        includeLocation: Boolean(parsed.controller && parsed.zone)
       });
       this.#renderBadges();
       if (this.panel) this.#renderPanel();
@@ -558,7 +563,8 @@
     #applyPublicClear(parsed) {
       let changed = false;
       for (const [key, marker] of this.markers) {
-        if (marker.controller.toLowerCase() !== parsed.controller.toLowerCase()) continue;
+        if (parsed.controller && marker.controller.toLowerCase() !== parsed.controller.toLowerCase()) continue;
+        if (parsed.zone && marker.zone !== parsed.zone) continue;
         if (marker.cardName.toLowerCase() !== parsed.cardName.toLowerCase()) continue;
         if (marker.label.toLowerCase() !== parsed.label.toLowerCase()) continue;
         this.markers.delete(key);
