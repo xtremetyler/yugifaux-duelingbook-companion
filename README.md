@@ -10,6 +10,7 @@ The current build:
 - adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
 - adds an opt-in, locally stored Custom DB-compatible macro editor and right-side `MACROS` menu with categories, variables, waits, messages, and an allowlisted set of player-triggered duel functions;
 - flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;
+- plays a synchronized synthesized chain-clank sound for installed players who have **Mute audio** turned off;
 - supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;
 - presents those Tokens to installed companions as `Bloom Token` (Plant/WIND/Level 2/ATK 0/DEF 0) while leaving DuelingBook's authoritative generic Token state untouched;
 - loads a versioned JSON configuration and falls back to the last valid cache or bundled defaults;

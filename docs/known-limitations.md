@@ -21,6 +21,7 @@
 
 - Chain messages rely on DuelingBook's native `#duel .cin_txt` input and Enter-key handler. DuelingBook keeps that native control transparent beneath its custom-rendered chat field, so the companion detects it by active layout presence rather than CSS opacity. If that interface changes, the fixed message remains in the chat box for the player to send manually.
 - The avatar flash is companion-only and is synchronized from the newly rendered public `⛓️ Chain Link N` chat row. Players without the companion still see the ordinary chat declaration.
+- The chain sound is companion-only, follows the global **Mute audio** setting, and requires the player to have interacted with DuelingBook once so the browser can unlock audio playback.
 
 # Custom macro limitations
 

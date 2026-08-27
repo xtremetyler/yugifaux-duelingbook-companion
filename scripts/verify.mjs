@@ -106,7 +106,9 @@ assert(chainMacrosSource.includes("#isUsableChatInput") && chainMacrosSource.inc
 assert(chainMacrosSource.includes("DuelingBook deliberately sets the native input's opacity to zero"), "Chain input detection must document DuelingBook's transparent-control behavior");
 assert(chainMacrosSource.includes('new KeyboardEvent("keydown"'), "Chain macros must use DuelingBook's native Enter handler");
 assert(chainMacrosSource.includes('font[message-id]'), "Chain flashes must synchronize from visible public chat messages");
-assert(!chainMacrosSource.includes('document.addEventListener("pointerdown"'), "Chain menu must not be dismissed by DuelingBook pointer event propagation");
+assert(chainMacrosSource.includes("#playChainSound") && chainMacrosSource.includes("AudioContext"), "Synchronized Chain sound is missing");
+assert(chainMacrosSource.includes("this.getSettings()?.muted"), "Chain sound must respect the global mute setting");
+assert(!chainMacrosSource.includes('document.addEventListener("pointerdown", (event)'), "Chain menu must not be dismissed by DuelingBook pointer event propagation");
 assert(!/\beval\s*\(|\bnew\s+Function\s*\(/.test(customMacrosSource), "Custom macros must never evaluate player-authored code");
 assert(customMacrosSource.includes('this.#page().Send({ action: "Duel", play, ...extra })'), "Custom macro functions must route through the guarded DuelingBook sender");
 assert(customMacrosSource.includes('if (!allowed.has(play))'), "Custom macro DuelingBook play names must be allowlisted");

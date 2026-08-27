@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.11.0
+// @version      0.11.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.11.0",
+    version: "0.11.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1609,6 +1609,7 @@
       this.toast = null;
       this.chatObserver = null;
       this.seenMessageIds = new Set();
+      this.audioContext = null;
     }
 
     mount() {
@@ -1643,7 +1644,11 @@
       this.menu.append(title, grid);
       document.body.append(this.menu);
 
-      document.addEventListener("keydown", (event) => { if (event.key === "Escape") this.close(); });
+      document.addEventListener("pointerdown", () => this.#unlockAudio(), { capture: true });
+      document.addEventListener("keydown", (event) => {
+        this.#unlockAudio();
+        if (event.key === "Escape") this.close();
+      });
       this.#observeChat();
       setInterval(() => this.refresh(), 750);
       this.refresh();
@@ -1753,8 +1758,73 @@
         if (messageId) this.#rememberMessage(messageId);
         const message = messageElement.textContent.trim();
         if (!/^⛓️\s*Chain Link [1-8]$/iu.test(message)) continue;
+        void this.#playChainSound();
         const username = row.querySelector("b font")?.textContent?.replace(/:\s*$/, "").trim();
         if (username) this.#flashAvatar(username);
+      }
+    }
+
+    #getAudioContext() {
+      if (this.audioContext) return this.audioContext;
+      const AudioContextClass = globalThis.AudioContext ?? globalThis.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      try { this.audioContext = new AudioContextClass(); } catch { this.audioContext = null; }
+      return this.audioContext;
+    }
+
+    #unlockAudio() {
+      const context = this.#getAudioContext();
+      if (context?.state === "suspended") void context.resume().catch(() => {});
+    }
+
+    async #playChainSound() {
+      if (this.getSettings()?.muted) return;
+      try {
+        const context = this.#getAudioContext();
+        if (!context) return;
+        if (context.state === "suspended") await context.resume();
+        if (context.state !== "running") return;
+        const start = context.currentTime + 0.01;
+        const master = context.createGain();
+        master.gain.setValueAtTime(0.0001, start);
+        master.gain.exponentialRampToValueAtTime(0.13, start + 0.018);
+        master.gain.exponentialRampToValueAtTime(0.0001, start + 0.42);
+        master.connect(context.destination);
+
+        [430, 690, 970].forEach((frequency, index) => {
+          const oscillator = context.createOscillator();
+          const strike = context.createGain();
+          oscillator.type = index === 1 ? "square" : "triangle";
+          oscillator.frequency.setValueAtTime(frequency, start);
+          oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.72, start + 0.3);
+          strike.gain.setValueAtTime(0.0001, start + index * 0.028);
+          strike.gain.exponentialRampToValueAtTime(0.32 / (index + 1), start + 0.015 + index * 0.028);
+          strike.gain.exponentialRampToValueAtTime(0.0001, start + 0.2 + index * 0.055);
+          oscillator.connect(strike);
+          strike.connect(master);
+          oscillator.start(start + index * 0.028);
+          oscillator.stop(start + 0.36 + index * 0.055);
+        });
+
+        const length = Math.max(1, Math.floor(context.sampleRate * 0.24));
+        const buffer = context.createBuffer(1, length, context.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let index = 0; index < length; index++) data[index] = (Math.random() * 2 - 1) * Math.pow(1 - index / length, 2.6);
+        const rattle = context.createBufferSource();
+        const filter = context.createBiquadFilter();
+        const rattleGain = context.createGain();
+        rattle.buffer = buffer;
+        filter.type = "bandpass";
+        filter.frequency.value = 2400;
+        filter.Q.value = 2.4;
+        rattleGain.gain.value = 0.22;
+        rattle.connect(filter);
+        filter.connect(rattleGain);
+        rattleGain.connect(master);
+        rattle.start(start + 0.025);
+        this.diagnostics.info("chain-sound", "synchronized chain sound played");
+      } catch (error) {
+        this.diagnostics.warn("chain-sound", "browser prevented chain sound", { reason: String(error?.message ?? error) });
       }
     }
 
