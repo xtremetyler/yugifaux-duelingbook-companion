@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.12.1
+// @version      0.12.2
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.12.1",
+    version: "0.12.2",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -2031,8 +2031,10 @@
     #${APP.ids.markerToast} { position: fixed; right: 58px; bottom: 18px; z-index: 2147483647; width: min(390px,calc(100vw - 80px)); border: 1px solid #fcd34d; border-radius: 9px; background: #451a03ef; color: #fffbeb; padding: 10px 12px; text-align: center; font: 750 13px/1.35 Arial,sans-serif; box-shadow: 0 8px 24px #000c; }
     #${APP.ids.markerToast}.yf-marker-error { border-color: #f87171; background: #450a0aef; color: #fee2e2; }
     #${APP.ids.markerBadgeLayer} { position: fixed; inset: 0; z-index: 2147483642; pointer-events: none; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-stack { position: fixed; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 22px; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip { --yf-marker-color: 180,83,9; pointer-events: auto; position: relative; display: grid; width: 21px; height: 21px; place-items: center; border: 1px solid #fff9; border-radius: 50%; background: linear-gradient(145deg,rgba(var(--yf-marker-color),.94),rgba(15,23,42,.9)); color: #fff; font: 900 13px/1 Georgia,serif; text-shadow: 0 1px 2px #000; box-shadow: 0 2px 6px #000c,0 0 8px rgba(var(--yf-marker-color),.65),inset 0 1px 2px #fff5; backdrop-filter: blur(4px); animation: yf-marker-medallion-in 180ms ease-out both; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-stack { position: fixed; display: flex; align-items: center; gap: 3px; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-stack[data-orientation="attack"] { flex-direction: column; width: 22px; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-stack[data-orientation="defense"] { flex-direction: row; width: auto; height: 22px; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip { --yf-marker-color: 180,83,9; pointer-events: auto; position: relative; display: grid; flex: 0 0 21px; width: 21px; height: 21px; place-items: center; border: 1px solid #fff9; border-radius: 50%; background: linear-gradient(145deg,rgba(var(--yf-marker-color),.94),rgba(15,23,42,.9)); color: #fff; font: 900 13px/1 Georgia,serif; text-shadow: 0 1px 2px #000; box-shadow: 0 2px 6px #000c,0 0 8px rgba(var(--yf-marker-color),.65),inset 0 1px 2px #fff5; backdrop-filter: blur(4px); }
     #${APP.ids.markerBadgeLayer} .yf-marker-chip::after { content: ""; position: absolute; inset: 2px; border: 1px solid #ffffff42; border-radius: inherit; }
     #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="negated"] { --yf-marker-color: 185,28,28; }
     #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="cannot-attack"] { --yf-marker-color: 220,38,38; }
@@ -2043,8 +2045,7 @@
     #${APP.ids.markerBadgeLayer} .yf-marker-tooltip strong, #${APP.ids.markerBadgeLayer} .yf-marker-tooltip small { display: block; }
     #${APP.ids.markerBadgeLayer} .yf-marker-tooltip small { margin-top: 2px; color: #cbd5e1; font-weight: 600; }
     #${APP.ids.markerBadgeLayer} .yf-marker-chip:hover .yf-marker-tooltip { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0); }
-    @keyframes yf-marker-medallion-in { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: scale(1); } }
-    @media (prefers-reduced-motion: reduce) { #${APP.ids.markerBadgeLayer} .yf-marker-chip { animation: none; } #${APP.ids.markerBadgeLayer} .yf-marker-tooltip { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { #${APP.ids.markerBadgeLayer} .yf-marker-tooltip { transition: none; } }
     .yf-marker-selectable { outline: 3px solid #facc15 !important; outline-offset: 3px; filter: drop-shadow(0 0 8px #facc15) !important; cursor: crosshair !important; }
     @media (max-width: 650px) { #${APP.ids.markerButton} { right: 4px; top: calc(50% + 215px); } #${APP.ids.markerPanel} { right: 48px; } }
   `;
@@ -2063,7 +2064,7 @@
       this.draftStatusId = "negated";
       this.draftCustomText = "";
       this.draftExpiration = "manual";
-      this.draftPublic = false;
+      this.draftPublic = true;
       this.chatRoot = null;
       this.chatObserver = null;
       this.seenMessageIds = new Set();
@@ -2214,7 +2215,7 @@
       shareInput.type = "checkbox";
       shareInput.checked = this.draftPublic;
       shareInput.addEventListener("change", () => { this.draftPublic = shareInput.checked; });
-      share.append(shareInput, document.createTextNode("Share through visible duel chat"));
+      share.append(shareInput, document.createTextNode("Visible to both players (uses duel chat)"));
       panel.append(share);
 
       const selected = this.#fieldEntries().find((entry) => entry.cardId === this.selectedCardId);
@@ -2392,37 +2393,57 @@
 
     #renderBadges() {
       if (!this.badgeLayer) return;
-      this.badgeLayer.replaceChildren();
       const groups = new Map();
       for (const marker of this.markers.values()) {
-        if (!(marker.element instanceof Element) || !marker.element.isConnected || marker.offField) continue;
+        const visual = marker.visualElement instanceof Element ? marker.visualElement : marker.element;
+        if (!(visual instanceof Element) || !visual.isConnected || marker.offField) continue;
         if (!groups.has(marker.cardId)) groups.set(marker.cardId, []);
         groups.get(marker.cardId).push(marker);
       }
-      for (const markers of groups.values()) {
-        const rect = markers[0].element.getBoundingClientRect();
-        if (!rect.width || !rect.height) continue;
-        const stack = document.createElement("div");
-        stack.className = "yf-marker-stack";
-        stack.style.left = `${Math.max(2, Math.min(innerWidth - 24, rect.right - 8))}px`;
-        stack.style.top = `${Math.max(2, rect.top + 8)}px`;
-        for (const marker of markers) {
-          const chip = document.createElement("div");
-          chip.className = "yf-marker-chip";
-          chip.dataset.status = marker.statusId;
-          chip.textContent = marker.icon ?? MARKER_PRESETS.find((preset) => preset.id === marker.statusId)?.icon ?? "!";
-          const tooltip = document.createElement("div");
-          tooltip.className = "yf-marker-tooltip";
-          const tooltipLabel = document.createElement("strong");
-          tooltipLabel.textContent = marker.label;
-          const tooltipDetails = document.createElement("small");
-          tooltipDetails.textContent = `${marker.expiration === "end-phase" ? "Until End Phase" : "Manual removal"} · ${marker.public ? "Public" : "Private"}`;
-          tooltip.append(tooltipLabel, tooltipDetails);
-          chip.append(tooltip);
-          stack.append(chip);
+      const existing = new Map([...this.badgeLayer.children].map((stack) => [stack.dataset.cardId, stack]));
+      for (const [cardId, markers] of groups) {
+        let visual = markers[0].visualElement instanceof Element ? markers[0].visualElement : markers[0].element;
+        let rect = visual.getBoundingClientRect();
+        if ((!rect.width || !rect.height) && visual !== markers[0].element) {
+          visual = markers[0].element;
+          rect = visual.getBoundingClientRect();
         }
-        this.badgeLayer.append(stack);
+        if (!rect.width || !rect.height) continue;
+        const defense = rect.width > rect.height;
+        const stack = existing.get(cardId) ?? document.createElement("div");
+        stack.className = "yf-marker-stack";
+        stack.dataset.cardId = cardId;
+        stack.dataset.orientation = defense ? "defense" : "attack";
+        stack.style.left = defense
+          ? `${Math.max(2, Math.min(innerWidth - (markers.length * 24), rect.left + 5))}px`
+          : `${Math.max(2, Math.min(innerWidth - 24, rect.right - 9))}px`;
+        stack.style.top = defense
+          ? `${Math.max(2, rect.top - 8)}px`
+          : `${Math.max(2, rect.top + 6)}px`;
+        const signature = markers.map((marker) => [marker.statusId, marker.label, marker.expiration, marker.public, marker.icon].join(":")).join("|");
+        if (stack.dataset.signature !== signature) {
+          stack.replaceChildren();
+          stack.dataset.signature = signature;
+          for (const marker of markers) {
+            const chip = document.createElement("div");
+            chip.className = "yf-marker-chip";
+            chip.dataset.status = marker.statusId;
+            chip.append(document.createTextNode(marker.icon ?? MARKER_PRESETS.find((preset) => preset.id === marker.statusId)?.icon ?? "!"));
+            const tooltip = document.createElement("div");
+            tooltip.className = "yf-marker-tooltip";
+            const tooltipLabel = document.createElement("strong");
+            tooltipLabel.textContent = marker.label;
+            const tooltipDetails = document.createElement("small");
+            tooltipDetails.textContent = `${marker.expiration === "end-phase" ? "Until End Phase" : "Manual removal"} · ${marker.public ? "Public" : "Private"}`;
+            tooltip.append(tooltipLabel, tooltipDetails);
+            chip.append(tooltip);
+            stack.append(chip);
+          }
+        }
+        if (!stack.isConnected) this.badgeLayer.append(stack);
+        existing.delete(cardId);
       }
+      for (const stale of existing.values()) stale.remove();
     }
 
     #attachChat() {
@@ -2552,7 +2573,14 @@
         const cardName = this.#cardName(card);
         if (!cardName) return;
         seen.add(String(cardId));
-        entries.push({ cardId: String(cardId), cardName, controller: String(controller ?? ""), zone, element });
+        entries.push({
+          cardId: String(cardId),
+          cardName,
+          controller: String(controller ?? ""),
+          zone,
+          element,
+          visualElement: this.#cardFrontElement(card) ?? element
+        });
       };
       for (const player of players) {
         for (let zone = 1; zone <= 5; zone++) add(player[`m${zone}`], player.username, `M${zone}`);
@@ -2576,6 +2604,7 @@
 
     #page() { return typeof unsafeWindow !== "undefined" ? unsafeWindow : window; }
     #cardElement(card) { try { return card?.[0] ?? card?.get?.(0) ?? null; } catch { return null; } }
+    #cardFrontElement(card) { try { return this.#cardElement(card?.data?.("cardfront")); } catch { return null; } }
     #cardId(card) { try { return card?.data?.("id") ?? null; } catch { return null; } }
     #cardData(card, key) { try { return card?.data?.(key) ?? null; } catch { return null; } }
     #cardName(card) { try { return String(card?.data?.("cardfront")?.data?.("name") ?? "").trim(); } catch { return ""; } }
