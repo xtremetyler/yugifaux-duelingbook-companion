@@ -7,6 +7,7 @@ The current build:
 - adds a small `YF` button and collapsible control panel;
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
+- plays the embedded recorded Token summon sound when a supported Token reaches the field, synchronized for installed players with **Mute audio** turned off;
 - adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
 - adds an opt-in, locally stored Custom DB-compatible macro editor and right-side `MACROS` menu with categories, variables, waits, messages, and an allowlisted set of player-triggered duel functions;
 - flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;

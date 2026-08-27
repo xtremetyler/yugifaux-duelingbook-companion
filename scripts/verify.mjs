@@ -98,6 +98,8 @@ assert(tokenMacrosSource.includes('preview.querySelector("img.pic")'), "custom T
 assert(tokenMacrosSource.includes("[data-overlayscrollbars-viewport]"), "Token details must preserve DuelingBook's native scrollbar viewport");
 assert(tokenMacrosSource.includes('document.addEventListener("mousemove"'), "Token preview must remain synchronized across the full field card");
 assert(tokenMacrosSource.includes("repeat(2,minmax(0,160px))"), "Token confirmation artwork must remain compact");
+assert(tokenMacrosSource.includes("data:audio/wav;base64,") && tokenMacrosSource.includes("#playTokenSummonSound"), "Embedded Token summon sound is missing");
+assert(tokenMacrosSource.includes("#announceTokenSummon") && tokenMacrosSource.includes("this.getSettings()?.muted"), "Token summon sound synchronization or mute handling is missing");
 assert(!chainMacrosSource.includes("Send("), "Chain macros must not call DuelingBook's socket sender");
 assert(!chainMacrosSource.includes("unsafeWindow"), "Chain macros must not access DuelingBook page globals");
 assert(chainMacrosSource.includes('#duel .cin_txt') && chainMacrosSource.includes('#duel #cin_txt'), "Chain macros must support DuelingBook's class- and ID-based duel chat inputs");
