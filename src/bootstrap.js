@@ -3,7 +3,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.11.1",
+    version: "0.11.2",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
