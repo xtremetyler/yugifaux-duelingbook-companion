@@ -144,6 +144,8 @@ assert(compatibleMacros.groups[0]?.name === "LP" && compatibleMacros.groups[1]?.
 assert(parseCustomMacroAction("${waitInMs(500)}").name === "waitInMs", "Custom macro function syntax must parse without code evaluation");
 assert(parseCustomMacroDefinitions("Bad | ${notAllowed(x)}").errors.some((error) => error.includes("unknown function")), "Unknown custom macro functions must be rejected");
 assert(CUSTOM_MACRO_FUNCTIONS.includes("specialFromDeckInAtk") && CUSTOM_MACRO_FUNCTIONS.includes("overlayMonsters"), "Gameplay macro function registry is incomplete");
+assert(CUSTOM_MACRO_FUNCTIONS.includes("specialFromHandInAtk") && CUSTOM_MACRO_FUNCTIONS.includes("specialFromHandInDefToZone"), "Hand Special Summon macro functions are missing");
+assert(parseCustomMacroDefinitions("SS Hand | ${specialFromHandInAtk(Test Monster)}").errors.length === 0, "Hand Special Summon macros must parse");
 for (const functionName of CUSTOM_MACRO_FUNCTIONS) assert(customMacrosSource.includes(`case "${functionName}"`), `Custom macro function ${functionName} is registered but has no implementation`);
 assert(CUSTOM_MACRO_VARIABLES.includes("currentLP") && CUSTOM_MACRO_VARIABLES.includes("atkAllFaceUpMonsters"), "Custom DB-compatible variables are incomplete");
 assert(validateMatchIdentifier(" YF-2026-001 ").identifier === "YF-2026-001", "valid match identifiers must be normalized");

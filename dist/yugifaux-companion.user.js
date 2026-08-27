@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.11.3
+// @version      0.11.4
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.11.3",
+    version: "0.11.4",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1946,6 +1946,7 @@ Thinking | Thinking...`;
 
   const CUSTOM_MACRO_FUNCTIONS = Object.freeze([
     "addFromDeckToHand", "sendFromDeckToGY",
+    "specialFromHandInAtk", "specialFromHandInDef", "specialFromHandInAtkRandomZone", "specialFromHandInDefRandomZone", "specialFromHandInAtkToZone", "specialFromHandInDefToZone",
     "specialFromDeckInAtk", "specialFromDeckInDef", "specialFromDeckInAtkRandomZone", "specialFromDeckInDefRandomZone", "specialFromDeckInAtkToZone", "specialFromDeckInDefToZone",
     "specialFromExtraDeckInAtk", "specialFromExtraDeckInDef", "specialFromExtraDeckInAtkRandomZone", "specialFromExtraDeckInDefRandomZone", "specialFromExtraDeckInAtkToZone", "specialFromExtraDeckInDefToZone", "sendFromExtraDeckToGY",
     "specialSummonToken", "specialSummonTokenToZone", "specialSummonMultipleTokens",
@@ -2117,18 +2118,24 @@ Thinking | Thinking...`;
         case "fromGYToTopOfDeck": return this.#actNames(this.#player()?.grave_arr, param, "To T Deck");
         case "fromFieldToTopOfDeck": return this.#actNames(this.#ownFieldCards(), param, "To T Deck");
         case "sendFromFieldToGY": return this.#actFieldNames(param);
+        case "specialFromHandInAtk": return this.#selectFromPile("hand", param, "SS ATK");
+        case "specialFromHandInDef": return this.#selectFromPile("hand", param, "SS DEF");
         case "specialFromDeckInAtk": return this.#selectFromPile("deck", param, "SS ATK");
         case "specialFromDeckInDef": return this.#selectFromPile("deck", param, "SS DEF");
         case "specialFromExtraDeckInAtk": return this.#selectFromPile("extra", param, "SS ATK");
         case "specialFromExtraDeckInDef": return this.#selectFromPile("extra", param, "SS DEF");
         case "specialFromGYInAtk": return this.#selectFromPile("grave", param, "SS ATK");
         case "specialFromGYInDef": return this.#selectFromPile("grave", param, "SS DEF");
+        case "specialFromHandInAtkRandomZone": return this.#actNames(this.#player()?.hand_arr, param, "SS ATK");
+        case "specialFromHandInDefRandomZone": return this.#actNames(this.#player()?.hand_arr, param, "SS DEF");
         case "specialFromDeckInAtkRandomZone": return this.#pileAction("deck", param, "SS ATK");
         case "specialFromDeckInDefRandomZone": return this.#pileAction("deck", param, "SS DEF");
         case "specialFromExtraDeckInAtkRandomZone": return this.#pileAction("extra", param, "SS ATK");
         case "specialFromExtraDeckInDefRandomZone": return this.#pileAction("extra", param, "SS DEF");
         case "specialFromGYInAtkRandomZone": return this.#actNames(this.#player()?.grave_arr, param, "SS ATK");
         case "specialFromGYInDefRandomZone": return this.#actNames(this.#player()?.grave_arr, param, "SS DEF");
+        case "specialFromHandInAtkToZone": return this.#zoneAction(this.#player()?.hand_arr, args, "SS ATK");
+        case "specialFromHandInDefToZone": return this.#zoneAction(this.#player()?.hand_arr, args, "SS DEF");
         case "specialFromDeckInAtkToZone": return this.#pileZoneAction("deck", args, "SS ATK");
         case "specialFromDeckInDefToZone": return this.#pileZoneAction("deck", args, "SS DEF");
         case "specialFromExtraDeckInAtkToZone": return this.#pileZoneAction("extra", args, "SS ATK");
@@ -2229,7 +2236,7 @@ Thinking | Thinking...`;
 
     #pile(name) {
       const player = this.#player();
-      return name === "deck" ? player?.main_arr : name === "extra" ? player?.extra_arr : player?.grave_arr;
+      return name === "hand" ? player?.hand_arr : name === "deck" ? player?.main_arr : name === "extra" ? player?.extra_arr : player?.grave_arr;
     }
 
     async #pileAction(pile, names, play) {
@@ -2519,6 +2526,7 @@ Thinking | Thinking...`;
         document.createTextNode("Categories: "), this.#code("-- Category Name"), document.createElement("br"),
         document.createTextNode("Variables: "), this.#code(CUSTOM_MACRO_VARIABLES.map((name) => `\${${name}}`).join(", ")), document.createElement("br"),
         document.createTextNode("Zones: M1–M5, S1–S5, OM1–OM5, EL, ER"), document.createElement("br"),
+        document.createTextNode("Hand summon examples: "), this.#code("${specialFromHandInAtk(Card Name)} or ${specialFromHandInDefToZone(Card Name~M1~M2)}"), document.createElement("br"),
         document.createTextNode("Functions: "), this.#code(CUSTOM_MACRO_FUNCTIONS.map((name) => `${name}()`).join(", "))
       );
       guide.append(summary, help);
