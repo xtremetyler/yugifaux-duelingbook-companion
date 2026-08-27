@@ -50,6 +50,10 @@ Chain macros contain only fixed declarations for Chain Links 1 through 8. They n
 
 Token macros are hard-coded, reviewed recipes. They do not accept executable actions from remote configuration and do not call DuelingBook's socket sender. After an explicit confirmation, the companion opens DuelingBook's visible native Token gallery, selects a reserved built-in carrier thumbnail, and leaves each native Monster Zone choice to the player. Companion artwork and metadata are presentation-only.
 
+# Marker boundary
+
+Markers are player-created presentation reminders. The selector lists face-up field cards only and never reads names from face-down cards. Private reminders stay in memory for the current page session. Public reminders use fixed, readable duel-chat sentences submitted through DuelingBook's visible native chat input; there are no hidden synchronization messages. Marker badges never block or execute gameplay actions.
+
 # Custom macro boundary
 
 Custom macros are local, opt-in, and player initiated. The parser recognizes only categories, messages, documented variables, and function-call expressions. It never uses `eval` or `Function`. Each function maps to fixed DuelingBook action names and derives card identifiers only from the current player's active duel state. Macro definitions cannot provide raw action names, object keys, selectors, or JavaScript.

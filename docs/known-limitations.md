@@ -30,3 +30,10 @@
 - The parser supports Custom DB's `-- Category` and `Button | action | action` format, the documented variables, `~` argument separator, and the allowlisted functions shown in the editor. It does not execute arbitrary JavaScript.
 - Functions that open DuelingBook's native zone chooser end the remaining macro sequence so the player can finish that interactive action safely.
 - Player-created macros can move multiple cards immediately. Test new gameplay macros in a consenting unrated room before league use.
+
+# Marker limitations
+
+- Markers are reminders, not rules enforcement. They never prevent attacks, activations, position changes, or other DuelingBook actions.
+- Private markers exist only in the current page session. Public markers synchronize only to installed companions that receive the readable marker chat declaration.
+- Automatic End Phase expiration depends on DuelingBook's visible public `Entered End Phase` duel-log line. A filtered or unavailable duel log can require manual removal.
+- Face-down cards are deliberately excluded so marker selection never reveals hidden card names.

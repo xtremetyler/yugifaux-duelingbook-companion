@@ -11,6 +11,8 @@ The current build:
 - adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
 - adds an opt-in, locally stored Custom DB-compatible macro editor and right-side `MACROS` menu with categories, variables, waits, messages, and an allowlisted set of player-triggered duel functions;
 - extends those functions with Attack/Defense Special Summons from the hand using an interactive zone chooser, a DuelingBook-chosen zone, or an ordered list of preferred zones;
+- adds a `MARKERS` tab for player-applied reminders including Effect Negated, Cannot Attack, Cannot Activate Effects, battle-position locks, End Phase returns, and custom notes;
+- supports private reminders or readable public chat declarations that synchronize field badges between installed companions, with manual or End Phase expiration;
 - flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;
 - plays the embedded recorded Chain sound for installed players who have **Mute audio** turned off;
 - supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;
@@ -35,7 +37,7 @@ The current build:
 5. Click the `YF` button near the lower-left corner.
 6. Use the named preview buttons to test any configured animation without entering a duel.
 
-During an active duel, `TOKENS` and `CHAIN` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain menu sends one explicit public declaration per button click; it never uses hidden synchronization messages.
+During an active duel, `TOKENS`, `CHAIN`, and `MARKERS` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain and public Marker tools send explicit readable chat declarations; they never use hidden synchronization messages.
 
 Hand Special Summon examples:
 

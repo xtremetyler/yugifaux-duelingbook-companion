@@ -14,6 +14,7 @@ const sources = [
   "src/match-launcher.js",
   "src/token-macros.js",
   "src/chain-macros.js",
+  "src/markers.js",
   "src/custom-macros.js",
   "src/ui.js",
   "src/main.js",

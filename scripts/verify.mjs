@@ -10,6 +10,7 @@ const observerSource = await readFile(resolve(root, "src/event-observer.js"), "u
 const launcherSource = await readFile(resolve(root, "src/match-launcher.js"), "utf8");
 const tokenMacrosSource = await readFile(resolve(root, "src/token-macros.js"), "utf8");
 const chainMacrosSource = await readFile(resolve(root, "src/chain-macros.js"), "utf8");
+const markersSource = await readFile(resolve(root, "src/markers.js"), "utf8");
 const customMacrosSource = await readFile(resolve(root, "src/custom-macros.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
@@ -34,6 +35,13 @@ const chainMacroTestContext = {
 vm.runInNewContext(
   `${chainMacrosSource}\nglobalThis.chainMacroTests = { CHAIN_LINKS, chainLinkMessage };`,
   chainMacroTestContext
+);
+const markerTestContext = {
+  APP: { ids: { markerButton: "test-marker-button", markerPanel: "test-marker-panel", markerToast: "test-marker-toast", markerBadgeLayer: "test-marker-badges" } }
+};
+vm.runInNewContext(
+  `${markersSource}\nglobalThis.markerTests = { MARKER_PRESETS, normalizeMarkerText, formatMarkerChatMessage, parseMarkerChatMessage };`,
+  markerTestContext
 );
 const customMacroTestContext = {
   APP: { ids: { customMacroButton: "test-custom-button", customMacroMenu: "test-custom-menu", customMacroEditor: "test-custom-editor", customMacroToast: "test-custom-toast" } }
@@ -83,6 +91,7 @@ assert(bundle.includes('formatValue: "cu"'), "Custom Cards host format is missin
 assert(bundle.includes('matchTypeValue: "m"'), "2 out of 3 host type is missing from the launcher");
 assert(bundle.includes("class TokenMacros"), "Token macro controller is missing from the bundle");
 assert(bundle.includes("class ChainMacros"), "Chain macro controller is missing from the bundle");
+assert(bundle.includes("class MarkerTracker"), "Marker reminder controller is missing from the bundle");
 assert(bundle.includes("class CustomMacros") && bundle.includes("class CustomMacroEngine"), "Custom macro editor or action engine is missing from the bundle");
 assert(bundle.includes("@grant        unsafeWindow"), "Custom macro engine requires the declared unsafeWindow grant");
 assert(bundle.includes("Polyflora Hexbloom"), "Polyflora Token recipe is missing from the bundle");
@@ -112,6 +121,10 @@ assert(chainMacrosSource.includes("#playChainSound") && chainMacrosSource.includ
 assert(chainMacrosSource.includes("new Audio(CHAIN_SOUND_DATA_URL)") && chainMacrosSource.includes("await audio.play()"), "Recorded Chain sound playback is missing");
 assert(chainMacrosSource.includes("this.getSettings()?.muted"), "Chain sound must respect the global mute setting");
 assert(!chainMacrosSource.includes('document.addEventListener("pointerdown", (event)'), "Chain menu must not be dismissed by DuelingBook pointer event propagation");
+assert(!markersSource.includes("Send("), "Markers must not call DuelingBook's socket sender");
+assert(markersSource.includes('font[message-id]') && markersSource.includes('new KeyboardEvent("keydown"'), "Public markers must synchronize through visible native duel chat");
+assert(markersSource.includes('this.#cardData(card, "face_down")'), "Marker selection must exclude face-down cards");
+assert(markersSource.includes('marker.statusId === "return-end-phase"') && markersSource.includes("#isCardBanished"), "End Phase return reminders must survive while their card is banished");
 assert(!/\beval\s*\(|\bnew\s+Function\s*\(/.test(customMacrosSource), "Custom macros must never evaluate player-authored code");
 assert(customMacrosSource.includes('this.#page().Send({ action: "Duel", play, ...extra })'), "Custom macro functions must route through the guarded DuelingBook sender");
 assert(customMacrosSource.includes('if (!allowed.has(play))'), "Custom macro DuelingBook play names must be allowlisted");
@@ -134,10 +147,17 @@ const { classifyPublicLogLine, getNewLogText } = observerTests.observerTests;
 const { LEAGUE_MATCH_DEFAULTS, validateMatchIdentifier } = launcherTestContext.launcherTests;
 const { BLOOM_TOKEN_VARIANTS, TOKEN_RECIPES, chooseDistinctTokenVariants, tokenCarrierFromUrl } = tokenMacroTestContext.tokenMacroTests;
 const { CHAIN_LINKS, chainLinkMessage } = chainMacroTestContext.chainMacroTests;
+const { MARKER_PRESETS, formatMarkerChatMessage, parseMarkerChatMessage } = markerTestContext.markerTests;
 const { CUSTOM_MACRO_FUNCTIONS, CUSTOM_MACRO_VARIABLES, parseCustomMacroAction, parseCustomMacroDefinitions } = customMacroTestContext.customMacroTests;
 assert(JSON.stringify([...CHAIN_LINKS]) === JSON.stringify([1, 2, 3, 4, 5, 6, 7, 8]), "Chain menu must provide links 1 through 8");
 assert(chainLinkMessage(1) === "⛓️ Chain Link 1" && chainLinkMessage(8) === "⛓️ Chain Link 8", "Chain messages must use the approved emoji prefix");
 assert(chainLinkMessage(0) === "" && chainLinkMessage(9) === "", "unsupported Chain Link messages must be rejected");
+assert(MARKER_PRESETS.some((marker) => marker.id === "negated") && MARKER_PRESETS.some((marker) => marker.id === "return-end-phase"), "required reminder presets are missing");
+const publicMarker = { controller: "TestPlayer", zone: "M3", cardName: "Iris — Infinite Reflections", label: "Effect Negated", expiration: "end-phase" };
+const publicMarkerMessage = formatMarkerChatMessage(publicMarker);
+const parsedPublicMarker = parseMarkerChatMessage(publicMarkerMessage);
+assert(parsedPublicMarker?.action === "apply" && parsedPublicMarker.cardName === publicMarker.cardName && parsedPublicMarker.expiration === "end-phase", "public marker messages must round-trip safely");
+assert(parseMarkerChatMessage(formatMarkerChatMessage(publicMarker, "clear"))?.action === "clear", "public marker clear messages must parse");
 const compatibleMacros = parseCustomMacroDefinitions("-- LP\nPay Half | /sub ${halfOfLP}\n-- Deck\nSend Card | ${sendFromDeckToGY(Test Card)} | Done");
 assert(compatibleMacros.errors.length === 0 && compatibleMacros.macros.length === 2, "Custom DB-compatible macro definitions must parse");
 assert(compatibleMacros.groups[0]?.name === "LP" && compatibleMacros.groups[1]?.name === "Deck", "Custom macro categories must be preserved");
@@ -169,6 +189,7 @@ assert(
   classifyPublicLogLine(getNewLogText(ashDeclaration, `${ashDeclaration}\n${normalSummon}`))?.type === "normal-summon",
   "a summon after Ash Blossom must not replay the Ash overlay"
 );
+assert(classifyPublicLogLine("Entered End Phase")?.type === "end-phase", "End Phase entry must expire timed reminders");
 assert(
   classifyPublicLogLine(getNewLogText(`${ashDeclaration}\n${normalSummon}`, `${ashDeclaration}\n${normalSummon}\n${positionChange}`)) === null,
   "a position change after Ash Blossom must not replay the Ash overlay"

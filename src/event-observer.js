@@ -1,4 +1,5 @@
   const EVENT_PHRASES = Object.freeze([
+    ["end-phase", /\bentered end phase\b/i],
     ["effect-declaration", /(?:\b(?:declare(?:d|s|ing)?|announc(?:ed|es|ing)?)\b.{0,160}\beffect\b|\beffect\b.{0,160}\bactivate(?:d|s|ing)?\b)/i],
     ["normal-summon", /\bnormal summon(?:ed|s|ing)?\b/i],
     ["special-summon", /\bspecial summon(?:ed|s|ing)?\b/i],

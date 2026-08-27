@@ -22,6 +22,7 @@ src/
   match-launcher.js           guarded league host setup and confirmation
   token-macros.js             confirmed custom Token recipes and presentation
   chain-macros.js             fixed visible Chain declarations and avatar flash
+  markers.js                  presentation-only card reminders and public chat synchronization
   custom-macros.js            compatible parser, editor, menu, and action engine
   ui.js                       namespaced panel and controls
   main.js                     lifecycle and dependency wiring

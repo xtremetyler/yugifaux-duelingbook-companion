@@ -54,3 +54,17 @@ Use two consenting accounts with version 0.9.0 or newer in an unrated Custom Car
 7. Hover each Token and verify its companion label identifies `Bloom Token`, WIND, Level 2, and 0/0.
 8. Repeat with only one open Monster Zone and confirm the workflow stops without summoning either Token.
 9. Repeat on a client without the companion and verify it sees ordinary DuelingBook Token artwork while the authoritative field placement remains correct.
+
+# Marker reminders
+
+Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Cards duel.
+
+1. Place a face-up monster on the field, open **MARKERS**, choose **Effect Negated**, and select that monster.
+2. Apply it privately and confirm only the initiating client shows a compact `NEG` field badge.
+3. Remove it from the active-reminders list and confirm the badge disappears without changing the card's gameplay state.
+4. Apply **Cannot Attack** publicly and confirm the readable marker sentence appears in duel chat and both installed clients show `NO ATK` on the same card.
+5. Remove the public marker and confirm the readable clear sentence removes it on both installed clients.
+6. Apply an **Until End Phase** marker, enter the End Phase, and confirm both clients expire it after the public `Entered End Phase` log line.
+7. Apply **Return in End Phase**, banish that card, and confirm the reminder remains in the active list without a field badge until the End Phase.
+8. Set a monster face-down and confirm it cannot be selected or have its hidden name exposed by the Marker panel.
+9. Attempt a public marker while the native chat box contains text and confirm the companion refuses to overwrite it.
