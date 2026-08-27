@@ -125,6 +125,7 @@ assert(!markersSource.includes("Send("), "Markers must not call DuelingBook's so
 assert(markersSource.includes('font[message-id]') && markersSource.includes('new KeyboardEvent("keydown"'), "Public markers must synchronize through visible native duel chat");
 assert(markersSource.includes('this.#cardData(card, "face_down")'), "Marker selection must exclude face-down cards");
 assert(markersSource.includes('marker.statusId === "return-end-phase"') && markersSource.includes("#isCardBanished"), "End Phase return reminders must survive while their card is banished");
+assert(markersSource.includes("yf-marker-medallion-in") && markersSource.includes("yf-marker-tooltip"), "Compact Marker medallions and hover details are missing");
 assert(!/\beval\s*\(|\bnew\s+Function\s*\(/.test(customMacrosSource), "Custom macros must never evaluate player-authored code");
 assert(customMacrosSource.includes('this.#page().Send({ action: "Duel", play, ...extra })'), "Custom macro functions must route through the guarded DuelingBook sender");
 assert(customMacrosSource.includes('if (!allowed.has(play))'), "Custom macro DuelingBook play names must be allowlisted");

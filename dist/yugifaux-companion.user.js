@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.12.0
+// @version      0.12.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.12.0",
+    version: "0.12.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1946,12 +1946,12 @@
   }
 
   const MARKER_PRESETS = Object.freeze([
-    Object.freeze({ id: "negated", label: "Effect Negated", shortLabel: "NEG" }),
-    Object.freeze({ id: "cannot-attack", label: "Cannot Attack", shortLabel: "NO ATK" }),
-    Object.freeze({ id: "cannot-activate", label: "Cannot Activate Effects", shortLabel: "NO FX" }),
-    Object.freeze({ id: "position-locked", label: "Cannot Change Battle Position", shortLabel: "LOCK" }),
-    Object.freeze({ id: "return-end-phase", label: "Return in End Phase", shortLabel: "RETURN EP" }),
-    Object.freeze({ id: "custom", label: "Custom Reminder", shortLabel: "NOTE" })
+    Object.freeze({ id: "negated", label: "Effect Negated", shortLabel: "NEG", icon: "Ø" }),
+    Object.freeze({ id: "cannot-attack", label: "Cannot Attack", shortLabel: "NO ATK", icon: "⚔" }),
+    Object.freeze({ id: "cannot-activate", label: "Cannot Activate Effects", shortLabel: "NO FX", icon: "✦" }),
+    Object.freeze({ id: "position-locked", label: "Cannot Change Battle Position", shortLabel: "LOCK", icon: "◆" }),
+    Object.freeze({ id: "return-end-phase", label: "Return in End Phase", shortLabel: "RETURN EP", icon: "↶" }),
+    Object.freeze({ id: "custom", label: "Custom Reminder", shortLabel: "NOTE", icon: "!" })
   ]);
 
   function normalizeMarkerText(value, maximum = 100, replaceDash = true) {
@@ -2011,7 +2011,8 @@
     #${APP.ids.markerPanel} button:hover, #${APP.ids.markerPanel} button:focus-visible { border-color: #fde68a; filter: brightness(1.14); }
     #${APP.ids.markerPanel} .yf-marker-close { border: 0; background: transparent; padding: 0 4px; color: #e2e8f0; font-size: 25px; line-height: 1; }
     #${APP.ids.markerPanel} .yf-marker-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
-    #${APP.ids.markerPanel} .yf-marker-presets button { min-width: 0; overflow-wrap: anywhere; background: linear-gradient(135deg,#312e81,#713f12); }
+    #${APP.ids.markerPanel} .yf-marker-presets button { display: flex; align-items: center; gap: 7px; min-width: 0; overflow-wrap: anywhere; text-align: left; background: linear-gradient(135deg,#312e81,#713f12); }
+    #${APP.ids.markerPanel} .yf-marker-preset-icon { display: grid; flex: 0 0 25px; width: 25px; height: 25px; place-items: center; border: 1px solid #fff7; border-radius: 50%; background: #02061777; color: #fff; font: 900 15px/1 Georgia,serif; box-shadow: 0 0 9px #facc1533; }
     #${APP.ids.markerPanel} .yf-marker-presets button[aria-pressed="true"] { border-color: #fef08a; background: linear-gradient(135deg,#6d28d9,#b45309); box-shadow: 0 0 0 1px #facc1566 inset; }
     #${APP.ids.markerPanel} .yf-marker-custom { display: block; width: 100%; margin-top: 8px; }
     #${APP.ids.markerPanel} .yf-marker-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
@@ -2030,13 +2031,20 @@
     #${APP.ids.markerToast} { position: fixed; right: 58px; bottom: 18px; z-index: 2147483647; width: min(390px,calc(100vw - 80px)); border: 1px solid #fcd34d; border-radius: 9px; background: #451a03ef; color: #fffbeb; padding: 10px 12px; text-align: center; font: 750 13px/1.35 Arial,sans-serif; box-shadow: 0 8px 24px #000c; }
     #${APP.ids.markerToast}.yf-marker-error { border-color: #f87171; background: #450a0aef; color: #fee2e2; }
     #${APP.ids.markerBadgeLayer} { position: fixed; inset: 0; z-index: 2147483642; pointer-events: none; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-stack { position: fixed; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; max-width: 92px; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip { overflow: hidden; max-width: 92px; border: 1px solid #fef3c7; border-radius: 5px; background: #7c2d12ef; color: #fff; padding: 2px 4px; white-space: nowrap; text-overflow: ellipsis; font: 900 9px/1.1 Arial,sans-serif; box-shadow: 0 2px 5px #000c; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="negated"] { background: #7f1d1def; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="cannot-attack"] { background: #991b1bef; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="cannot-activate"] { background: #581c87ef; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="position-locked"] { background: #1e3a8aef; }
-    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="return-end-phase"] { background: #065f46ef; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-stack { position: fixed; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 22px; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip { --yf-marker-color: 180,83,9; pointer-events: auto; position: relative; display: grid; width: 21px; height: 21px; place-items: center; border: 1px solid #fff9; border-radius: 50%; background: linear-gradient(145deg,rgba(var(--yf-marker-color),.94),rgba(15,23,42,.9)); color: #fff; font: 900 13px/1 Georgia,serif; text-shadow: 0 1px 2px #000; box-shadow: 0 2px 6px #000c,0 0 8px rgba(var(--yf-marker-color),.65),inset 0 1px 2px #fff5; backdrop-filter: blur(4px); animation: yf-marker-medallion-in 180ms ease-out both; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip::after { content: ""; position: absolute; inset: 2px; border: 1px solid #ffffff42; border-radius: inherit; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="negated"] { --yf-marker-color: 185,28,28; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="cannot-attack"] { --yf-marker-color: 220,38,38; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="cannot-activate"] { --yf-marker-color: 126,34,206; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="position-locked"] { --yf-marker-color: 29,78,216; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip[data-status="return-end-phase"] { --yf-marker-color: 5,150,105; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-tooltip { pointer-events: none; position: absolute; right: 26px; top: 50%; width: max-content; max-width: 190px; transform: translateY(-50%) translateX(4px); border: 1px solid rgba(var(--yf-marker-color),.8); border-radius: 7px; background: #07111ff2; color: #f8fafc; padding: 6px 8px; opacity: 0; visibility: hidden; white-space: normal; text-align: left; font: 700 11px/1.25 Arial,sans-serif; text-shadow: none; box-shadow: 0 6px 18px #000d,0 0 12px rgba(var(--yf-marker-color),.35); transition: opacity 120ms ease,transform 120ms ease,visibility 120ms; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-tooltip strong, #${APP.ids.markerBadgeLayer} .yf-marker-tooltip small { display: block; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-tooltip small { margin-top: 2px; color: #cbd5e1; font-weight: 600; }
+    #${APP.ids.markerBadgeLayer} .yf-marker-chip:hover .yf-marker-tooltip { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0); }
+    @keyframes yf-marker-medallion-in { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { #${APP.ids.markerBadgeLayer} .yf-marker-chip { animation: none; } #${APP.ids.markerBadgeLayer} .yf-marker-tooltip { transition: none; } }
     .yf-marker-selectable { outline: 3px solid #facc15 !important; outline-offset: 3px; filter: drop-shadow(0 0 8px #facc15) !important; cursor: crosshair !important; }
     @media (max-width: 650px) { #${APP.ids.markerButton} { right: 4px; top: calc(50% + 215px); } #${APP.ids.markerPanel} { right: 48px; } }
   `;
@@ -2155,7 +2163,12 @@
       for (const preset of MARKER_PRESETS) {
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = preset.label;
+        const icon = document.createElement("span");
+        icon.className = "yf-marker-preset-icon";
+        icon.textContent = preset.icon;
+        const buttonLabel = document.createElement("span");
+        buttonLabel.textContent = preset.label;
+        button.append(icon, buttonLabel);
         button.setAttribute("aria-pressed", String(this.draftStatusId === preset.id));
         button.addEventListener("click", () => {
           this.draftStatusId = preset.id;
@@ -2243,7 +2256,7 @@
         item.className = "yf-marker-active";
         const copy = document.createElement("div");
         const name = document.createElement("strong");
-        name.textContent = marker.label;
+        name.textContent = `${marker.icon ?? "!"} ${marker.label}`;
         const details = document.createElement("small");
         const location = marker.offField ? "Banished / off field" : `${marker.controller} ${marker.zone}`;
         details.textContent = `${marker.cardName} — ${location} — ${marker.expiration === "end-phase" ? "until End Phase" : "manual"}${marker.public ? " — public" : " — private"}`;
@@ -2302,6 +2315,7 @@
         element: entry.element,
         statusId: preset.id,
         shortLabel: preset.id === "custom" ? "NOTE" : preset.shortLabel,
+        icon: preset.icon,
         label,
         expiration: preset.id === "return-end-phase" ? "end-phase" : this.draftExpiration,
         public: this.draftPublic,
@@ -2390,14 +2404,21 @@
         if (!rect.width || !rect.height) continue;
         const stack = document.createElement("div");
         stack.className = "yf-marker-stack";
-        stack.style.left = `${Math.max(2, Math.min(innerWidth - 96, rect.right - 86))}px`;
-        stack.style.top = `${Math.max(2, rect.top + 3)}px`;
+        stack.style.left = `${Math.max(2, Math.min(innerWidth - 24, rect.right - 8))}px`;
+        stack.style.top = `${Math.max(2, rect.top + 8)}px`;
         for (const marker of markers) {
           const chip = document.createElement("div");
           chip.className = "yf-marker-chip";
           chip.dataset.status = marker.statusId;
-          chip.textContent = marker.shortLabel;
-          chip.title = `${marker.label} — ${marker.expiration === "end-phase" ? "Until End Phase" : "Manual removal"}`;
+          chip.textContent = marker.icon ?? MARKER_PRESETS.find((preset) => preset.id === marker.statusId)?.icon ?? "!";
+          const tooltip = document.createElement("div");
+          tooltip.className = "yf-marker-tooltip";
+          const tooltipLabel = document.createElement("strong");
+          tooltipLabel.textContent = marker.label;
+          const tooltipDetails = document.createElement("small");
+          tooltipDetails.textContent = `${marker.expiration === "end-phase" ? "Until End Phase" : "Manual removal"} · ${marker.public ? "Public" : "Private"}`;
+          tooltip.append(tooltipLabel, tooltipDetails);
+          chip.append(tooltip);
           stack.append(chip);
         }
         this.badgeLayer.append(stack);
@@ -2450,6 +2471,7 @@
         ...entry,
         statusId: preset.id,
         shortLabel: preset.id === "custom" ? "NOTE" : preset.shortLabel,
+        icon: preset.icon,
         label: parsed.label,
         expiration: parsed.expiration,
         public: true,
