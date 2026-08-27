@@ -15,6 +15,7 @@ The current build:
 - supports private reminders or readable public chat declarations that synchronize field badges between installed companions, with manual or End Phase expiration;
 - presents active reminders as stable color-coded medallions—vertical along Attack Position cards and horizontal across Defense Position cards—with full details revealed on hover; public sharing is enabled by default;
 - keeps public marker chat concise—for example, `‼️ Xigg, the Lost — Return in End Phase (Until End Phase)`—adding a location only when identical face-up card names require disambiguation;
+- discovers face-up cards through both the local player and DuelingBook's opponent references, allowing reminders on either player's cards;
 - flashes a chain emoji over the declaring player's avatar when an installed companion receives that public chat line;
 - plays the embedded recorded Chain sound for installed players who have **Mute audio** turned off;
 - supports `Polyflora Hexbloom` by selecting two distinct Bloom artworks from six approved variants, requiring two open Monster Zones, and using DuelingBook's visible native Token controls;

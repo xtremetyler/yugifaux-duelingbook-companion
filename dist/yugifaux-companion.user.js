@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.12.3
+// @version      0.12.4
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.12.3",
+    version: "0.12.4",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -2568,7 +2568,7 @@
 
     #fieldEntries() {
       const page = this.#page();
-      const players = [page.player1, page.player2, page.player3, page.player4].filter((player) => player?.username);
+      const players = this.#duelPlayers();
       const entries = [];
       const seen = new Set();
       const add = (card, controller, zone) => {
@@ -2601,14 +2601,25 @@
     }
 
     #isCardBanished(cardId) {
-      const page = this.#page();
-      for (const player of [page.player1, page.player2, page.player3, page.player4]) {
+      for (const player of this.#duelPlayers()) {
         for (const card of player?.banished_arr ?? []) if (String(this.#cardId(card)) === String(cardId)) return true;
       }
       return false;
     }
 
     #page() { return typeof unsafeWindow !== "undefined" ? unsafeWindow : window; }
+    #duelPlayers() {
+      const page = this.#page();
+      const direct = [page.player1, page.player2, page.player3, page.player4].filter(Boolean);
+      const candidates = direct.flatMap((player) => [player, player?.opponent]).filter((player) => player?.username);
+      const seen = new Set();
+      return candidates.filter((player) => {
+        const key = String(player.username).toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
     #cardElement(card) { try { return card?.[0] ?? card?.get?.(0) ?? null; } catch { return null; } }
     #cardFrontElement(card) { try { return this.#cardElement(card?.data?.("cardfront")); } catch { return null; } }
     #cardId(card) { try { return card?.data?.("id") ?? null; } catch { return null; } }
