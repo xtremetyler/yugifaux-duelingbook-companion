@@ -130,6 +130,8 @@ assert(!markersSource.includes("yf-marker-medallion-in"), "Marker medallions mus
 assert(markersSource.includes("stack.dataset.signature") && markersSource.includes("#cardFrontElement"), "Marker badges must persist and position from the visible card frame");
 assert(markersSource.includes("(entry.visualElement ?? entry.element).classList.add"), "Marker selection must highlight the visible card instead of its zone wrapper");
 assert(markersSource.includes("#duelPlayers") && markersSource.includes("player?.opponent"), "Marker selection must discover opponent-controlled field cards");
+assert(markersSource.includes('document.querySelectorAll("#field .card")') && markersSource.includes("#jqueryCard"), "Marker selection must include the guarded live-field DOM fallback");
+assert(markersSource.includes("#isExplicitlyFaceUp"), "DOM-discovered marker cards must require explicit face-up state");
 assert(!/\beval\s*\(|\bnew\s+Function\s*\(/.test(customMacrosSource), "Custom macros must never evaluate player-authored code");
 assert(customMacrosSource.includes('this.#page().Send({ action: "Duel", play, ...extra })'), "Custom macro functions must route through the guarded DuelingBook sender");
 assert(customMacrosSource.includes('if (!allowed.has(play))'), "Custom macro DuelingBook play names must be allowlisted");

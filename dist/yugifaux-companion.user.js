@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.12.4
+// @version      0.12.5
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.12.4",
+    version: "0.12.5",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -1967,7 +1967,9 @@
     const zone = String(marker?.zone ?? "").toUpperCase();
     const cardName = normalizeMarkerText(marker?.cardName, 120, false);
     const label = normalizeMarkerText(marker?.label, 60);
-    if (!controller || !/^(?:M[1-5]|S[1-5]|F|EL|ER)$/.test(zone) || !cardName || !label) return "";
+    if (!cardName || !label) return "";
+    const hasLocation = controller && /^(?:M[1-5]|S[1-5]|F|EL|ER)$/.test(zone);
+    if (marker?.includeLocation && !hasLocation) return "";
     const location = marker?.includeLocation ? ` [${controller} ${zone}]` : "";
     if (action === "clear") return `✅ ${cardName}${location} — ${label} (Cleared)`;
     const expiration = marker?.expiration === "end-phase" ? "Until End Phase" : "Manual";
@@ -2572,7 +2574,7 @@
       const entries = [];
       const seen = new Set();
       const add = (card, controller, zone) => {
-        if (!card || this.#cardData(card, "face_down")) return;
+        if (!card || !this.#isExplicitlyFaceUp(card)) return;
         const cardId = this.#cardId(card);
         const element = this.#cardElement(card);
         if (cardId === null || !(element instanceof Element) || seen.has(String(cardId))) return;
@@ -2596,6 +2598,12 @@
       for (const [card, zone] of [[page.linkLeft, "EL"], [page.linkRight, "ER"]]) {
         const controller = this.#cardData(card, "controller")?.username;
         add(card, controller, zone);
+      }
+      for (const element of document.querySelectorAll("#field .card")) {
+        const card = this.#jqueryCard(element);
+        if (!card) continue;
+        const controller = this.#cardData(card, "controller")?.username ?? "Visible field";
+        add(card, controller, this.#inferDomZone(card, element));
       }
       return entries;
     }
@@ -2622,9 +2630,34 @@
     }
     #cardElement(card) { try { return card?.[0] ?? card?.get?.(0) ?? null; } catch { return null; } }
     #cardFrontElement(card) { try { return this.#cardElement(card?.data?.("cardfront")); } catch { return null; } }
-    #cardId(card) { try { return card?.data?.("id") ?? null; } catch { return null; } }
+    #cardId(card) { try { return card?.data?.("id") ?? this.#cardElement(card)?.dataset?.id ?? null; } catch { return null; } }
     #cardData(card, key) { try { return card?.data?.(key) ?? null; } catch { return null; } }
     #cardName(card) { try { return String(card?.data?.("cardfront")?.data?.("name") ?? "").trim(); } catch { return ""; } }
+    #jqueryCard(element) {
+      try {
+        const jquery = this.#page()?.$;
+        return typeof jquery === "function" ? jquery(element) : null;
+      } catch { return null; }
+    }
+    #isExplicitlyFaceUp(card) {
+      const value = this.#cardData(card, "face_down");
+      return value === false || value === 0 || value === "false";
+    }
+    #inferDomZone(card, element) {
+      const rawZone = String(this.#cardData(card, "zone") ?? "").trim();
+      const normalized = rawZone.replaceAll("-", "").toUpperCase();
+      if (/^[MS][1-5]$/.test(normalized)) return normalized;
+      if (/^(?:EL|ER|F)$/.test(normalized)) return normalized;
+      for (let current = element; current && current !== document.body; current = current.parentElement) {
+        const values = [current.id, current.dataset?.zone, ...current.classList].filter(Boolean);
+        for (const value of values) {
+          const match = String(value).match(/(?:^|[_-])([ms])[_-]?([1-5])(?:$|[_-])/i);
+          if (match) return `${match[1].toUpperCase()}${match[2]}`;
+        }
+        if (current.id === "field") break;
+      }
+      return "FIELD";
+    }
 
     #showToast(message, error = false) {
       this.toast?.remove();
