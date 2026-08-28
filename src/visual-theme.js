@@ -17,6 +17,8 @@
     body.yf-visual-theme #greenlines { display: none !important; }
     body.yf-visual-theme #start #brionac_large {
       object-fit: contain;
+      scale: .4;
+      transform-origin: 100% 100%;
       filter: drop-shadow(0 12px 12px #000b) drop-shadow(0 0 16px #c084fc55);
     }
   `;
