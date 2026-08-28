@@ -102,6 +102,10 @@ assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].opacity < 
 assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["ghost-rare"].artworkOpacity < 1, "Ghost Rare must wash out the printed artwork");
 assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["ghost-rare"].artworkFilter.includes("grayscale(1)"), "Ghost Rare must use a fully spectral artwork treatment");
 assert(rarityOverlaysSource.includes("yf-ghost-rare-breathe") && rarityOverlaysSource.includes('data-yf-rarity="ghost-rare"'), "Ghost Rare must use its dedicated animated spectral treatment");
+for (const rarity of ["ultra-rare", "rare", "secret-rare", "prismatic-rare", "ghost-rare", "platinum-rare", "gold-rare"]) {
+  assert(rarityOverlaysSource.includes(`data-yf-rarity="${rarity}"`), `${rarity} name treatment is missing`);
+}
+assert(rarityOverlaysSource.includes("yf-iridescent-rarity-name") && rarityOverlaysSource.includes("-webkit-background-clip: text"), "Secret and Prismatic names must use the iridescent treatment");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
 assert(rarityOverlaysSource.includes("yf-rarity-artwork-effect") && rarityOverlaysSource.includes("#applyArtworkFilter"), "per-rarity artwork filters are missing");
 assert(rarityOverlaysSource.includes('document.querySelectorAll("#duel #field .card")') && rarityOverlaysSource.includes("#refreshDuelCards"), "rarity presentation must scan duel field cards");

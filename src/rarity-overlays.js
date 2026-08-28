@@ -78,12 +78,44 @@
       opacity: var(--yf-ghost-art-opacity) !important;
       animation: yf-ghost-rare-breathe 4.8s ease-in-out infinite !important;
     }
-    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .name_txt,
-    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .name2_txt,
-    #duel .cardfront[data-yf-rarity="ghost-rare"] .name_txt,
-    #duel .cardfront[data-yf-rarity="ghost-rare"] .name2_txt {
+    #deck_constructor .cardfront[data-yf-rarity="ultra-rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="ultra-rare"] :is(.name_txt,.name2_txt) {
+      color: #f6d365 !important;
+      -webkit-text-fill-color: #f6d365 !important;
+      text-shadow: 0 1px 0 #704100,0 0 3px #fff2a8,0 0 8px #d89a18 !important;
+    }
+    #deck_constructor .cardfront[data-yf-rarity="rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="rare"] :is(.name_txt,.name2_txt) {
+      color: #e7edf3 !important;
+      -webkit-text-fill-color: #e7edf3 !important;
+      text-shadow: 0 1px 0 #475569,0 0 3px #fff,0 0 7px #aebdca !important;
+    }
+    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] :is(.name_txt,.name2_txt),
+    #deck_constructor .cardfront[data-yf-rarity="platinum-rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="ghost-rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="platinum-rare"] :is(.name_txt,.name2_txt) {
       color: #edfaff !important;
+      -webkit-text-fill-color: #edfaff !important;
       text-shadow: 0 0 2px #fff,0 0 7px #b9efff,0 0 13px #c4b5fd !important;
+    }
+    #deck_constructor .cardfront[data-yf-rarity="gold-rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="gold-rare"] :is(.name_txt,.name2_txt) {
+      color: #d99b20 !important;
+      -webkit-text-fill-color: #d99b20 !important;
+      text-shadow: 0 1px 0 #4a2a00,0 0 2px #ffe09a,0 0 7px #9a5b00 !important;
+    }
+    #deck_constructor .cardfront[data-yf-rarity="secret-rare"] :is(.name_txt,.name2_txt),
+    #deck_constructor .cardfront[data-yf-rarity="prismatic-rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="secret-rare"] :is(.name_txt,.name2_txt),
+    #duel .cardfront[data-yf-rarity="prismatic-rare"] :is(.name_txt,.name2_txt) {
+      color: #f8fafc !important;
+      background: linear-gradient(105deg,#f8fafc 0%,#dbeafe 20%,#f5d0fe 40%,#fef3c7 60%,#ccfbf1 80%,#f8fafc 100%) !important;
+      background-size: 220% 100% !important;
+      background-clip: text !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      text-shadow: 0 0 3px #fff9,0 0 8px #c4b5fd99 !important;
+      animation: yf-iridescent-rarity-name 5.5s linear infinite !important;
     }
     @keyframes yf-ghost-rare-breathe {
       0%,100% {
@@ -94,6 +126,10 @@
         --yf-ghost-brightness: 1.76;
         --yf-ghost-art-opacity: .87;
       }
+    }
+    @keyframes yf-iridescent-rarity-name {
+      from { background-position: 100% 50%; }
+      to { background-position: -120% 50%; }
     }
     #${APP.ids.rarityToggle} {
       position: absolute !important;
