@@ -55,11 +55,18 @@
       opacity: 1 !important;
     }
     body.yf-visual-theme #deck_constructor #banlists {
+      appearance: none !important;
+      -webkit-appearance: none !important;
       border: 1px solid #8b5cf6 !important;
       border-radius: 4px;
-      background: #18181b !important;
+      background-color: #18181b !important;
+      background-image: linear-gradient(45deg,transparent 50%,#ede9fe 50%),linear-gradient(135deg,#ede9fe 50%,transparent 50%),linear-gradient(to right,#4c1d95,#4c1d95) !important;
+      background-position: calc(100% - 12px) 50%,calc(100% - 7px) 50%,100% 0 !important;
+      background-repeat: no-repeat !important;
+      background-size: 5px 5px,5px 5px,30px 100% !important;
       color: #f8fafc !important;
       color-scheme: dark;
+      padding: 2px 34px 2px 7px !important;
     }
     body.yf-visual-theme #deck_constructor #banlists option { background: #18181b; color: #f8fafc; }
     body.yf-visual-theme .bypass_limit_lbl,
