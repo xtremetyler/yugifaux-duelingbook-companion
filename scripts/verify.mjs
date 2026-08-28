@@ -88,6 +88,7 @@ assert(bundle.includes("v1787771135/painfulpref.png"), "approved Painful Prefere
 assert(bundle.includes("class MatchLauncher"), "guided match launcher is missing from the bundle");
 assert(bundle.includes("class VisualTheme"), "YugiFaux visual theme controller is missing from the bundle");
 assert(visualThemeSource.includes('document.getElementById("brionac_large")'), "start-page monster replacement must use DuelingBook's proven target");
+assert(visualThemeSource.includes("body.yf-visual-theme #brionac_large") && !visualThemeSource.includes("body.yf-visual-theme #start #brionac_large"), "start-page monster styling must not assume the image is nested inside the start container");
 assert(visualThemeSource.includes("data-yf-original-src") && visualThemeSource.includes("#restoreStartMonster"), "start-page monster replacement must be reversible");
 assert(visualThemeSource.includes("v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg"), "approved YugiFaux background is missing");
 assert(visualThemeSource.includes("v1787885319/beltza.png"), "approved start-page monster is missing");

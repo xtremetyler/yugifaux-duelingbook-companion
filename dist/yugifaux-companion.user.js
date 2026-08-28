@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.13.2
+// @version      0.13.3
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.13.2",
+    version: "0.13.3",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -132,7 +132,7 @@
     }
     body.yf-visual-theme #circuit_board,
     body.yf-visual-theme #greenlines { display: none !important; }
-    body.yf-visual-theme #start #brionac_large {
+    body.yf-visual-theme #brionac_large {
       position: absolute !important;
       right: 2vw !important;
       bottom: 0 !important;

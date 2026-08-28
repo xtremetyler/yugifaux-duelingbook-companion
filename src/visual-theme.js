@@ -15,7 +15,7 @@
     }
     body.yf-visual-theme #circuit_board,
     body.yf-visual-theme #greenlines { display: none !important; }
-    body.yf-visual-theme #start #brionac_large {
+    body.yf-visual-theme #brionac_large {
       position: absolute !important;
       right: 2vw !important;
       bottom: 0 !important;
