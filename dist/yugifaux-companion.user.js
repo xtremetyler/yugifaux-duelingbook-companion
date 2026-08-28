@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.19.2
+// @version      0.19.3
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.19.2",
+    version: "0.19.3",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -936,21 +936,66 @@
       this.root = null;
       this.snapshot = "";
       this.scanQueued = false;
+      this.bridgeTimer = null;
+      this.bridge = null;
+      this.bridgeOriginal = null;
+      this.recentEvents = new Map();
     }
 
     start() {
       this.#attachIfAvailable();
+      this.#attachPublicLogBridge();
       this.pageObserver = new MutationObserver(() => this.#attachIfAvailable());
       this.pageObserver.observe(document.body, { childList: true, subtree: true });
+      this.bridgeTimer = setInterval(() => this.#attachPublicLogBridge(), 500);
     }
 
     stop() {
       this.logObserver?.disconnect();
       this.pageObserver?.disconnect();
+      if (this.bridgeTimer) clearInterval(this.bridgeTimer);
+      const page = this.#page();
+      if (this.bridge && page?.duelLogPrint === this.bridge && typeof this.bridgeOriginal === "function") {
+        page.duelLogPrint = this.bridgeOriginal;
+      }
       this.logObserver = null;
       this.pageObserver = null;
+      this.bridgeTimer = null;
+      this.bridge = null;
+      this.bridgeOriginal = null;
       this.root = null;
       this.snapshot = "";
+      this.recentEvents.clear();
+    }
+
+    #page() {
+      return typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+    }
+
+    #attachPublicLogBridge() {
+      const page = this.#page();
+      const current = page?.duelLogPrint;
+      if (typeof current !== "function" || current === this.bridge) return;
+      const observer = this;
+      const bridge = function (...args) {
+        observer.#ingestPublicLogData(args[0]);
+        return current.apply(this, args);
+      };
+      try {
+        Object.defineProperty(bridge, "__yfPublicLogBridge", { value: true });
+        page.duelLogPrint = bridge;
+        this.bridgeOriginal = current;
+        this.bridge = bridge;
+        this.diagnostics.info("observer", "attached to DuelingBook public log renderer", { source: "public_log" });
+      } catch (error) {
+        this.diagnostics.warn("observer", "public log renderer bridge unavailable; using rendered log fallback", { reason: String(error?.message ?? error) });
+      }
+    }
+
+    #ingestPublicLogData(data) {
+      if (!data || Array.isArray(data)) return;
+      if (typeof data.public_log !== "string") return;
+      this.#emitPublicLine(data.public_log, "public-log-renderer");
     }
 
     #attachIfAvailable() {
@@ -986,12 +1031,23 @@
       this.snapshot = current;
       const lines = addedText.split(/\r?\n/).map(normalizeLine).filter(Boolean);
       for (const line of lines) {
-        const event = classifyPublicLogLine(line);
-        if (event) {
-          this.diagnostics.info("observer", "public duel event detected", { type: event.type, text: event.text });
-          this.onEvent(event);
-        }
+        this.#emitPublicLine(line, "rendered-log");
       }
+    }
+
+    #emitPublicLine(line, source) {
+      const event = classifyPublicLogLine(line);
+      if (!event) return;
+      const now = Date.now();
+      const fingerprint = `${event.type}\n${event.text.toLocaleLowerCase()}`;
+      const lastSeen = this.recentEvents.get(fingerprint) ?? 0;
+      this.recentEvents.set(fingerprint, now);
+      for (const [key, seenAt] of this.recentEvents) {
+        if (now - seenAt > 3000) this.recentEvents.delete(key);
+      }
+      if (now - lastSeen < 500) return;
+      this.diagnostics.info("observer", "public duel event detected", { type: event.type, text: event.text, source });
+      this.onEvent(event);
     }
   }
 

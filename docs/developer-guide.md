@@ -32,7 +32,7 @@ dist/                         generated installable userscript
 
 ## Lifecycle
 
-At `document-idle`, the companion restores settings, attaches a narrow observer to `#duel_log .log_txt`, mounts its own UI, and requests configuration. Existing log lines are marked as seen but never replayed. New visible lines are normalized and assigned an occurrence number, which prevents a DuelingBook re-render from replaying the same event while still allowing identical actions to occur more than once.
+At `document-idle`, the companion restores settings, attaches a narrow observer to `#duel_log .log_txt`, mounts its own UI, and requests configuration. It also wraps DuelingBook's public-log renderer as a spectator-safe event source, reading only `public_log`; history arrays are ignored so joining spectators do not replay old animations. Existing rendered lines are marked as seen, and renderer/DOM duplicates are suppressed briefly.
 
 An event must pass two gates: a conservative public-log phrase classifier and an exact case-insensitive configured card-name match. The animation overlay uses `pointer-events: none`. On any load or playback failure, it is skipped and the duel remains untouched.
 

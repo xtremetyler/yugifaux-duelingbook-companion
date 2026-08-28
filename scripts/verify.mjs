@@ -281,6 +281,10 @@ assert(
   classifyPublicLogLine(getNewLogText(pepperDeclaration, `${pepperDeclaration}\n${painfulPreferenceActivation}`))?.type === "activation",
   "an Activated Painful Preference line must be classified as an activation"
 );
+assert(observerSource.includes("public_log") && observerSource.includes("duelLogPrint"), "spectators must receive events from DuelingBook's public log renderer");
+assert(observerSource.includes("if (!data || Array.isArray(data)) return"), "spectator history batches must not replay old animations");
+assert(!observerSource.includes("private_log"), "the spectator observer must never inspect private log data");
+assert(observerSource.includes("recentEvents") && observerSource.includes("now - lastSeen < 500"), "renderer and DOM event paths must be deduplicated");
 
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join("\n"));

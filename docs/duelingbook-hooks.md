@@ -22,6 +22,7 @@ Observed against the current public page on 2026-08-26. Treat every item as vers
 | `#duel` | Duel screen | Presence evidence only | Never infer that hidden children are public. |
 | `#duel_log` | Duel-log panel | Scope boundary | No checkbox or search mutations. |
 | `#duel_log .log_txt` | Rendered log text | **Read-only Phase 1 observer** | Scoped `MutationObserver`; missing node fails open. |
+| `duelLogPrint(data)` / `data.public_log` | DuelingBook public-log renderer | Spectator-safe passive event source | Wrapper preserves the native call, ignores history arrays, reads only `public_log`, and falls back to the rendered-log observer. |
 | `#duel_log .chat_cb` | Chat filter | None | Never toggle automatically. |
 | `#duel_log .duel_cb` | Duel-event filter | None | Testers must leave public duel events visible. |
 | `#duel_log .game_cb` | Game-event filter | None | Never toggle automatically. |
