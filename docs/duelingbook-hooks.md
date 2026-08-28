@@ -10,7 +10,7 @@ Observed against the current public page on 2026-08-26. Treat every item as vers
 | `body`, `#circuit_board`, `#greenlines` | Page background layers | Reversible visual theme | Apply a body class and CSS overrides; never remove DuelingBook's native layers. |
 | `#deck_constructor`, `.deck_bg`, `.side_bg`, `.extra_bg` | Current deck-editor background layers | Reversible visual theme | Recolor the native panels with scoped CSS; restore by removing the body theme class. |
 | `#search`, `.search_bg` | Current deck-editor search background layers | Reversible visual theme | Recolor the native search panel and pair it with readable light labels. |
-| `#deck_constructor #preview .cardfront`, `.deck_card`, `.side_card`, `.extra_card`, `.search_card` | Native Deck Constructor card renders | Optional Secret Rare presentation | Read rendered card names, append a pointer-transparent animated image only to selected names, and remove all layers when disabled. |
+| `#deck_constructor #preview`, `.deck_card`, `.side_card`, `.extra_card`, `.search_card` | Native Deck Constructor card renders | Optional rarity presentation | Read rendered card names, append a pointer-transparent animated rarity layer with per-rarity opacity/blending only to selected names, and remove all layers when disabled. |
 | `#front_page` | Login/front page | Detection evidence only | Never inspect form values. |
 | `#main_menu` | Main menu screen | Future screen status | Observe visibility only if needed. |
 | `#duel_room` | Room and format selection | Guided launcher scope | Must be visibly active before host fields are changed. |

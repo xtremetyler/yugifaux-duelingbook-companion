@@ -54,7 +54,7 @@ vm.runInNewContext(
 );
 const rarityTestContext = { APP: { ids: { rarityToggle: "test-rarity-toggle" } } };
 vm.runInNewContext(
-  `${rarityOverlaysSource}\nglobalThis.rarityTests = { normalizeRarityCardName, SECRET_RARE_ASSET, RARITY_STORAGE_KEY };`,
+  `${rarityOverlaysSource}\nglobalThis.rarityTests = { normalizeRarityCardName, RARITY_DEFINITIONS, RARITY_STORAGE_KEY, LEGACY_SECRET_RARE_STORAGE_KEY };`,
   rarityTestContext
 );
 
@@ -95,10 +95,13 @@ assert(bundle.includes("class MatchLauncher"), "guided match launcher is missing
 assert(bundle.includes("class VisualTheme"), "YugiFaux visual theme controller is missing from the bundle");
 assert(bundle.includes("class RarityOverlays"), "Deck Constructor rarity overlay controller is missing from the bundle");
 assert(rarityOverlaysSource.includes("v1787890399/secretrare.gif"), "approved Secret Rare animation is missing");
+assert(rarityOverlaysSource.includes("v1787891533/superRare.gif"), "approved Super Rare animation is missing");
+assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].opacity < 1 && rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].blendMode === "screen", "Super Rare must use a softened screen blend");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
 assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview")') && rarityOverlaysSource.includes('matches?.(".cardfront")'), "rarity toggle must support DuelingBook's native preview being the cardfront itself");
 assert(rarityOverlaysSource.includes("rarityOverlaysEnabled"), "rarity overlays must have an immediate global disable path");
 assert(rarityOverlaysSource.includes("this.storage.set(RARITY_STORAGE_KEY"), "per-card rarity selections must persist only in Companion storage");
+assert(rarityOverlaysSource.includes("LEGACY_SECRET_RARE_STORAGE_KEY") && rarityOverlaysSource.includes('rarity: "secret-rare"'), "existing Secret Rare selections must migrate to the multi-rarity format");
 assert(rarityTestContext.rarityTests.normalizeRarityCardName("  Sgt.   Pepper  ") === "sgt. pepper", "rarity card names must normalize whitespace and case");
 assert(visualThemeSource.includes('document.getElementById("brionac_large")'), "start-page monster replacement must use DuelingBook's proven target");
 assert(visualThemeSource.includes("body.yf-visual-theme #brionac_large") && !visualThemeSource.includes("body.yf-visual-theme #start #brionac_large"), "start-page monster styling must not assume the image is nested inside the start container");
