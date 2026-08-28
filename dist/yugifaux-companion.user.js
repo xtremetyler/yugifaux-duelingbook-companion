@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.14.0
+// @version      0.14.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.14.0",
+    version: "0.14.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -119,8 +119,8 @@
     logo: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885076/yugifaux_icon.png",
     background: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg",
     startMonsters: Object.freeze([
-      Object.freeze({ name: "Beltza", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885319/beltza.png", scale: .6 }),
-      Object.freeze({ name: "Cheepflight", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787786834/cheepflight.png", scale: .55 })
+      Object.freeze({ name: "Beltza", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885319/beltza.png", scale: .6, x: "0px", y: "0px" }),
+      Object.freeze({ name: "Cheepflight", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787786834/cheepflight.png", scale: .55, x: "0px", y: "-48px" })
     ])
   });
 
@@ -144,6 +144,7 @@
     body.yf-visual-theme #brionac_large {
       object-fit: contain;
       scale: var(--yf-start-monster-scale,.6) !important;
+      translate: var(--yf-start-monster-x,0px) var(--yf-start-monster-y,0px) !important;
       transform-origin: 50% 50% !important;
       filter: drop-shadow(0 12px 12px #000b) drop-shadow(0 0 16px #c084fc55);
     }
@@ -194,6 +195,8 @@
         monster.setAttribute("data-yf-original-alt", monster.getAttribute("alt") ?? "");
       }
       monster.style.setProperty("--yf-start-monster-scale", String(this.startMonster.scale));
+      monster.style.setProperty("--yf-start-monster-x", this.startMonster.x ?? "0px");
+      monster.style.setProperty("--yf-start-monster-y", this.startMonster.y ?? "0px");
       monster.setAttribute("alt", this.startMonster.name);
       if (monster.getAttribute("src") !== this.startMonster.url) {
         monster.setAttribute("src", this.startMonster.url);
@@ -209,6 +212,8 @@
         if (originalAlt) monster.setAttribute("alt", originalAlt);
         else monster.removeAttribute("alt");
         monster.style.removeProperty("--yf-start-monster-scale");
+        monster.style.removeProperty("--yf-start-monster-x");
+        monster.style.removeProperty("--yf-start-monster-y");
         monster.removeAttribute("data-yf-original-src");
         monster.removeAttribute("data-yf-original-alt");
       }

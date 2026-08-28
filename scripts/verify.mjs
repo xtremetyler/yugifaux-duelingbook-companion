@@ -94,6 +94,8 @@ assert(visualThemeSource.includes("v1787885326/Gemini_Generated_Image_pmss9epmss
 assert(visualThemeSource.includes("v1787885319/beltza.png"), "approved Beltza start-page monster is missing");
 assert(visualThemeSource.includes("v1787786834/cheepflight.png"), "approved Cheepflight start-page monster is missing");
 assert(visualThemeSource.includes("chooseStartMonster(VISUAL_ASSETS.startMonsters)") && visualThemeSource.includes("var(--yf-start-monster-scale,.6)"), "start-page monster pool must choose once and support per-character scale");
+assert(visualThemeSource.includes('name: "Cheepflight"') && visualThemeSource.includes('y: "-48px"'), "Cheepflight must use its approved upward offset");
+assert(visualThemeSource.includes("--yf-start-monster-x") && visualThemeSource.includes("--yf-start-monster-y"), "start-page monsters must support unique positions");
 assert(visualThemeSource.includes("transform-origin: 50% 50% !important"), "start-page monster must shrink around its native layout center");
 assert(!visualThemeSource.includes("width: clamp(220px,18vw,320px)") && !visualThemeSource.includes("right: 2vw !important"), "start-page monster must retain DuelingBook's native dimensions and positioning offsets");
 assert(bundle.includes("v1787885076/yugifaux_icon.png"), "approved YugiFaux launcher logo is missing");
