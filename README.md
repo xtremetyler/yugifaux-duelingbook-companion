@@ -4,7 +4,8 @@ This repository contains a player-controlled Tampermonkey companion for YugiFAUX
 
 The current build:
 
-- adds a small `YF` button and collapsible control panel;
+- replaces the small `YF` launcher with the YugiFaux league logo and a collapsible control panel;
+- adds an optional YugiFaux visual theme with the approved background and start-page monster artwork, while preserving the original DuelingBook artwork for restoration when disabled;
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
 - plays the embedded recorded Token summon sound when a supported Token reaches the field, synchronized for installed players with **Mute audio** turned off;
@@ -37,7 +38,7 @@ The current build:
 2. Open the [raw userscript](https://github.com/xtremetyler/yugifaux-duelingbook-companion/raw/refs/heads/main/dist/yugifaux-companion.user.js).
 3. Approve the installation in Tampermonkey.
 4. Open `https://www.duelingbook.com/`.
-5. Click the `YF` button near the lower-left corner.
+5. Click the YugiFaux league logo near the lower-left corner.
 6. Use the named preview buttons to test any configured animation without entering a duel.
 
 During an active duel, `TOKENS`, `CHAIN`, and `MARKERS` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain and public Marker tools send explicit readable chat declarations; they never use hidden synchronization messages.

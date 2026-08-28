@@ -3,7 +3,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.12.5",
+    version: "0.13.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -31,6 +31,7 @@
     enabled: true,
     animationsEnabled: true,
     muted: true,
+    visualThemeEnabled: true,
     diagnosticsEnabled: false,
     customMacrosEnabled: false,
     reducedMotion: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false

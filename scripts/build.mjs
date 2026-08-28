@@ -8,6 +8,7 @@ const sources = [
   "src/bootstrap.js",
   "src/diagnostics.js",
   "src/storage.js",
+  "src/visual-theme.js",
   "src/config.js",
   "src/event-observer.js",
   "src/animation-player.js",

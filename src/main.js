@@ -4,6 +4,7 @@
   let ui;
   let logObserver;
   let animationPlayer;
+  let visualTheme;
   let matchLauncher;
   let tokenMacros;
   let chainMacros;
@@ -29,6 +30,7 @@
     state.settings = { ...DEFAULT_SETTINGS, ...(await storage.get("settings", {})) };
     diagnostics.setEnabled(state.settings.diagnosticsEnabled);
     animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
+    visualTheme = new VisualTheme(diagnostics, () => state.settings);
     matchLauncher = new MatchLauncher(diagnostics);
     tokenMacros = new TokenMacros(diagnostics, () => state.settings);
     chainMacros = new ChainMacros(diagnostics, () => state.settings);
@@ -65,6 +67,7 @@
         chainMacros.close();
         markerTracker.close();
         customMacros.close();
+        visualTheme.refresh();
         await persistSettings();
         tokenMacros.refresh();
         chainMacros.refresh();
@@ -78,6 +81,7 @@
         if (key === "diagnosticsEnabled") diagnostics.setEnabled(value);
         if (key === "enabled" && !value) document.getElementById(APP.ids.overlay)?.remove();
         await persistSettings();
+        visualTheme.refresh();
         tokenMacros.refresh();
         chainMacros.refresh();
         markerTracker.refresh();
@@ -86,6 +90,7 @@
       }
     });
     ui.mount();
+    visualTheme.mount();
     tokenMacros.mount();
     chainMacros.mount();
     markerTracker.mount();

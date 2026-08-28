@@ -12,6 +12,7 @@ const tokenMacrosSource = await readFile(resolve(root, "src/token-macros.js"), "
 const chainMacrosSource = await readFile(resolve(root, "src/chain-macros.js"), "utf8");
 const markersSource = await readFile(resolve(root, "src/markers.js"), "utf8");
 const customMacrosSource = await readFile(resolve(root, "src/custom-macros.js"), "utf8");
+const visualThemeSource = await readFile(resolve(root, "src/visual-theme.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
   `${observerSource}\nglobalThis.observerTests = { classifyPublicLogLine, getNewLogText };`,
@@ -85,6 +86,12 @@ assert(bundle.includes("dhh7m81-c2929be0-8eda-42d9-840b-2ceb6ef6c44b.png"), "Iri
 assert(bundle.includes("v1787769996/sgt._pepper.png"), "approved Sgt. Pepper asset is missing from the bundle");
 assert(bundle.includes("v1787771135/painfulpref.png"), "approved Painful Preference asset is missing from the bundle");
 assert(bundle.includes("class MatchLauncher"), "guided match launcher is missing from the bundle");
+assert(bundle.includes("class VisualTheme"), "YugiFaux visual theme controller is missing from the bundle");
+assert(visualThemeSource.includes('document.getElementById("brionac_large")'), "start-page monster replacement must use DuelingBook's proven target");
+assert(visualThemeSource.includes("data-yf-original-src") && visualThemeSource.includes("#restoreStartMonster"), "start-page monster replacement must be reversible");
+assert(visualThemeSource.includes("v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg"), "approved YugiFaux background is missing");
+assert(visualThemeSource.includes("v1787885319/beltza.png"), "approved start-page monster is missing");
+assert(bundle.includes("v1787885076/yugifaux_icon.png"), "approved YugiFaux launcher logo is missing");
 assert(bundle.includes("Confirm & Host"), "launcher confirmation gate is missing from the bundle");
 assert(bundle.includes("YugiFAUX League Match - DM for info"), "approved league duel note is missing from the bundle");
 assert(bundle.includes('formatValue: "cu"'), "Custom Cards host format is missing from the launcher");

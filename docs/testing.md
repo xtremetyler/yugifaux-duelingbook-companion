@@ -68,3 +68,9 @@ Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Ca
 7. Apply **Return in End Phase**, banish that card, and confirm the reminder remains in the active list without a field badge until the End Phase.
 8. Set a monster face-down and confirm it cannot be selected or have its hidden name exposed by the Marker panel.
 9. Attempt a public marker while the native chat box contains text and confirm the companion refuses to overwrite it.
+
+# YugiFaux visual theme
+
+1. On DuelingBook's start page, confirm the league background fills the window and Beltza replaces the native start-page monster.
+2. Open the league-logo button and turn **YugiFaux visual theme** off. Confirm DuelingBook's original background layers and start-page monster return.
+3. Turn the theme back on, enter a duel, and confirm the Companion's duel controls remain usable and the replacement monster does not appear over the field.

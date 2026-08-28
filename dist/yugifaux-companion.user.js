@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.12.5
+// @version      0.13.0
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.12.5",
+    version: "0.13.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -51,6 +51,7 @@
     enabled: true,
     animationsEnabled: true,
     muted: true,
+    visualThemeEnabled: true,
     diagnosticsEnabled: false,
     customMacrosEnabled: false,
     reducedMotion: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
@@ -111,6 +112,86 @@
 
     async set(key, value) {
       await GM.setValue(`yf:${key}`, value);
+    }
+  }
+
+  const VISUAL_ASSETS = Object.freeze({
+    logo: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885076/yugifaux_icon.png",
+    background: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg",
+    startMonster: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885319/beltza.png"
+  });
+
+  const VISUAL_THEME_STYLE = `
+    body.yf-visual-theme {
+      background-color: #160d1d !important;
+      background-image: linear-gradient(#14091f24,#14091f24),url("${VISUAL_ASSETS.background}") !important;
+      background-position: center center !important;
+      background-repeat: no-repeat !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+    }
+    body.yf-visual-theme #circuit_board,
+    body.yf-visual-theme #greenlines { display: none !important; }
+    body.yf-visual-theme #start #brionac_large {
+      object-fit: contain;
+      filter: drop-shadow(0 12px 12px #000b) drop-shadow(0 0 16px #c084fc55);
+    }
+  `;
+
+  class VisualTheme {
+    constructor(diagnostics, getSettings) {
+      this.diagnostics = diagnostics;
+      this.getSettings = getSettings;
+      this.observer = null;
+      this.refreshQueued = false;
+    }
+
+    mount() {
+      if (!document.getElementById("yf-visual-theme-style")) {
+        const style = document.createElement("style");
+        style.id = "yf-visual-theme-style";
+        style.textContent = VISUAL_THEME_STYLE;
+        document.head.append(style);
+      }
+      this.observer = new MutationObserver(() => this.#queueRefresh());
+      this.observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
+      this.refresh();
+    }
+
+    refresh() {
+      const active = Boolean(this.getSettings()?.enabled && this.getSettings()?.visualThemeEnabled);
+      document.body.classList.toggle("yf-visual-theme", active);
+      if (active) this.#applyStartMonster();
+      else this.#restoreStartMonster();
+    }
+
+    #queueRefresh() {
+      if (this.refreshQueued) return;
+      this.refreshQueued = true;
+      requestAnimationFrame(() => {
+        this.refreshQueued = false;
+        this.refresh();
+      });
+    }
+
+    #applyStartMonster() {
+      const monster = document.getElementById("brionac_large");
+      if (!(monster instanceof HTMLImageElement)) return;
+      if (!monster.hasAttribute("data-yf-original-src")) {
+        monster.setAttribute("data-yf-original-src", monster.getAttribute("src") ?? "");
+      }
+      if (monster.getAttribute("src") !== VISUAL_ASSETS.startMonster) {
+        monster.setAttribute("src", VISUAL_ASSETS.startMonster);
+      }
+    }
+
+    #restoreStartMonster() {
+      for (const monster of document.querySelectorAll("#brionac_large[data-yf-original-src]")) {
+        const original = monster.getAttribute("data-yf-original-src") ?? "";
+        if (original) monster.setAttribute("src", original);
+        else monster.removeAttribute("src");
+        monster.removeAttribute("data-yf-original-src");
+      }
     }
   }
 
@@ -3392,8 +3473,10 @@ Thinking | Thinking...`;
   }
 
   const STYLE = `
-    #${APP.ids.button} { position: fixed; left: 18px; bottom: 18px; z-index: 2147483645; border: 1px solid #d6b55b; border-radius: 999px; background: #111827; color: #f8e7aa; padding: 9px 13px; font: 700 13px/1 Arial,sans-serif; cursor: pointer; box-shadow: 0 4px 16px #0008; }
-    #${APP.ids.panel} { position: fixed; left: 18px; bottom: 62px; z-index: 2147483646; box-sizing: border-box; width: min(350px, calc(100vw - 36px)); max-height: min(570px, calc(100vh - 90px)); overflow: auto; border: 1px solid #d6b55b; border-radius: 10px; background: #111827f5; color: #f8fafc; padding: 14px; font: 13px/1.4 Arial,sans-serif; box-shadow: 0 10px 34px #000b; }
+    #${APP.ids.button} { position: fixed; left: 16px; bottom: 14px; z-index: 2147483645; width: 64px; height: 64px; overflow: hidden; border: 1px solid #f6d477; border-radius: 50%; background-color: #100916; background-image: url("${VISUAL_ASSETS.logo}"); background-position: center; background-repeat: no-repeat; background-size: 94%; color: transparent; padding: 0; cursor: pointer; box-shadow: 0 5px 18px #000b,0 0 15px #c084fc55; transition: transform 140ms ease,box-shadow 140ms ease; }
+    #${APP.ids.button}:hover { transform: scale(1.06); box-shadow: 0 7px 22px #000c,0 0 20px #f6d47766; }
+    #${APP.ids.button}:focus-visible { outline: 3px solid #c084fc; outline-offset: 3px; }
+    #${APP.ids.panel} { position: fixed; left: 18px; bottom: 86px; z-index: 2147483646; box-sizing: border-box; width: min(350px, calc(100vw - 36px)); max-height: min(570px, calc(100vh - 112px)); overflow: auto; border: 1px solid #d6b55b; border-radius: 10px; background: #111827f5; color: #f8fafc; padding: 14px; font: 13px/1.4 Arial,sans-serif; box-shadow: 0 10px 34px #000b; }
     #${APP.ids.panel}[hidden] { display: none; }
     #${APP.ids.panel} h2 { margin: 0 0 4px; color: #f8e7aa; font-size: 18px; }
     #${APP.ids.panel} p { margin: 4px 0 10px; color: #cbd5e1; }
@@ -3577,7 +3660,7 @@ Thinking | Thinking...`;
       const button = document.createElement("button");
       button.id = APP.ids.button;
       button.type = "button";
-      button.textContent = "YF";
+      button.setAttribute("aria-label", "Open YugiFaux Companion");
       button.title = "Open YugiFaux Companion";
 
       const panel = document.createElement("section");
@@ -3598,6 +3681,7 @@ Thinking | Thinking...`;
         this.#checkbox("Companion enabled", "enabled", settings.enabled),
         this.#checkbox("Animations enabled", "animationsEnabled", settings.animationsEnabled),
         this.#checkbox("Mute audio", "muted", settings.muted),
+        this.#checkbox("YugiFaux visual theme", "visualThemeEnabled", settings.visualThemeEnabled),
         this.#checkbox("Reduced motion", "reducedMotion", settings.reducedMotion),
         this.#checkbox("Custom macros enabled", "customMacrosEnabled", settings.customMacrosEnabled),
         this.#checkbox("Diagnostics", "diagnosticsEnabled", settings.diagnosticsEnabled)
@@ -3694,6 +3778,7 @@ Thinking | Thinking...`;
   let ui;
   let logObserver;
   let animationPlayer;
+  let visualTheme;
   let matchLauncher;
   let tokenMacros;
   let chainMacros;
@@ -3719,6 +3804,7 @@ Thinking | Thinking...`;
     state.settings = { ...DEFAULT_SETTINGS, ...(await storage.get("settings", {})) };
     diagnostics.setEnabled(state.settings.diagnosticsEnabled);
     animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
+    visualTheme = new VisualTheme(diagnostics, () => state.settings);
     matchLauncher = new MatchLauncher(diagnostics);
     tokenMacros = new TokenMacros(diagnostics, () => state.settings);
     chainMacros = new ChainMacros(diagnostics, () => state.settings);
@@ -3755,6 +3841,7 @@ Thinking | Thinking...`;
         chainMacros.close();
         markerTracker.close();
         customMacros.close();
+        visualTheme.refresh();
         await persistSettings();
         tokenMacros.refresh();
         chainMacros.refresh();
@@ -3768,6 +3855,7 @@ Thinking | Thinking...`;
         if (key === "diagnosticsEnabled") diagnostics.setEnabled(value);
         if (key === "enabled" && !value) document.getElementById(APP.ids.overlay)?.remove();
         await persistSettings();
+        visualTheme.refresh();
         tokenMacros.refresh();
         chainMacros.refresh();
         markerTracker.refresh();
@@ -3776,6 +3864,7 @@ Thinking | Thinking...`;
       }
     });
     ui.mount();
+    visualTheme.mount();
     tokenMacros.mount();
     chainMacros.mount();
     markerTracker.mount();

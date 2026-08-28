@@ -5,7 +5,9 @@ Observed against the current public page on 2026-08-26. Treat every item as vers
 | Selector | Purpose | Phase 1 use | Stability approach |
 |---|---|---|---|
 | `#frames` | Main DuelingBook application frame | Detection evidence only | Do not depend on it for events. |
-| `#start` | Intro/start screen | Detection evidence only | Top-level screen ID. |
+| `#start` | Intro/start screen | Visual-theme scope | Top-level screen ID; only its named monster image is replaced. |
+| `#brionac_large` | Start-page monster image | Reversible artwork replacement | Preserve the original `src` and restore it when the visual theme is disabled. |
+| `body`, `#circuit_board`, `#greenlines` | Page background layers | Reversible visual theme | Apply a body class and CSS overrides; never remove DuelingBook's native layers. |
 | `#front_page` | Login/front page | Detection evidence only | Never inspect form values. |
 | `#main_menu` | Main menu screen | Future screen status | Observe visibility only if needed. |
 | `#duel_room` | Room and format selection | Guided launcher scope | Must be visibly active before host fields are changed. |

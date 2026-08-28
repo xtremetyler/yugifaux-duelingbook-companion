@@ -1,6 +1,8 @@
   const STYLE = `
-    #${APP.ids.button} { position: fixed; left: 18px; bottom: 18px; z-index: 2147483645; border: 1px solid #d6b55b; border-radius: 999px; background: #111827; color: #f8e7aa; padding: 9px 13px; font: 700 13px/1 Arial,sans-serif; cursor: pointer; box-shadow: 0 4px 16px #0008; }
-    #${APP.ids.panel} { position: fixed; left: 18px; bottom: 62px; z-index: 2147483646; box-sizing: border-box; width: min(350px, calc(100vw - 36px)); max-height: min(570px, calc(100vh - 90px)); overflow: auto; border: 1px solid #d6b55b; border-radius: 10px; background: #111827f5; color: #f8fafc; padding: 14px; font: 13px/1.4 Arial,sans-serif; box-shadow: 0 10px 34px #000b; }
+    #${APP.ids.button} { position: fixed; left: 16px; bottom: 14px; z-index: 2147483645; width: 64px; height: 64px; overflow: hidden; border: 1px solid #f6d477; border-radius: 50%; background-color: #100916; background-image: url("${VISUAL_ASSETS.logo}"); background-position: center; background-repeat: no-repeat; background-size: 94%; color: transparent; padding: 0; cursor: pointer; box-shadow: 0 5px 18px #000b,0 0 15px #c084fc55; transition: transform 140ms ease,box-shadow 140ms ease; }
+    #${APP.ids.button}:hover { transform: scale(1.06); box-shadow: 0 7px 22px #000c,0 0 20px #f6d47766; }
+    #${APP.ids.button}:focus-visible { outline: 3px solid #c084fc; outline-offset: 3px; }
+    #${APP.ids.panel} { position: fixed; left: 18px; bottom: 86px; z-index: 2147483646; box-sizing: border-box; width: min(350px, calc(100vw - 36px)); max-height: min(570px, calc(100vh - 112px)); overflow: auto; border: 1px solid #d6b55b; border-radius: 10px; background: #111827f5; color: #f8fafc; padding: 14px; font: 13px/1.4 Arial,sans-serif; box-shadow: 0 10px 34px #000b; }
     #${APP.ids.panel}[hidden] { display: none; }
     #${APP.ids.panel} h2 { margin: 0 0 4px; color: #f8e7aa; font-size: 18px; }
     #${APP.ids.panel} p { margin: 4px 0 10px; color: #cbd5e1; }
@@ -184,7 +186,7 @@
       const button = document.createElement("button");
       button.id = APP.ids.button;
       button.type = "button";
-      button.textContent = "YF";
+      button.setAttribute("aria-label", "Open YugiFaux Companion");
       button.title = "Open YugiFaux Companion";
 
       const panel = document.createElement("section");
@@ -205,6 +207,7 @@
         this.#checkbox("Companion enabled", "enabled", settings.enabled),
         this.#checkbox("Animations enabled", "animationsEnabled", settings.animationsEnabled),
         this.#checkbox("Mute audio", "muted", settings.muted),
+        this.#checkbox("YugiFaux visual theme", "visualThemeEnabled", settings.visualThemeEnabled),
         this.#checkbox("Reduced motion", "reducedMotion", settings.reducedMotion),
         this.#checkbox("Custom macros enabled", "customMacrosEnabled", settings.customMacrosEnabled),
         this.#checkbox("Diagnostics", "diagnosticsEnabled", settings.diagnosticsEnabled)
