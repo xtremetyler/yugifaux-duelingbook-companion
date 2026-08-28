@@ -45,7 +45,7 @@ The current build:
 
 During an active duel, `TOKENS`, `CHAIN`, and `MARKERS` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain and public Marker tools send explicit readable chat declarations; they never use hidden synchronization messages.
 
-In the Deck Constructor, hover a card so it appears in DuelingBook's large preview, then use the rarity selector immediately below that preview to choose **No Rarity**, **Secret Rare**, or **Super Rare**. The choice applies to every visible copy with the same card name and is stored only in Tampermonkey. Super Rare uses reduced opacity with screen blending so the card stays readable. **YF → Rarity overlays enabled** removes or restores every rarity layer immediately without deleting those saved choices. Existing Secret Rare choices migrate automatically.
+In the Deck Constructor, hover a card so it appears in DuelingBook's large preview, then open the Companion-owned rarity menu immediately below that preview to choose **No Rarity**, **Secret Rare**, or **Super Rare**. The choice applies to every visible copy with the same card name and is stored only in Tampermonkey. Super Rare uses reduced opacity with screen blending so the card stays readable. **YF → Rarity overlays enabled** removes or restores every rarity layer immediately without deleting those saved choices. Existing Secret Rare choices migrate automatically.
 
 Hand Special Summon examples:
 

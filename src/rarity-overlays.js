@@ -52,7 +52,39 @@
       opacity: .62 !important;
       cursor: default !important;
     }
-    #${APP.ids.rarityToggle} option { background: #18181b !important; color: #fff !important; }
+    #${APP.ids.rarityMenu} {
+      position: absolute !important;
+      left: 3px !important;
+      top: 298px !important;
+      width: 190px !important;
+      z-index: 90 !important;
+      box-sizing: border-box !important;
+      padding: 5px !important;
+      border: 1px solid #c084fc !important;
+      border-radius: 6px !important;
+      background: rgba(24,24,27,.98) !important;
+      box-shadow: 0 8px 20px #000c !important;
+    }
+    #${APP.ids.rarityMenu}[hidden] { display: none !important; }
+    #${APP.ids.rarityMenu} button {
+      position: relative !important;
+      display: block !important;
+      width: 100% !important;
+      height: 27px !important;
+      margin: 0 0 4px !important;
+      border: 1px solid #6d28d9 !important;
+      border-radius: 4px !important;
+      background: linear-gradient(90deg,#27272a,#4c1d95) !important;
+      color: #fff !important;
+      font: 700 12px/23px Arial,sans-serif !important;
+      cursor: pointer !important;
+    }
+    #${APP.ids.rarityMenu} button:last-child { margin-bottom: 0 !important; }
+    #${APP.ids.rarityMenu} button[data-selected="true"] {
+      border-color: #fde68a !important;
+      color: #fff7cc !important;
+      background: linear-gradient(90deg,#7c2d12,#a21caf) !important;
+    }
   `;
 
   class RarityOverlays {
@@ -63,7 +95,8 @@
       this.selections = new Map();
       this.observer = null;
       this.refreshQueued = false;
-      this.raritySelect = null;
+      this.rarityButton = null;
+      this.rarityMenu = null;
     }
 
     async mount() {
@@ -91,7 +124,7 @@
         document.head.append(style);
       }
       this.observer = new MutationObserver(() => this.#queueRefresh());
-      this.observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+      this.observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class", "style"] });
       this.refresh();
     }
 
@@ -100,12 +133,14 @@
       const enabled = Boolean(this.getSettings()?.enabled && this.getSettings()?.rarityOverlaysEnabled);
       if (!root || !enabled) {
         document.querySelectorAll(".yf-rarity-overlay,.yf-secret-rare-overlay").forEach((overlay) => overlay.remove());
-        if (this.raritySelect) this.raritySelect.hidden = true;
+        if (this.rarityButton) this.rarityButton.hidden = true;
+        if (this.rarityMenu) this.rarityMenu.hidden = true;
         return;
       }
 
       this.#mountToggle(root);
-      this.raritySelect.hidden = !this.#isVisible(root);
+      this.rarityButton.hidden = false;
+      if (!this.#isVisible(root)) this.rarityMenu.hidden = true;
       this.#refreshToggle();
 
       for (const cardFront of root.querySelectorAll(".cardfront")) {
@@ -133,26 +168,39 @@
     }
 
     #mountToggle(root) {
-      if (this.raritySelect?.isConnected) return;
-      const select = document.createElement("select");
-      select.id = APP.ids.rarityToggle;
-      const none = document.createElement("option");
-      none.value = "";
-      none.textContent = "No Rarity";
-      select.append(none);
-      for (const [rarity, definition] of Object.entries(RARITY_DEFINITIONS)) {
-        const option = document.createElement("option");
-        option.value = rarity;
-        option.textContent = definition.label;
-        select.append(option);
-      }
-      select.addEventListener("pointerdown", (event) => event.stopPropagation());
-      select.addEventListener("change", (event) => {
+      if (this.rarityButton?.isConnected && this.rarityMenu?.isConnected) return;
+      const button = document.createElement("button");
+      button.id = APP.ids.rarityToggle;
+      button.type = "button";
+      button.addEventListener("pointerdown", (event) => event.stopPropagation());
+      button.addEventListener("click", (event) => {
         event.stopPropagation();
-        void this.#setPreviewRarity(select.value);
+        if (!button.disabled) this.rarityMenu.hidden = !this.rarityMenu.hidden;
       });
-      root.append(select);
-      this.raritySelect = select;
+
+      const menu = document.createElement("div");
+      menu.id = APP.ids.rarityMenu;
+      menu.hidden = true;
+      const choices = [["", "No Rarity"], ...Object.entries(RARITY_DEFINITIONS).map(([rarity, definition]) => [rarity, definition.label])];
+      for (const [rarity, label] of choices) {
+        const choice = document.createElement("button");
+        choice.type = "button";
+        choice.dataset.rarity = rarity;
+        choice.textContent = label;
+        choice.addEventListener("pointerdown", (event) => event.stopPropagation());
+        choice.addEventListener("click", (event) => {
+          event.stopPropagation();
+          menu.hidden = true;
+          void this.#setPreviewRarity(rarity);
+        });
+        menu.append(choice);
+      }
+      document.addEventListener("pointerdown", (event) => {
+        if (!menu.hidden && !menu.contains(event.target) && event.target !== button) menu.hidden = true;
+      });
+      root.append(button, menu);
+      this.rarityButton = button;
+      this.rarityMenu = menu;
     }
 
     async #setPreviewRarity(rarity) {
@@ -167,19 +215,21 @@
     }
 
     #refreshToggle() {
-      if (!this.raritySelect) return;
+      if (!this.rarityButton || !this.rarityMenu) return;
       const name = this.#previewCardName();
       const selection = this.selections.get(normalizeRarityCardName(name));
       const value = selection?.rarity ?? "";
-      this.raritySelect.disabled = !name;
-      if (this.raritySelect.value !== value) this.raritySelect.value = value;
-      const none = this.raritySelect.options[0];
-      const noneLabel = name ? "No Rarity" : "Hover a card";
-      if (none.textContent !== noneLabel) none.textContent = noneLabel;
+      this.rarityButton.disabled = !name;
+      this.rarityButton.dataset.active = String(Boolean(value));
+      const label = !name ? "◇ Hover a card" : value ? `✦ ${RARITY_DEFINITIONS[value].label}` : "◇ No Rarity";
+      if (this.rarityButton.textContent !== label) this.rarityButton.textContent = label;
+      for (const choice of this.rarityMenu.querySelectorAll("button[data-rarity]")) {
+        choice.dataset.selected = String(choice.dataset.rarity === value);
+      }
       const title = name
         ? `Choose the local rarity treatment for every copy of ${name}`
         : "Hover a card in the Deck Constructor first";
-      if (this.raritySelect.title !== title) this.raritySelect.title = title;
+      if (this.rarityButton.title !== title) this.rarityButton.title = title;
     }
 
     async #persistSelections() {

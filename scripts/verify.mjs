@@ -52,7 +52,7 @@ vm.runInNewContext(
   `${customMacrosSource}\nglobalThis.customMacroTests = { CUSTOM_MACRO_FUNCTIONS, CUSTOM_MACRO_VARIABLES, parseCustomMacroAction, parseCustomMacroDefinitions };`,
   customMacroTestContext
 );
-const rarityTestContext = { APP: { ids: { rarityToggle: "test-rarity-toggle" } } };
+const rarityTestContext = { APP: { ids: { rarityToggle: "test-rarity-toggle", rarityMenu: "test-rarity-menu" } } };
 vm.runInNewContext(
   `${rarityOverlaysSource}\nglobalThis.rarityTests = { normalizeRarityCardName, RARITY_DEFINITIONS, RARITY_STORAGE_KEY, LEGACY_SECRET_RARE_STORAGE_KEY };`,
   rarityTestContext
@@ -100,6 +100,7 @@ assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].opacity < 
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
 assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview")') && rarityOverlaysSource.includes('matches?.(".cardfront")'), "rarity toggle must support DuelingBook's native preview being the cardfront itself");
 assert(rarityOverlaysSource.includes("rarityOverlaysEnabled"), "rarity overlays must have an immediate global disable path");
+assert(rarityOverlaysSource.includes("APP.ids.rarityMenu") && rarityOverlaysSource.includes("choice.dataset.rarity"), "rarity choices must use a Companion-owned button menu rather than DuelingBook's native select styling");
 assert(rarityOverlaysSource.includes("this.storage.set(RARITY_STORAGE_KEY"), "per-card rarity selections must persist only in Companion storage");
 assert(rarityOverlaysSource.includes("LEGACY_SECRET_RARE_STORAGE_KEY") && rarityOverlaysSource.includes('rarity: "secret-rare"'), "existing Secret Rare selections must migrate to the multi-rarity format");
 assert(rarityTestContext.rarityTests.normalizeRarityCardName("  Sgt.   Pepper  ") === "sgt. pepper", "rarity card names must normalize whitespace and case");
