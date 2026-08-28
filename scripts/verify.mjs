@@ -97,8 +97,8 @@ assert(visualThemeSource.includes("chooseStartMonster(VISUAL_ASSETS.startMonster
 assert(visualThemeSource.includes('name: "Cheepflight"') && visualThemeSource.includes('y: "-48px"'), "Cheepflight must use its approved upward offset");
 assert(visualThemeSource.includes("--yf-start-monster-x") && visualThemeSource.includes("--yf-start-monster-y"), "start-page monsters must support unique positions");
 assert(visualThemeSource.includes("custom-db.yugioh.app/assets/deck_constructor.svg") && visualThemeSource.includes("custom-db.yugioh.app/assets/search.svg"), "approved deck-editor theme assets are missing");
-assert(visualThemeSource.includes('document.querySelector("#deck_constructor img.deck_constructor")') && visualThemeSource.includes('document.querySelector("#search > img")'), "deck-editor theme must use the proven DuelingBook image targets");
-assert(visualThemeSource.includes('["src", "data-src"]') && visualThemeSource.includes("#restoreDeckEditorArtwork"), "deck-editor lazy image replacements must persist and remain reversible");
+assert(visualThemeSource.includes("#deck_constructor > .deck_bg") && visualThemeSource.includes("#search > .search_bg"), "deck-editor theme must target DuelingBook's current div-based background layers");
+assert(!visualThemeSource.includes("#deck_constructor img.deck_constructor") && !visualThemeSource.includes("#search > img"), "deck-editor theme must not rely on DuelingBook's retired image elements");
 assert(visualThemeSource.includes("transform-origin: 50% 50% !important"), "start-page monster must shrink around its native layout center");
 assert(!visualThemeSource.includes("width: clamp(220px,18vw,320px)") && !visualThemeSource.includes("right: 2vw !important"), "start-page monster must retain DuelingBook's native dimensions and positioning offsets");
 assert(bundle.includes("v1787885076/yugifaux_icon.png"), "approved YugiFaux launcher logo is missing");

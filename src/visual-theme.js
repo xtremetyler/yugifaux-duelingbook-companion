@@ -34,6 +34,22 @@
       filter: drop-shadow(0 12px 12px #000b) drop-shadow(0 0 16px #c084fc55);
     }
     body.yf-visual-theme #search { color: #efeff1 !important; }
+    body.yf-visual-theme #deck_constructor {
+      background-image: url("${VISUAL_ASSETS.deckConstructor}") !important;
+      background-position: 0 0 !important;
+      background-repeat: no-repeat !important;
+      background-size: 1024px 640px !important;
+    }
+    body.yf-visual-theme #deck_constructor > .deck_bg,
+    body.yf-visual-theme #deck_constructor > .side_bg,
+    body.yf-visual-theme #deck_constructor > .extra_bg { background: transparent !important; }
+    body.yf-visual-theme #search {
+      background-image: url("${VISUAL_ASSETS.deckSearch}") !important;
+      background-position: 0 0 !important;
+      background-repeat: no-repeat !important;
+      background-size: 100% 100% !important;
+    }
+    body.yf-visual-theme #search > .search_bg { background: transparent !important; }
     body.yf-visual-theme #search .more_options_btn { color: #16c6fa !important; }
     body.yf-visual-theme .bypass_background { background-color: #18181b !important; }
     body.yf-visual-theme .bypass_limit_lbl,
@@ -58,7 +74,7 @@
         document.head.append(style);
       }
       this.observer = new MutationObserver(() => this.#queueRefresh());
-      this.observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "data-src"] });
+      this.observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
       this.refresh();
     }
 
@@ -67,10 +83,8 @@
       document.body.classList.toggle("yf-visual-theme", active);
       if (active) {
         this.#applyStartMonster();
-        this.#applyDeckEditorArtwork();
       } else {
         this.#restoreStartMonster();
-        this.#restoreDeckEditorArtwork();
       }
     }
 
@@ -115,37 +129,4 @@
       }
     }
 
-    #applyDeckEditorArtwork() {
-      this.#replaceThemeImage(document.querySelector("#deck_constructor img.deck_constructor"), VISUAL_ASSETS.deckConstructor);
-      this.#replaceThemeImage(document.querySelector("#search > img"), VISUAL_ASSETS.deckSearch);
-    }
-
-    #replaceThemeImage(image, replacementUrl) {
-      if (!(image instanceof HTMLImageElement)) return;
-      if (!image.hasAttribute("data-yf-theme-image")) {
-        image.setAttribute("data-yf-theme-image", "true");
-        image.setAttribute("data-yf-had-src", String(image.hasAttribute("src")));
-        image.setAttribute("data-yf-original-image-src", image.getAttribute("src") ?? "");
-        image.setAttribute("data-yf-had-data-src", String(image.hasAttribute("data-src")));
-        image.setAttribute("data-yf-original-image-data-src", image.getAttribute("data-src") ?? "");
-      }
-      if (image.getAttribute("data-src") !== replacementUrl) image.setAttribute("data-src", replacementUrl);
-      if (image.getAttribute("src") !== replacementUrl) image.setAttribute("src", replacementUrl);
-    }
-
-    #restoreDeckEditorArtwork() {
-      for (const image of document.querySelectorAll('[data-yf-theme-image="true"]')) {
-        const originalSrc = image.getAttribute("data-yf-original-image-src") ?? "";
-        const originalDataSrc = image.getAttribute("data-yf-original-image-data-src") ?? "";
-        if (image.getAttribute("data-yf-had-src") === "true") image.setAttribute("src", originalSrc);
-        else image.removeAttribute("src");
-        if (image.getAttribute("data-yf-had-data-src") === "true") image.setAttribute("data-src", originalDataSrc);
-        else image.removeAttribute("data-src");
-        image.removeAttribute("data-yf-theme-image");
-        image.removeAttribute("data-yf-had-src");
-        image.removeAttribute("data-yf-original-image-src");
-        image.removeAttribute("data-yf-had-data-src");
-        image.removeAttribute("data-yf-original-image-data-src");
-      }
-    }
   }
