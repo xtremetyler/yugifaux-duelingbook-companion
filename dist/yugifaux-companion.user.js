@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.16.0
+// @version      0.16.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.16.0",
+    version: "0.16.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -413,10 +413,9 @@
     }
 
     #previewCardName() {
-      const preview = document.querySelector("#deck_constructor #preview .cardfront")
-        ?? document.querySelector("#deck_constructor > .cards #preview .cardfront")
-        ?? document.querySelector("#deck_constructor > .cards > .card .cardfront");
-      return this.#cardName(preview);
+      const preview = document.querySelector("#deck_constructor #preview");
+      const cardFront = preview?.matches?.(".cardfront") ? preview : preview?.querySelector?.(".cardfront");
+      return this.#cardName(cardFront ?? preview);
     }
 
     #cardName(cardFront) {

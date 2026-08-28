@@ -144,10 +144,9 @@
     }
 
     #previewCardName() {
-      const preview = document.querySelector("#deck_constructor #preview .cardfront")
-        ?? document.querySelector("#deck_constructor > .cards #preview .cardfront")
-        ?? document.querySelector("#deck_constructor > .cards > .card .cardfront");
-      return this.#cardName(preview);
+      const preview = document.querySelector("#deck_constructor #preview");
+      const cardFront = preview?.matches?.(".cardfront") ? preview : preview?.querySelector?.(".cardfront");
+      return this.#cardName(cardFront ?? preview);
     }
 
     #cardName(cardFront) {

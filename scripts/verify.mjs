@@ -96,7 +96,7 @@ assert(bundle.includes("class VisualTheme"), "YugiFaux visual theme controller i
 assert(bundle.includes("class RarityOverlays"), "Deck Constructor rarity overlay controller is missing from the bundle");
 assert(rarityOverlaysSource.includes("v1787890399/secretrare.gif"), "approved Secret Rare animation is missing");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
-assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview .cardfront")'), "rarity toggle must target DuelingBook's native preview card");
+assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview")') && rarityOverlaysSource.includes('matches?.(".cardfront")'), "rarity toggle must support DuelingBook's native preview being the cardfront itself");
 assert(rarityOverlaysSource.includes("rarityOverlaysEnabled"), "rarity overlays must have an immediate global disable path");
 assert(rarityOverlaysSource.includes("this.storage.set(RARITY_STORAGE_KEY"), "per-card rarity selections must persist only in Companion storage");
 assert(rarityTestContext.rarityTests.normalizeRarityCardName("  Sgt.   Pepper  ") === "sgt. pepper", "rarity card names must normalize whitespace and case");
