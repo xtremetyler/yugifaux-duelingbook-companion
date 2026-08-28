@@ -92,7 +92,8 @@ assert(visualThemeSource.includes("body.yf-visual-theme #brionac_large") && !vis
 assert(visualThemeSource.includes("data-yf-original-src") && visualThemeSource.includes("#restoreStartMonster"), "start-page monster replacement must be reversible");
 assert(visualThemeSource.includes("v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg"), "approved YugiFaux background is missing");
 assert(visualThemeSource.includes("v1787885319/beltza.png"), "approved start-page monster is missing");
-assert(visualThemeSource.includes("width: clamp(220px,18vw,320px)") && visualThemeSource.includes("right: 2vw") && visualThemeSource.includes("bottom: 0"), "start-page monster must have a strict responsive size and bottom-right position");
+assert(visualThemeSource.includes("width: clamp(220px,18vw,320px)") && visualThemeSource.includes("height: auto !important"), "start-page monster must have strict responsive dimensions");
+assert(!visualThemeSource.includes("right: 2vw !important") && !visualThemeSource.includes("transform: none !important"), "start-page monster must retain DuelingBook's native positioning");
 assert(bundle.includes("v1787885076/yugifaux_icon.png"), "approved YugiFaux launcher logo is missing");
 assert(bundle.includes("Confirm & Host"), "launcher confirmation gate is missing from the bundle");
 assert(bundle.includes("YugiFAUX League Match - DM for info"), "approved league duel note is missing from the bundle");
