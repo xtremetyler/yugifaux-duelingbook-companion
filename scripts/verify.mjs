@@ -100,6 +100,7 @@ assert(visualThemeSource.includes("#deck_constructor > .deck_bg") && visualTheme
 assert(!visualThemeSource.includes("#deck_constructor img.deck_constructor") && !visualThemeSource.includes("#search > img"), "deck-editor theme must not rely on DuelingBook's retired image elements");
 assert(!visualThemeSource.includes("custom-db.yugioh.app/assets/deck_constructor.svg") && !visualThemeSource.includes("custom-db.yugioh.app/assets/search.svg"), "deck-editor theme must recolor native panels instead of loading replacement SVGs");
 assert(visualThemeSource.includes("rgba(24,24,27,.97)") && visualThemeSource.includes("rgba(8,47,73,.97)") && visualThemeSource.includes("rgba(67,20,7,.97)"), "deck, side, and extra panels must use the approved dark palette");
+assert(visualThemeSource.includes("#deck_constructor #banlists") && visualThemeSource.includes("#deck_constructor .bypass_background2"), "deck-editor banlist control and its backing gradient must be recolored");
 assert(visualThemeSource.includes("transform-origin: 50% 50% !important"), "start-page monster must shrink around its native layout center");
 assert(!visualThemeSource.includes("width: clamp(220px,18vw,320px)") && !visualThemeSource.includes("right: 2vw !important"), "start-page monster must retain DuelingBook's native dimensions and positioning offsets");
 assert(bundle.includes("v1787885076/yugifaux_icon.png"), "approved YugiFaux launcher logo is missing");

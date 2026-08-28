@@ -50,6 +50,18 @@
     }
     body.yf-visual-theme #search .more_options_btn { color: #16c6fa !important; }
     body.yf-visual-theme .bypass_background { background-color: #18181b !important; }
+    body.yf-visual-theme #deck_constructor .bypass_background2 {
+      background: linear-gradient(0deg,#18181b,#312e8100) !important;
+      opacity: 1 !important;
+    }
+    body.yf-visual-theme #deck_constructor #banlists {
+      border: 1px solid #8b5cf6 !important;
+      border-radius: 4px;
+      background: #18181b !important;
+      color: #f8fafc !important;
+      color-scheme: dark;
+    }
+    body.yf-visual-theme #deck_constructor #banlists option { background: #18181b; color: #f8fafc; }
     body.yf-visual-theme .bypass_limit_lbl,
     body.yf-visual-theme .tcg_limit_lbl,
     body.yf-visual-theme .ocg_limit_lbl { color: #efeff1 !important; }

@@ -77,3 +77,4 @@ Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Ca
 4. Reload the page several times and confirm each load shows either Beltza or Cheepflight, with no character swap during a single page session.
 5. Open the Deck Constructor and confirm the deck, side, extra, and search areas use the dark recolored panels with readable light search labels.
 6. Disable **YugiFaux visual theme** and confirm the native panel colors return; re-enable it and confirm the themed colors return without reopening the page.
+7. Confirm the banlist dropdown and the strip behind it are dark with readable light text and no remaining green area.
