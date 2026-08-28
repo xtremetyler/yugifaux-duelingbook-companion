@@ -88,3 +88,6 @@ Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Ca
 5. Reload DuelingBook and confirm the first card's selection persists.
 6. Open **YF**, turn **Rarity overlays enabled** off, and confirm all animated layers and artwork filters disappear immediately. Turn it back on and confirm the saved selection returns.
 7. Choose **No Foil** for a selected card and confirm its animation is removed from the preview, deck, side/extra deck, and search results.
+8. Enter a consenting unrated duel, summon a rarity-assigned card face-up, and confirm the treatment follows its Attack/Defense rotation without blocking its native menu.
+9. Set that card face-down and confirm the treatment disappears immediately; flip it face-up and confirm it returns.
+10. Confirm assigned cards in either player's hand, Deck, Extra Deck, face-down field zones, or other hidden locations never receive a rarity layer.

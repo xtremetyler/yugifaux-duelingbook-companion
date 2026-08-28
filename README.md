@@ -11,7 +11,7 @@ The current build:
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
 - plays the embedded recorded Token summon sound when a supported Token reaches the field, synchronized for installed players with **Mute audio** turned off;
 - adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
-- adds a locally saved 15-rarity Dueling Nexus foil catalog plus No Foil to player-selected cards in the Deck Constructor;
+- adds a locally saved 15-rarity Dueling Nexus foil catalog plus No Foil to player-selected cards in the Deck Constructor and their explicitly face-up field copies during duels;
 - adds an opt-in, locally stored Custom DB-compatible macro editor and right-side `MACROS` menu with categories, variables, waits, messages, and an allowlisted set of player-triggered duel functions;
 - extends those functions with Attack/Defense Special Summons from the hand using an interactive zone chooser, a DuelingBook-chosen zone, or an ordered list of preferred zones;
 - adds a `MARKERS` tab for player-applied reminders including Effect Negated, Cannot Attack, Cannot Activate Effects, battle-position locks, End Phase returns, and custom notes;
@@ -46,6 +46,8 @@ The current build:
 During an active duel, `TOKENS`, `CHAIN`, and `MARKERS` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain and public Marker tools send explicit readable chat declarations; they never use hidden synchronization messages.
 
 In the Deck Constructor, hover a card so it appears in DuelingBook's large preview, then open the scrollable Companion-owned rarity menu immediately below that preview. It includes Super, Ghost, Nexus, Ultra, Secret, Prismatic, Ultimate, Gold, Shatterfoil, Starfoil, Anniversary, Platinum, Collector's, Rare, and Grand Master Rare, plus **No Foil**. The choice applies to every visible copy with the same card name and is stored only in Tampermonkey. Each rarity has an isolated opacity/blend treatment; Ghost, Ultimate, and Platinum also demonstrate artwork-only filters. Grand Master uses its overframe asset. **YF → Rarity overlays enabled** removes or restores every rarity layer and artwork filter immediately without deleting saved choices. Existing Secret Rare choices migrate automatically.
+
+During a duel, saved treatments are applied only to cards in `#field` whose native DuelingBook state explicitly reports `face_down === false`. Face-down cards, hidden zones, hands, decks, and Extra Decks are never inferred or decorated. Duel rarity layers are local presentation and remain pointer-transparent.
 
 Hand Special Summon examples:
 

@@ -28,7 +28,8 @@
   }
 
   const RARITY_OVERLAY_STYLE = `
-    #deck_constructor .yf-rarity-overlay {
+    #deck_constructor .yf-rarity-overlay,
+    #duel .yf-rarity-overlay {
       position: absolute !important;
       left: 0 !important;
       top: 0 !important;
@@ -43,7 +44,10 @@
     }
     #deck_constructor .cardfront.yf-rarity-artwork-effect .pic,
     #deck_constructor .cardfront.yf-rarity-artwork-effect .black_pic,
-    #deck_constructor .cardfront.yf-rarity-artwork-effect .rush_pic {
+    #deck_constructor .cardfront.yf-rarity-artwork-effect .rush_pic,
+    #duel .cardfront.yf-rarity-artwork-effect .pic,
+    #duel .cardfront.yf-rarity-artwork-effect .black_pic,
+    #duel .cardfront.yf-rarity-artwork-effect .rush_pic {
       filter: var(--yf-rarity-artwork-filter,none) !important;
     }
     #${APP.ids.rarityToggle} {
@@ -161,29 +165,9 @@
       this.#refreshToggle();
 
       for (const cardFront of root.querySelectorAll(".cardfront")) {
-        const cardName = this.#cardName(cardFront);
-        const selection = this.selections.get(normalizeRarityCardName(cardName));
-        const definition = selection ? RARITY_DEFINITIONS[selection.rarity] : null;
-        const existing = cardFront.querySelector(":scope > .yf-rarity-overlay");
-        if (!definition) {
-          existing?.remove();
-          this.#applyArtworkFilter(cardFront, null);
-          continue;
-        }
-        this.#applyArtworkFilter(cardFront, definition.artworkFilter ?? null);
-        if (existing?.dataset.rarity === selection.rarity) continue;
-        existing?.remove();
-        const overlay = document.createElement("img");
-        overlay.className = "yf-rarity-overlay";
-        overlay.dataset.rarity = selection.rarity;
-        overlay.src = definition.assetUrl;
-        overlay.style.setProperty("--yf-rarity-opacity", String(definition.opacity));
-        overlay.style.setProperty("--yf-rarity-blend", definition.blendMode);
-        overlay.alt = "";
-        overlay.draggable = false;
-        overlay.setAttribute("aria-hidden", "true");
-        cardFront.append(overlay);
+        this.#applySelectionToCardFront(cardFront);
       }
+      this.#refreshDuelCards();
     }
 
     #mountToggle(root) {
@@ -262,6 +246,57 @@
       const current = cardFront.style.getPropertyValue("--yf-rarity-artwork-filter");
       if (filter && current !== filter) cardFront.style.setProperty("--yf-rarity-artwork-filter", filter);
       else if (!filter && current) cardFront.style.removeProperty("--yf-rarity-artwork-filter");
+    }
+
+    #applySelectionToCardFront(cardFront) {
+      const cardName = this.#cardName(cardFront);
+      const selection = this.selections.get(normalizeRarityCardName(cardName));
+      const definition = selection ? RARITY_DEFINITIONS[selection.rarity] : null;
+      const existing = cardFront.querySelector(":scope > .yf-rarity-overlay");
+      if (!definition) {
+        existing?.remove();
+        this.#applyArtworkFilter(cardFront, null);
+        return;
+      }
+      this.#applyArtworkFilter(cardFront, definition.artworkFilter ?? null);
+      if (existing?.dataset.rarity === selection.rarity) return;
+      existing?.remove();
+      const overlay = document.createElement("img");
+      overlay.className = "yf-rarity-overlay";
+      overlay.dataset.rarity = selection.rarity;
+      overlay.src = definition.assetUrl;
+      overlay.style.setProperty("--yf-rarity-opacity", String(definition.opacity));
+      overlay.style.setProperty("--yf-rarity-blend", definition.blendMode);
+      overlay.alt = "";
+      overlay.draggable = false;
+      overlay.setAttribute("aria-hidden", "true");
+      cardFront.append(overlay);
+    }
+
+    #refreshDuelCards() {
+      const eligible = new Set();
+      for (const card of document.querySelectorAll("#duel #field .card")) {
+        const cardFront = card.querySelector(".cardfront");
+        if (!(cardFront instanceof Element) || !this.#isExplicitlyFaceUp(card)) continue;
+        eligible.add(cardFront);
+        this.#applySelectionToCardFront(cardFront);
+      }
+      for (const cardFront of document.querySelectorAll("#duel .cardfront")) {
+        if (eligible.has(cardFront)) continue;
+        cardFront.querySelector(":scope > .yf-rarity-overlay")?.remove();
+        this.#applyArtworkFilter(cardFront, null);
+      }
+    }
+
+    #isExplicitlyFaceUp(card) {
+      try {
+        const page = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+        const jquery = page?.$;
+        const value = typeof jquery === "function" ? jquery(card)?.data?.("face_down") : null;
+        if (value === false || value === 0 || value === "false") return true;
+      } catch {}
+      const value = card.dataset?.faceDown;
+      return value === "false" || card.classList.contains("face_up") || card.classList.contains("face-up");
     }
 
     #previewCardName() {

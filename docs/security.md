@@ -16,6 +16,7 @@
 | Malicious remote text/HTML | Remote labels use `textContent`; HTML from configuration is unsupported. |
 | Credential leakage | No cookie, password, token, WebSocket, or login-form access. Diagnostics drop credential-like keys. |
 | Hidden-information advantage | The passive observer reads only visible duel-log text. Opt-in custom macros may read the current player's own DuelingBook arrays to locate named cards, but never opponent hidden-zone arrays. |
+| Rarity on hidden cards | Duel rarity rendering scans only field DOM cards and requires DuelingBook's explicit `face_down === false` state. All other duel cardfronts are actively stripped of rarity layers and artwork filters. |
 | Accidental gameplay action | No page-function replacement or raw user-defined socket payloads. Custom functions run only from a player-clicked macro, and action/play names come from an internal allowlist. Host creation and Token recipes retain explicit review flows. |
 | Network exfiltration | Userscript requests are limited to public configuration and static presentation assets from documented hosts. No account, deck, duel, chat, or rarity-selection data is uploaded. |
 | UI obstruction | Overlay uses `pointer-events: none`, has a bounded duration, and can be removed by emergency disable. |

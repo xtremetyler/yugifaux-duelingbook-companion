@@ -101,6 +101,9 @@ assert(rarityOverlaysSource.includes("grand-master-rare-overframe.webp") && rari
 assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].opacity < 1 && rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].blendMode === "screen", "Super Rare must use a softened screen blend");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
 assert(rarityOverlaysSource.includes("yf-rarity-artwork-effect") && rarityOverlaysSource.includes("#applyArtworkFilter"), "per-rarity artwork filters are missing");
+assert(rarityOverlaysSource.includes('document.querySelectorAll("#duel #field .card")') && rarityOverlaysSource.includes("#refreshDuelCards"), "rarity presentation must scan duel field cards");
+assert(rarityOverlaysSource.includes('data?.("face_down")') && rarityOverlaysSource.includes("#isExplicitlyFaceUp"), "duel rarity presentation must require explicit face-up state");
+assert(rarityOverlaysSource.includes('document.querySelectorAll("#duel .cardfront")'), "duel rarity presentation must clean layers from hidden or ineligible cards");
 assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview")') && rarityOverlaysSource.includes('matches?.(".cardfront")'), "rarity toggle must support DuelingBook's native preview being the cardfront itself");
 assert(rarityOverlaysSource.includes("rarityOverlaysEnabled"), "rarity overlays must have an immediate global disable path");
 assert(rarityOverlaysSource.includes("APP.ids.rarityMenu") && rarityOverlaysSource.includes("choice.dataset.rarity"), "rarity choices must use a Companion-owned button menu rather than DuelingBook's native select styling");
