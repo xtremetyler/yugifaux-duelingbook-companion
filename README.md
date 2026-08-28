@@ -11,7 +11,7 @@ The current build:
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
 - plays the embedded recorded Token summon sound when a supported Token reaches the field, synchronized for installed players with **Mute audio** turned off;
 - adds a compact right-side `CHAIN` menu for visible, player-initiated `⛓️ Chain Link 1` through `⛓️ Chain Link 8` chat declarations;
-- adds optional, locally saved Secret Rare and softened Super Rare animations to player-selected cards in the Deck Constructor;
+- adds a locally saved 15-rarity Dueling Nexus foil catalog plus No Foil to player-selected cards in the Deck Constructor;
 - adds an opt-in, locally stored Custom DB-compatible macro editor and right-side `MACROS` menu with categories, variables, waits, messages, and an allowlisted set of player-triggered duel functions;
 - extends those functions with Attack/Defense Special Summons from the hand using an interactive zone chooser, a DuelingBook-chosen zone, or an ordered list of preferred zones;
 - adds a `MARKERS` tab for player-applied reminders including Effect Negated, Cannot Attack, Cannot Activate Effects, battle-position locks, End Phase returns, and custom notes;
@@ -32,7 +32,7 @@ The current build:
 - resolves Iris's excavation visually by sending three reflected card backs toward the hand, GY, and face-down banishment;
 - stages a psychedelic concert entrance with rising notes, equalizer bars, spotlights, and beat pulses for `Sgt. Pepper's Lonely Hearts Club Band`;
 - includes animation, mute, reduced-motion, diagnostics, and emergency-disable controls;
-- does not read cookies, alter DuelingBook functions, or transmit data outside DuelingBook; Token summons require player confirmation and player-selected native zones, while Chain messages use DuelingBook's visible chat input. Opt-in custom macros can inspect the current player's own duel arrays and call DuelingBook's native sender only with fixed, allowlisted actions initiated by the player.
+- does not read cookies or transmit account, deck, duel, or card-selection data; it loads only its public configuration and static presentation assets from their documented hosts. Token summons require player confirmation and player-selected native zones, while Chain messages use DuelingBook's visible chat input. Opt-in custom macros can inspect the current player's own duel arrays and call DuelingBook's native sender only with fixed, allowlisted actions initiated by the player.
 
 ## Install the proof of concept
 
@@ -45,7 +45,7 @@ The current build:
 
 During an active duel, `TOKENS`, `CHAIN`, and `MARKERS` buttons appear along the right side. Enabling **Custom macros** adds a `MACROS` button. Open **YF → Manage Custom Macros** to paste Custom DB-format definitions such as `Button | message | ${function(arguments)}`. The Chain and public Marker tools send explicit readable chat declarations; they never use hidden synchronization messages.
 
-In the Deck Constructor, hover a card so it appears in DuelingBook's large preview, then open the Companion-owned rarity menu immediately below that preview to choose **No Rarity**, **Secret Rare**, or **Super Rare**. The choice applies to every visible copy with the same card name and is stored only in Tampermonkey. Super Rare uses reduced opacity with screen blending so the card stays readable. **YF → Rarity overlays enabled** removes or restores every rarity layer immediately without deleting those saved choices. Existing Secret Rare choices migrate automatically.
+In the Deck Constructor, hover a card so it appears in DuelingBook's large preview, then open the scrollable Companion-owned rarity menu immediately below that preview. It includes Super, Ghost, Nexus, Ultra, Secret, Prismatic, Ultimate, Gold, Shatterfoil, Starfoil, Anniversary, Platinum, Collector's, Rare, and Grand Master Rare, plus **No Foil**. The choice applies to every visible copy with the same card name and is stored only in Tampermonkey. Each rarity has an isolated opacity/blend treatment; Ghost, Ultimate, and Platinum also demonstrate artwork-only filters. Grand Master uses its overframe asset. **YF → Rarity overlays enabled** removes or restores every rarity layer and artwork filter immediately without deleting saved choices. Existing Secret Rare choices migrate automatically.
 
 Hand Special Summon examples:
 

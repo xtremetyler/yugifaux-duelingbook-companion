@@ -1,18 +1,26 @@
   const LEGACY_SECRET_RARE_STORAGE_KEY = "rarity:secret-rare-card-names";
   const RARITY_STORAGE_KEY = "rarity:card-selections:v1";
   const RARITY_DEFINITIONS = Object.freeze({
-    "secret-rare": Object.freeze({
-      label: "Secret Rare",
-      assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787890399/secretrare.gif",
-      opacity: 1,
-      blendMode: "normal"
-    }),
     "super-rare": Object.freeze({
       label: "Super Rare",
-      assetUrl: "https://res.cloudinary.com/vosvpv50/image/upload/v1787891533/superRare.gif",
+      assetUrl: "https://duelingnexus.com/assets/rarity/super-rare.webp",
       opacity: .76,
       blendMode: "screen"
-    })
+    }),
+    "ghost-rare": Object.freeze({ label: "Ghost Rare", assetUrl: "https://duelingnexus.com/assets/rarity/ghost-rare.webp", opacity: .84, blendMode: "screen", artworkFilter: "grayscale(.92) brightness(1.13) contrast(1.1)" }),
+    "nexus-rare": Object.freeze({ label: "Nexus Rare", assetUrl: "https://duelingnexus.com/assets/rarity/nexus-rare.webp", opacity: .82, blendMode: "screen" }),
+    "ultra-rare": Object.freeze({ label: "Ultra Rare", assetUrl: "https://duelingnexus.com/assets/rarity/ultra-rare.webp", opacity: .86, blendMode: "screen" }),
+    "secret-rare": Object.freeze({ label: "Secret Rare", assetUrl: "https://duelingnexus.com/assets/rarity/secret-rare.webp", opacity: .9, blendMode: "screen" }),
+    "prismatic-rare": Object.freeze({ label: "Prismatic Rare", assetUrl: "https://duelingnexus.com/assets/rarity/prismatic-rare.webp", opacity: .8, blendMode: "screen" }),
+    "ultimate-rare": Object.freeze({ label: "Ultimate Rare", assetUrl: "https://duelingnexus.com/assets/rarity/ultimate-rare.webp", opacity: .86, blendMode: "screen", artworkFilter: "saturate(1.08) contrast(1.04)" }),
+    "gold-rare": Object.freeze({ label: "Gold Rare", assetUrl: "https://duelingnexus.com/assets/rarity/gold-rare.webp", opacity: .94, blendMode: "normal" }),
+    "shatterfoil-rare": Object.freeze({ label: "Shatterfoil Rare", assetUrl: "https://duelingnexus.com/assets/rarity/shatterfoil-rare.webp", opacity: .76, blendMode: "screen" }),
+    "starfoil-rare": Object.freeze({ label: "Starfoil Rare", assetUrl: "https://duelingnexus.com/assets/rarity/starfoil-rare.webp", opacity: .76, blendMode: "screen" }),
+    "anniversary-rare": Object.freeze({ label: "Anniversary Rare", assetUrl: "https://duelingnexus.com/assets/rarity/anniversary-rare.webp", opacity: .84, blendMode: "screen" }),
+    "platinum-rare": Object.freeze({ label: "Platinum Rare", assetUrl: "https://duelingnexus.com/assets/rarity/platinum-rare.webp", opacity: .88, blendMode: "screen", artworkFilter: "saturate(.82) contrast(1.06) brightness(1.04)" }),
+    "collectors-rare": Object.freeze({ label: "Collector's Rare", assetUrl: "https://duelingnexus.com/assets/rarity/collectors-rare.webp", opacity: .84, blendMode: "screen" }),
+    "rare": Object.freeze({ label: "Rare", assetUrl: "https://duelingnexus.com/assets/rarity/rare.webp", opacity: .94, blendMode: "normal" }),
+    "grand-master-rare": Object.freeze({ label: "Grand Master Rare", assetUrl: "https://duelingnexus.com/assets/rarity/grand-master-rare-overframe.webp", opacity: 1, blendMode: "normal", overframeOnly: true })
   });
 
   function normalizeRarityCardName(value) {
@@ -32,6 +40,11 @@
       mix-blend-mode: var(--yf-rarity-blend,normal) !important;
       pointer-events: none !important;
       user-select: none !important;
+    }
+    #deck_constructor .cardfront.yf-rarity-artwork-effect .pic,
+    #deck_constructor .cardfront.yf-rarity-artwork-effect .black_pic,
+    #deck_constructor .cardfront.yf-rarity-artwork-effect .rush_pic {
+      filter: var(--yf-rarity-artwork-filter,none) !important;
     }
     #${APP.ids.rarityToggle} {
       position: absolute !important;
@@ -64,6 +77,9 @@
       border-radius: 6px !important;
       background: rgba(24,24,27,.98) !important;
       box-shadow: 0 8px 20px #000c !important;
+      max-height: 310px !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
     }
     #${APP.ids.rarityMenu}[hidden] { display: none !important; }
     #${APP.ids.rarityMenu} button {
@@ -133,6 +149,7 @@
       const enabled = Boolean(this.getSettings()?.enabled && this.getSettings()?.rarityOverlaysEnabled);
       if (!root || !enabled) {
         document.querySelectorAll(".yf-rarity-overlay,.yf-secret-rare-overlay").forEach((overlay) => overlay.remove());
+        document.querySelectorAll(".cardfront.yf-rarity-artwork-effect").forEach((cardFront) => this.#applyArtworkFilter(cardFront, null));
         if (this.rarityButton) this.rarityButton.hidden = true;
         if (this.rarityMenu) this.rarityMenu.hidden = true;
         return;
@@ -150,8 +167,10 @@
         const existing = cardFront.querySelector(":scope > .yf-rarity-overlay");
         if (!definition) {
           existing?.remove();
+          this.#applyArtworkFilter(cardFront, null);
           continue;
         }
+        this.#applyArtworkFilter(cardFront, definition.artworkFilter ?? null);
         if (existing?.dataset.rarity === selection.rarity) continue;
         existing?.remove();
         const overlay = document.createElement("img");
@@ -181,7 +200,7 @@
       const menu = document.createElement("div");
       menu.id = APP.ids.rarityMenu;
       menu.hidden = true;
-      const choices = [["", "No Rarity"], ...Object.entries(RARITY_DEFINITIONS).map(([rarity, definition]) => [rarity, definition.label])];
+      const choices = [["", "No Foil"], ...Object.entries(RARITY_DEFINITIONS).map(([rarity, definition]) => [rarity, definition.label])];
       for (const [rarity, label] of choices) {
         const choice = document.createElement("button");
         choice.type = "button";
@@ -221,7 +240,7 @@
       const value = selection?.rarity ?? "";
       this.rarityButton.disabled = !name;
       this.rarityButton.dataset.active = String(Boolean(value));
-      const label = !name ? "◇ Hover a card" : value ? `✦ ${RARITY_DEFINITIONS[value].label}` : "◇ No Rarity";
+      const label = !name ? "◇ Hover a card" : value ? `✦ ${RARITY_DEFINITIONS[value].label}` : "◇ No Foil";
       if (this.rarityButton.textContent !== label) this.rarityButton.textContent = label;
       for (const choice of this.rarityMenu.querySelectorAll("button[data-rarity]")) {
         choice.dataset.selected = String(choice.dataset.rarity === value);
@@ -235,6 +254,14 @@
     async #persistSelections() {
       const selections = [...this.selections.values()].sort((a, b) => a.name.localeCompare(b.name));
       await this.storage.set(RARITY_STORAGE_KEY, selections);
+    }
+
+    #applyArtworkFilter(cardFront, filter) {
+      const active = Boolean(filter);
+      if (cardFront.classList.contains("yf-rarity-artwork-effect") !== active) cardFront.classList.toggle("yf-rarity-artwork-effect", active);
+      const current = cardFront.style.getPropertyValue("--yf-rarity-artwork-filter");
+      if (filter && current !== filter) cardFront.style.setProperty("--yf-rarity-artwork-filter", filter);
+      else if (!filter && current) cardFront.style.removeProperty("--yf-rarity-artwork-filter");
     }
 
     #previewCardName() {

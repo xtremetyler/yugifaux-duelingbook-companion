@@ -94,10 +94,13 @@ assert(bundle.includes("v1787771135/painfulpref.png"), "approved Painful Prefere
 assert(bundle.includes("class MatchLauncher"), "guided match launcher is missing from the bundle");
 assert(bundle.includes("class VisualTheme"), "YugiFaux visual theme controller is missing from the bundle");
 assert(bundle.includes("class RarityOverlays"), "Deck Constructor rarity overlay controller is missing from the bundle");
-assert(rarityOverlaysSource.includes("v1787890399/secretrare.gif"), "approved Secret Rare animation is missing");
-assert(rarityOverlaysSource.includes("v1787891533/superRare.gif"), "approved Super Rare animation is missing");
+assert(Object.keys(rarityTestContext.rarityTests.RARITY_DEFINITIONS).length === 15, "complete Dueling Nexus rarity catalog is missing");
+assert(rarityOverlaysSource.includes("https://duelingnexus.com/assets/rarity/secret-rare.webp"), "Dueling Nexus Secret Rare animation is missing");
+assert(rarityOverlaysSource.includes("https://duelingnexus.com/assets/rarity/super-rare.webp"), "Dueling Nexus Super Rare animation is missing");
+assert(rarityOverlaysSource.includes("grand-master-rare-overframe.webp") && rarityTestContext.rarityTests.RARITY_DEFINITIONS["grand-master-rare"].overframeOnly === true, "Grand Master Rare must use only its overframe asset");
 assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].opacity < 1 && rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].blendMode === "screen", "Super Rare must use a softened screen blend");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
+assert(rarityOverlaysSource.includes("yf-rarity-artwork-effect") && rarityOverlaysSource.includes("#applyArtworkFilter"), "per-rarity artwork filters are missing");
 assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview")') && rarityOverlaysSource.includes('matches?.(".cardfront")'), "rarity toggle must support DuelingBook's native preview being the cardfront itself");
 assert(rarityOverlaysSource.includes("rarityOverlaysEnabled"), "rarity overlays must have an immediate global disable path");
 assert(rarityOverlaysSource.includes("APP.ids.rarityMenu") && rarityOverlaysSource.includes("choice.dataset.rarity"), "rarity choices must use a Companion-owned button menu rather than DuelingBook's native select styling");

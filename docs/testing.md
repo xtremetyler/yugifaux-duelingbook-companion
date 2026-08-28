@@ -84,6 +84,7 @@ Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Ca
 1. Open the Deck Constructor and hover a card until it appears in the large native preview.
 2. Choose **Secret Rare** below the preview and confirm the transparent animation fits every visible copy of that card without blocking hover, drag, or click behavior.
 3. Hover another card, choose **Super Rare**, and confirm its softened, screen-blended animation remains subtle enough to read the complete card.
-4. Reload DuelingBook and confirm the first card's selection persists.
-5. Open **YF**, turn **Rarity overlays enabled** off, and confirm all animated layers disappear immediately. Turn it back on and confirm the saved selection returns.
-6. Choose **No Rarity** for a selected card and confirm its animation is removed from the preview, deck, side/extra deck, and search results.
+4. Scroll the menu and sample Ghost, Ultimate, Platinum, and Grand Master Rare. Confirm artwork filters affect only the artwork and Grand Master uses the overframe without blocking interaction.
+5. Reload DuelingBook and confirm the first card's selection persists.
+6. Open **YF**, turn **Rarity overlays enabled** off, and confirm all animated layers and artwork filters disappear immediately. Turn it back on and confirm the saved selection returns.
+7. Choose **No Foil** for a selected card and confirm its animation is removed from the preview, deck, side/extra deck, and search results.

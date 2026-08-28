@@ -17,7 +17,7 @@
 | Credential leakage | No cookie, password, token, WebSocket, or login-form access. Diagnostics drop credential-like keys. |
 | Hidden-information advantage | The passive observer reads only visible duel-log text. Opt-in custom macros may read the current player's own DuelingBook arrays to locate named cards, but never opponent hidden-zone arrays. |
 | Accidental gameplay action | No page-function replacement or raw user-defined socket payloads. Custom functions run only from a player-clicked macro, and action/play names come from an internal allowlist. Host creation and Token recipes retain explicit review flows. |
-| Network exfiltration | The only userscript request is a GET for public configuration from one declared host. No duel data is uploaded. |
+| Network exfiltration | Userscript requests are limited to public configuration and static presentation assets from documented hosts. No account, deck, duel, chat, or rarity-selection data is uploaded. |
 | UI obstruction | Overlay uses `pointer-events: none`, has a bounded duration, and can be removed by emergency disable. |
 | Host/config outage | Last valid config is cached; otherwise bundled defaults load. DuelingBook does not depend on either. |
 | Duplicate presentation | Existing lines are seeded and normalized line occurrences are deduplicated. Once-per-duel rules add a second guard. |
@@ -32,6 +32,7 @@ DuelingBook may change log wording or DOM structure without notice. A false posi
 Stored locally through Tampermonkey:
 
 - companion enable/mute/reduced-motion/diagnostics settings;
+- Deck Constructor rarity selections keyed by rendered public card name;
 - the custom-macro enable setting and player-authored macro definition text;
 - the last valid public configuration and its fetch time.
 
