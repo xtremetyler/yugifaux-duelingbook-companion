@@ -1,8 +1,6 @@
   const VISUAL_ASSETS = Object.freeze({
     logo: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885076/yugifaux_icon.png",
     background: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg",
-    deckConstructor: "https://custom-db.yugioh.app/assets/deck_constructor.svg",
-    deckSearch: "https://custom-db.yugioh.app/assets/search.svg",
     startMonsters: Object.freeze([
       Object.freeze({ name: "Beltza", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885319/beltza.png", scale: .6, x: "0px", y: "0px" }),
       Object.freeze({ name: "Cheepflight", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787786834/cheepflight.png", scale: .55, x: "0px", y: "-48px" })
@@ -34,22 +32,22 @@
       filter: drop-shadow(0 12px 12px #000b) drop-shadow(0 0 16px #c084fc55);
     }
     body.yf-visual-theme #search { color: #efeff1 !important; }
-    body.yf-visual-theme #deck_constructor {
-      background-image: url("${VISUAL_ASSETS.deckConstructor}") !important;
-      background-position: 0 0 !important;
-      background-repeat: no-repeat !important;
-      background-size: 1024px 640px !important;
+    body.yf-visual-theme #deck_constructor > .deck_bg {
+      background: linear-gradient(145deg,rgba(24,24,27,.97),rgba(46,16,101,.92)) !important;
+      box-shadow: inset 0 0 28px #a855f72b;
     }
-    body.yf-visual-theme #deck_constructor > .deck_bg,
-    body.yf-visual-theme #deck_constructor > .side_bg,
-    body.yf-visual-theme #deck_constructor > .extra_bg { background: transparent !important; }
-    body.yf-visual-theme #search {
-      background-image: url("${VISUAL_ASSETS.deckSearch}") !important;
-      background-position: 0 0 !important;
-      background-repeat: no-repeat !important;
-      background-size: 100% 100% !important;
+    body.yf-visual-theme #deck_constructor > .side_bg {
+      background: linear-gradient(145deg,rgba(8,47,73,.97),rgba(14,116,144,.9)) !important;
+      box-shadow: inset 0 0 22px #22d3ee26;
     }
-    body.yf-visual-theme #search > .search_bg { background: transparent !important; }
+    body.yf-visual-theme #deck_constructor > .extra_bg {
+      background: linear-gradient(145deg,rgba(67,20,7,.97),rgba(154,52,18,.9)) !important;
+      box-shadow: inset 0 0 22px #fb923c26;
+    }
+    body.yf-visual-theme #search > .search_bg {
+      background: linear-gradient(160deg,rgba(24,24,27,.98),rgba(49,46,129,.94)) !important;
+      box-shadow: inset 0 0 30px #a78bfa24;
+    }
     body.yf-visual-theme #search .more_options_btn { color: #16c6fa !important; }
     body.yf-visual-theme .bypass_background { background-color: #18181b !important; }
     body.yf-visual-theme .bypass_limit_lbl,

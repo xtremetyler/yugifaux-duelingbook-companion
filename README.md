@@ -6,7 +6,7 @@ The current build:
 
 - replaces the small `YF` launcher with the YugiFaux league logo and a collapsible control panel;
 - adds an optional YugiFaux visual theme with the approved background and a randomly selected start-page monster from an extensible artwork pool with per-character scale and positioning, while preserving the original DuelingBook artwork for restoration when disabled;
-- replaces the deck editor and search-panel artwork with the approved dark Custom DB SVGs and adjusts search labels for readability;
+- recolors DuelingBook's native deck, side, extra, and search panels with a dark YugiFaux palette and adjusts search labels for readability;
 - provides a guided `Start YugiFAUX Match` launcher with a session-only match identifier, fixed Custom Cards and best-of-three settings, an exact league note, no password, and an explicit review before hosting;
 - adds a manual right-side `TOKENS` macro that lets the player choose a supported source monster and explicitly confirm its Token recipe;
 - plays the embedded recorded Token summon sound when a supported Token reaches the field, synchronized for installed players with **Mute audio** turned off;
