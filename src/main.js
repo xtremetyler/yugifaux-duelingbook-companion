@@ -5,6 +5,7 @@
   let logObserver;
   let animationPlayer;
   let visualTheme;
+  let rarityOverlays;
   let matchLauncher;
   let tokenMacros;
   let chainMacros;
@@ -31,6 +32,7 @@
     diagnostics.setEnabled(state.settings.diagnosticsEnabled);
     animationPlayer = new AnimationPlayer(diagnostics, () => state.settings);
     visualTheme = new VisualTheme(diagnostics, () => state.settings);
+    rarityOverlays = new RarityOverlays(storage, diagnostics, () => state.settings);
     matchLauncher = new MatchLauncher(diagnostics);
     tokenMacros = new TokenMacros(diagnostics, () => state.settings);
     chainMacros = new ChainMacros(diagnostics, () => state.settings);
@@ -68,6 +70,7 @@
         markerTracker.close();
         customMacros.close();
         visualTheme.refresh();
+        rarityOverlays.refresh();
         await persistSettings();
         tokenMacros.refresh();
         chainMacros.refresh();
@@ -82,6 +85,7 @@
         if (key === "enabled" && !value) document.getElementById(APP.ids.overlay)?.remove();
         await persistSettings();
         visualTheme.refresh();
+        rarityOverlays.refresh();
         tokenMacros.refresh();
         chainMacros.refresh();
         markerTracker.refresh();
@@ -91,6 +95,7 @@
     });
     ui.mount();
     visualTheme.mount();
+    await rarityOverlays.mount();
     tokenMacros.mount();
     chainMacros.mount();
     markerTracker.mount();

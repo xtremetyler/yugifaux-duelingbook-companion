@@ -208,6 +208,7 @@
         this.#checkbox("Animations enabled", "animationsEnabled", settings.animationsEnabled),
         this.#checkbox("Mute audio", "muted", settings.muted),
         this.#checkbox("YugiFaux visual theme", "visualThemeEnabled", settings.visualThemeEnabled),
+        this.#checkbox("Rarity overlays enabled", "rarityOverlaysEnabled", settings.rarityOverlaysEnabled),
         this.#checkbox("Reduced motion", "reducedMotion", settings.reducedMotion),
         this.#checkbox("Custom macros enabled", "customMacrosEnabled", settings.customMacrosEnabled),
         this.#checkbox("Diagnostics", "diagnosticsEnabled", settings.diagnosticsEnabled)

@@ -13,6 +13,7 @@ const chainMacrosSource = await readFile(resolve(root, "src/chain-macros.js"), "
 const markersSource = await readFile(resolve(root, "src/markers.js"), "utf8");
 const customMacrosSource = await readFile(resolve(root, "src/custom-macros.js"), "utf8");
 const visualThemeSource = await readFile(resolve(root, "src/visual-theme.js"), "utf8");
+const rarityOverlaysSource = await readFile(resolve(root, "src/rarity-overlays.js"), "utf8");
 const observerTests = {};
 vm.runInNewContext(
   `${observerSource}\nglobalThis.observerTests = { classifyPublicLogLine, getNewLogText };`,
@@ -51,6 +52,11 @@ vm.runInNewContext(
   `${customMacrosSource}\nglobalThis.customMacroTests = { CUSTOM_MACRO_FUNCTIONS, CUSTOM_MACRO_VARIABLES, parseCustomMacroAction, parseCustomMacroDefinitions };`,
   customMacroTestContext
 );
+const rarityTestContext = { APP: { ids: { rarityToggle: "test-rarity-toggle" } } };
+vm.runInNewContext(
+  `${rarityOverlaysSource}\nglobalThis.rarityTests = { normalizeRarityCardName, SECRET_RARE_ASSET, RARITY_STORAGE_KEY };`,
+  rarityTestContext
+);
 
 const failures = [];
 const assert = (condition, message) => {
@@ -87,6 +93,13 @@ assert(bundle.includes("v1787769996/sgt._pepper.png"), "approved Sgt. Pepper ass
 assert(bundle.includes("v1787771135/painfulpref.png"), "approved Painful Preference asset is missing from the bundle");
 assert(bundle.includes("class MatchLauncher"), "guided match launcher is missing from the bundle");
 assert(bundle.includes("class VisualTheme"), "YugiFaux visual theme controller is missing from the bundle");
+assert(bundle.includes("class RarityOverlays"), "Deck Constructor rarity overlay controller is missing from the bundle");
+assert(rarityOverlaysSource.includes("v1787890399/secretrare.gif"), "approved Secret Rare animation is missing");
+assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
+assert(rarityOverlaysSource.includes('document.querySelector("#deck_constructor #preview .cardfront")'), "rarity toggle must target DuelingBook's native preview card");
+assert(rarityOverlaysSource.includes("rarityOverlaysEnabled"), "rarity overlays must have an immediate global disable path");
+assert(rarityOverlaysSource.includes("this.storage.set(RARITY_STORAGE_KEY"), "per-card rarity selections must persist only in Companion storage");
+assert(rarityTestContext.rarityTests.normalizeRarityCardName("  Sgt.   Pepper  ") === "sgt. pepper", "rarity card names must normalize whitespace and case");
 assert(visualThemeSource.includes('document.getElementById("brionac_large")'), "start-page monster replacement must use DuelingBook's proven target");
 assert(visualThemeSource.includes("body.yf-visual-theme #brionac_large") && !visualThemeSource.includes("body.yf-visual-theme #start #brionac_large"), "start-page monster styling must not assume the image is nested inside the start container");
 assert(visualThemeSource.includes("data-yf-original-src") && visualThemeSource.includes("#restoreStartMonster"), "start-page monster replacement must be reversible");

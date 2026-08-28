@@ -78,3 +78,12 @@ Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Ca
 5. Open the Deck Constructor and confirm the deck, side, extra, and search areas use the dark recolored panels with readable light search labels.
 6. Disable **YugiFaux visual theme** and confirm the native panel colors return; re-enable it and confirm the themed colors return without reopening the page.
 7. Confirm the banlist dropdown and the strip behind it are dark with readable light text and no remaining green area.
+
+# Deck Constructor rarity overlays
+
+1. Open the Deck Constructor and hover a card until it appears in the large native preview.
+2. Click **Secret Rare: OFF** below the preview. Confirm the button changes to **ON** and the transparent animation fits every visible copy of that card without blocking hover, drag, or click behavior.
+3. Hover another card and confirm its toggle remains off.
+4. Reload DuelingBook and confirm the first card's selection persists.
+5. Open **YF**, turn **Rarity overlays enabled** off, and confirm all animated layers disappear immediately. Turn it back on and confirm the saved selection returns.
+6. Toggle the selected card off and confirm its animation is removed from the preview, deck, side/extra deck, and search results.

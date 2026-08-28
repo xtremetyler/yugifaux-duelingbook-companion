@@ -3,7 +3,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.15.4",
+    version: "0.16.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -23,7 +23,8 @@
       markerButton: "yf-markers-button",
       markerPanel: "yf-markers-panel",
       markerToast: "yf-markers-toast",
-      markerBadgeLayer: "yf-markers-badge-layer"
+      markerBadgeLayer: "yf-markers-badge-layer",
+      rarityToggle: "yf-rarity-toggle"
     })
   });
 
@@ -32,6 +33,7 @@
     animationsEnabled: true,
     muted: true,
     visualThemeEnabled: true,
+    rarityOverlaysEnabled: true,
     diagnosticsEnabled: false,
     customMacrosEnabled: false,
     reducedMotion: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false

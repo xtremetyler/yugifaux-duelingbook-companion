@@ -9,6 +9,7 @@ const sources = [
   "src/diagnostics.js",
   "src/storage.js",
   "src/visual-theme.js",
+  "src/rarity-overlays.js",
   "src/config.js",
   "src/event-observer.js",
   "src/animation-player.js",
