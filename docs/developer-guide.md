@@ -36,6 +36,8 @@ At `document-idle`, the companion restores settings, attaches a narrow observer 
 
 An event must pass two gates: a conservative public-log phrase classifier and an exact case-insensitive configured card-name match. The animation overlay uses `pointer-events: none`. On any load or playback failure, it is skipped and the duel remains untouched.
 
+Saved card rarities are card-name based, but their artwork layer is selected per rendered card. DuelingBook's `pendulum` template metadata maps `2` to the small Pendulum asset, `1` and `3` to normal, and `4` to large. If a specialized asset cannot load, the standard rarity asset is restored automatically.
+
 The match launcher runs only after a player opens it and confirms a review screen. It may open the Duel Room, selects semantic option values for Custom Cards and a 2-out-of-3 match, applies the approved note and an empty password, and clicks DuelingBook's Host control only from the player's `Confirm & Host` action. Match identifiers stay in memory for the open launcher and are neither persisted nor transmitted.
 
 ## Configuration rules

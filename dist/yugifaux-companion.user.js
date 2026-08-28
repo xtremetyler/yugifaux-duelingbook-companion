@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.19.3
+// @version      0.20.0
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.19.3",
+    version: "0.20.0",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -304,6 +304,20 @@
     return String(value ?? "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
   }
 
+  function pendulumRarityVariant(value) {
+    const template = Number(value);
+    if (template === 2) return "small";
+    if (template === 1 || template === 3) return "normal";
+    if (template === 4) return "large";
+    return "";
+  }
+
+  function rarityAssetUrl(rarity, definition, pendulumTemplate) {
+    const variant = pendulumRarityVariant(pendulumTemplate);
+    if (!variant || definition?.overframeOnly) return definition?.assetUrl ?? "";
+    return `https://duelingnexus.com/assets/rarity/${rarity}-pendulum-${variant}.webp`;
+  }
+
   const RARITY_OVERLAY_STYLE = `
     @property --yf-ghost-brightness {
       syntax: "<number>";
@@ -506,6 +520,7 @@
         document.querySelectorAll(".yf-rarity-overlay,.yf-secret-rare-overlay").forEach((overlay) => overlay.remove());
         document.querySelectorAll(".cardfront.yf-rarity-artwork-effect,.cardfront[data-yf-rarity]").forEach((cardFront) => {
           delete cardFront.dataset.yfRarity;
+          delete cardFront.dataset.yfRarityAssetFallback;
           this.#applyArtworkFilter(cardFront, null);
         });
         if (this.rarityButton) this.rarityButton.hidden = true;
@@ -613,23 +628,55 @@
       if (!definition) {
         existing?.remove();
         delete cardFront.dataset.yfRarity;
+        delete cardFront.dataset.yfRarityAssetFallback;
         this.#applyArtworkFilter(cardFront, null);
         return;
       }
       cardFront.dataset.yfRarity = selection.rarity;
       this.#applyArtworkFilter(cardFront, definition.artworkFilter ?? null, definition.artworkOpacity ?? null);
-      if (existing?.dataset.rarity === selection.rarity) return;
+      const pendulumTemplate = this.#pendulumTemplate(cardFront);
+      const requestedVariant = pendulumRarityVariant(pendulumTemplate) || "standard";
+      const fallbackKey = `${selection.rarity}:${requestedVariant}`;
+      const useFallback = cardFront.dataset.yfRarityAssetFallback === fallbackKey;
+      const variant = useFallback ? "standard-fallback" : requestedVariant;
+      const assetUrl = useFallback ? definition.assetUrl : rarityAssetUrl(selection.rarity, definition, pendulumTemplate);
+      if (existing?.dataset.rarity === selection.rarity && existing.dataset.variant === variant) return;
       existing?.remove();
       const overlay = document.createElement("img");
       overlay.className = "yf-rarity-overlay";
       overlay.dataset.rarity = selection.rarity;
-      overlay.src = definition.assetUrl;
+      overlay.dataset.variant = variant;
+      overlay.src = assetUrl;
       overlay.style.setProperty("--yf-rarity-opacity", String(definition.opacity));
       overlay.style.setProperty("--yf-rarity-blend", definition.blendMode);
       overlay.alt = "";
       overlay.draggable = false;
       overlay.setAttribute("aria-hidden", "true");
+      if (assetUrl !== definition.assetUrl) {
+        overlay.addEventListener("error", () => {
+          cardFront.dataset.yfRarityAssetFallback = fallbackKey;
+          overlay.dataset.variant = "standard-fallback";
+          overlay.src = definition.assetUrl;
+        }, { once: true });
+      }
       cardFront.append(overlay);
+    }
+
+    #pendulumTemplate(cardFront) {
+      const direct = cardFront.dataset?.pendulum;
+      if (direct != null && direct !== "") return direct;
+      try {
+        const page = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+        const jquery = page?.$;
+        if (typeof jquery !== "function") return null;
+        const ownValue = jquery(cardFront)?.data?.("pendulum");
+        if (ownValue != null) return ownValue;
+        const card = cardFront.closest(".card");
+        const liveFront = card ? jquery(card)?.data?.("cardfront") : null;
+        const liveValue = liveFront?.data?.("pendulum");
+        if (liveValue != null) return liveValue;
+      } catch {}
+      return null;
     }
 
     #refreshDuelCards() {
@@ -644,6 +691,7 @@
         if (eligible.has(cardFront)) continue;
         cardFront.querySelector(":scope > .yf-rarity-overlay")?.remove();
         delete cardFront.dataset.yfRarity;
+        delete cardFront.dataset.yfRarityAssetFallback;
         this.#applyArtworkFilter(cardFront, null);
       }
     }

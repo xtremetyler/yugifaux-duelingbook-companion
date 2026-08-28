@@ -54,7 +54,7 @@ vm.runInNewContext(
 );
 const rarityTestContext = { APP: { ids: { rarityToggle: "test-rarity-toggle", rarityMenu: "test-rarity-menu" } } };
 vm.runInNewContext(
-  `${rarityOverlaysSource}\nglobalThis.rarityTests = { normalizeRarityCardName, RARITY_DEFINITIONS, RARITY_STORAGE_KEY, LEGACY_SECRET_RARE_STORAGE_KEY };`,
+  `${rarityOverlaysSource}\nglobalThis.rarityTests = { normalizeRarityCardName, pendulumRarityVariant, rarityAssetUrl, RARITY_DEFINITIONS, RARITY_STORAGE_KEY, LEGACY_SECRET_RARE_STORAGE_KEY };`,
   rarityTestContext
 );
 
@@ -106,6 +106,16 @@ for (const rarity of ["ultra-rare", "rare", "secret-rare", "prismatic-rare", "gh
   assert(rarityOverlaysSource.includes(`data-yf-rarity="${rarity}"`), `${rarity} name treatment is missing`);
 }
 assert(rarityOverlaysSource.includes("yf-iridescent-rarity-name") && rarityOverlaysSource.includes("-webkit-background-clip: text"), "Secret and Prismatic names must use the iridescent treatment");
+const { pendulumRarityVariant, rarityAssetUrl } = rarityTestContext.rarityTests;
+assert(pendulumRarityVariant(2) === "small", "Pendulum template 2 must use the small rarity overlay");
+assert(pendulumRarityVariant(1) === "normal" && pendulumRarityVariant(3) === "normal", "Pendulum templates 1 and 3 must use the normal rarity overlay");
+assert(pendulumRarityVariant(4) === "large", "Pendulum template 4 must use the large rarity overlay");
+assert(pendulumRarityVariant(0) === "" && pendulumRarityVariant(null) === "", "non-Pendulum templates must use the standard rarity overlay");
+assert(rarityAssetUrl("super-rare", rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"], 2).endsWith("super-rare-pendulum-small.webp"), "small Pendulum rarity filename is incorrect");
+assert(rarityAssetUrl("secret-rare", rarityTestContext.rarityTests.RARITY_DEFINITIONS["secret-rare"], 3).endsWith("secret-rare-pendulum-normal.webp"), "normal Pendulum rarity filename is incorrect");
+assert(rarityAssetUrl("ghost-rare", rarityTestContext.rarityTests.RARITY_DEFINITIONS["ghost-rare"], 4).endsWith("ghost-rare-pendulum-large.webp"), "large Pendulum rarity filename is incorrect");
+assert(rarityAssetUrl("grand-master-rare", rarityTestContext.rarityTests.RARITY_DEFINITIONS["grand-master-rare"], 4).endsWith("grand-master-rare-overframe.webp"), "overframe-only rarities must not receive Pendulum variants");
+assert(rarityOverlaysSource.includes('data?.("pendulum")') && rarityOverlaysSource.includes("standard-fallback"), "live Pendulum metadata detection or asset fallback is missing");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
 assert(rarityOverlaysSource.includes("yf-rarity-artwork-effect") && rarityOverlaysSource.includes("#applyArtworkFilter"), "per-rarity artwork filters are missing");
 assert(rarityOverlaysSource.includes('document.querySelectorAll("#duel #field .card")') && rarityOverlaysSource.includes("#refreshDuelCards"), "rarity presentation must scan duel field cards");
