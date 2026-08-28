@@ -6,7 +6,7 @@ Observed against the current public page on 2026-08-26. Treat every item as vers
 |---|---|---|---|
 | `#frames` | Main DuelingBook application frame | Detection evidence only | Do not depend on it for events. |
 | `#start` | Intro/start screen | Visual-theme scope | Top-level screen ID; only its named monster image is replaced. |
-| `#brionac_large` | Start-page monster image | Reversible artwork replacement | Preserve the original `src` and restore it when the visual theme is disabled. |
+| `#brionac_large` | Start-page monster image | Reversible artwork replacement | Preserve the original `src`, 1370px layout box, and native negative positioning; resize the replacement visually around its center and restore the original when disabled. |
 | `body`, `#circuit_board`, `#greenlines` | Page background layers | Reversible visual theme | Apply a body class and CSS overrides; never remove DuelingBook's native layers. |
 | `#front_page` | Login/front page | Detection evidence only | Never inspect form values. |
 | `#main_menu` | Main menu screen | Future screen status | Observe visibility only if needed. |
