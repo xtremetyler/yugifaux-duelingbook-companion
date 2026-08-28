@@ -74,3 +74,4 @@ Use two consenting accounts with version 0.12.0 or newer in an unrated Custom Ca
 1. On DuelingBook's start page, confirm the league background fills the window and Beltza replaces the native start-page monster.
 2. Open the league-logo button and turn **YugiFaux visual theme** off. Confirm DuelingBook's original background layers and start-page monster return.
 3. Turn the theme back on, enter a duel, and confirm the Companion's duel controls remain usable and the replacement monster does not appear over the field.
+4. Reload the page several times and confirm each load shows either Beltza or Cheepflight, with no character swap during a single page session.

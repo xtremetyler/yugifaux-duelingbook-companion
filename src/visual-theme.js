@@ -1,8 +1,17 @@
   const VISUAL_ASSETS = Object.freeze({
     logo: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885076/yugifaux_icon.png",
     background: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885326/Gemini_Generated_Image_pmss9epmss9epmss.jpg",
-    startMonster: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885319/beltza.png"
+    startMonsters: Object.freeze([
+      Object.freeze({ name: "Beltza", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787885319/beltza.png", scale: .6 }),
+      Object.freeze({ name: "Cheepflight", url: "https://res.cloudinary.com/vosvpv50/image/upload/v1787786834/cheepflight.png", scale: .55 })
+    ])
   });
+
+  function chooseStartMonster(options, random = Math.random) {
+    if (!Array.isArray(options) || options.length === 0) return null;
+    const index = Math.min(options.length - 1, Math.floor(Math.max(0, random()) * options.length));
+    return options[index];
+  }
 
   const VISUAL_THEME_STYLE = `
     body.yf-visual-theme {
@@ -17,7 +26,7 @@
     body.yf-visual-theme #greenlines { display: none !important; }
     body.yf-visual-theme #brionac_large {
       object-fit: contain;
-      scale: .6 !important;
+      scale: var(--yf-start-monster-scale,.6) !important;
       transform-origin: 50% 50% !important;
       filter: drop-shadow(0 12px 12px #000b) drop-shadow(0 0 16px #c084fc55);
     }
@@ -27,6 +36,7 @@
     constructor(diagnostics, getSettings) {
       this.diagnostics = diagnostics;
       this.getSettings = getSettings;
+      this.startMonster = chooseStartMonster(VISUAL_ASSETS.startMonsters);
       this.observer = null;
       this.refreshQueued = false;
     }
@@ -61,21 +71,29 @@
 
     #applyStartMonster() {
       const monster = document.getElementById("brionac_large");
-      if (!(monster instanceof HTMLImageElement)) return;
+      if (!(monster instanceof HTMLImageElement) || !this.startMonster) return;
       if (!monster.hasAttribute("data-yf-original-src")) {
         monster.setAttribute("data-yf-original-src", monster.getAttribute("src") ?? "");
+        monster.setAttribute("data-yf-original-alt", monster.getAttribute("alt") ?? "");
       }
-      if (monster.getAttribute("src") !== VISUAL_ASSETS.startMonster) {
-        monster.setAttribute("src", VISUAL_ASSETS.startMonster);
+      monster.style.setProperty("--yf-start-monster-scale", String(this.startMonster.scale));
+      monster.setAttribute("alt", this.startMonster.name);
+      if (monster.getAttribute("src") !== this.startMonster.url) {
+        monster.setAttribute("src", this.startMonster.url);
       }
     }
 
     #restoreStartMonster() {
       for (const monster of document.querySelectorAll("#brionac_large[data-yf-original-src]")) {
         const original = monster.getAttribute("data-yf-original-src") ?? "";
+        const originalAlt = monster.getAttribute("data-yf-original-alt") ?? "";
         if (original) monster.setAttribute("src", original);
         else monster.removeAttribute("src");
+        if (originalAlt) monster.setAttribute("alt", originalAlt);
+        else monster.removeAttribute("alt");
+        monster.style.removeProperty("--yf-start-monster-scale");
         monster.removeAttribute("data-yf-original-src");
+        monster.removeAttribute("data-yf-original-alt");
       }
     }
   }
