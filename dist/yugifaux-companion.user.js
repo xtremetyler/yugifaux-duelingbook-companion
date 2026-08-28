@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YugiFaux DuelingBook Companion (Phase 1 POC)
 // @namespace    https://github.com/xtremetyler/yugifaux-duelingbook-companion
-// @version      0.19.0
+// @version      0.19.1
 // @description  Player-controlled YugiFaux presentation proof of concept for DuelingBook.
 // @author       YugiFaux
 // @license      MIT
@@ -23,7 +23,7 @@
 
   const APP = Object.freeze({
     name: "YugiFaux Companion",
-    version: "0.19.0",
+    version: "0.19.1",
     configUrl: "https://raw.githubusercontent.com/xtremetyler/yugifaux-duelingbook-companion/main/config/companion.sample.json",
     ids: Object.freeze({
       button: "yf-companion-button",
@@ -277,7 +277,14 @@
       opacity: .76,
       blendMode: "screen"
     }),
-    "ghost-rare": Object.freeze({ label: "Ghost Rare", assetUrl: "https://duelingnexus.com/assets/rarity/ghost-rare.webp", opacity: .84, blendMode: "screen", artworkFilter: "grayscale(.92) brightness(1.13) contrast(1.1)" }),
+    "ghost-rare": Object.freeze({
+      label: "Ghost Rare",
+      assetUrl: "https://duelingnexus.com/assets/rarity/ghost-rare.webp",
+      opacity: .96,
+      blendMode: "screen",
+      artworkFilter: "grayscale(1) saturate(0) contrast(.66) brightness(1.62)",
+      artworkOpacity: .82
+    }),
     "nexus-rare": Object.freeze({ label: "Nexus Rare", assetUrl: "https://duelingnexus.com/assets/rarity/nexus-rare.webp", opacity: .82, blendMode: "screen" }),
     "ultra-rare": Object.freeze({ label: "Ultra Rare", assetUrl: "https://duelingnexus.com/assets/rarity/ultra-rare.webp", opacity: .86, blendMode: "screen" }),
     "secret-rare": Object.freeze({ label: "Secret Rare", assetUrl: "https://duelingnexus.com/assets/rarity/secret-rare.webp", opacity: .9, blendMode: "screen" }),
@@ -298,6 +305,16 @@
   }
 
   const RARITY_OVERLAY_STYLE = `
+    @property --yf-ghost-brightness {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 1.56;
+    }
+    @property --yf-ghost-art-opacity {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: .79;
+    }
     #deck_constructor .yf-rarity-overlay,
     #duel .yf-rarity-overlay {
       position: absolute !important;
@@ -319,6 +336,34 @@
     #duel .cardfront.yf-rarity-artwork-effect .black_pic,
     #duel .cardfront.yf-rarity-artwork-effect .rush_pic {
       filter: var(--yf-rarity-artwork-filter,none) !important;
+      opacity: var(--yf-rarity-artwork-opacity,1) !important;
+    }
+    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .pic,
+    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .black_pic,
+    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .rush_pic,
+    #duel .cardfront[data-yf-rarity="ghost-rare"] .pic,
+    #duel .cardfront[data-yf-rarity="ghost-rare"] .black_pic,
+    #duel .cardfront[data-yf-rarity="ghost-rare"] .rush_pic {
+      filter: grayscale(1) saturate(0) contrast(.64) brightness(var(--yf-ghost-brightness)) drop-shadow(0 0 6px #d9f7ff) !important;
+      opacity: var(--yf-ghost-art-opacity) !important;
+      animation: yf-ghost-rare-breathe 4.8s ease-in-out infinite !important;
+    }
+    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .name_txt,
+    #deck_constructor .cardfront[data-yf-rarity="ghost-rare"] .name2_txt,
+    #duel .cardfront[data-yf-rarity="ghost-rare"] .name_txt,
+    #duel .cardfront[data-yf-rarity="ghost-rare"] .name2_txt {
+      color: #edfaff !important;
+      text-shadow: 0 0 2px #fff,0 0 7px #b9efff,0 0 13px #c4b5fd !important;
+    }
+    @keyframes yf-ghost-rare-breathe {
+      0%,100% {
+        --yf-ghost-brightness: 1.56;
+        --yf-ghost-art-opacity: .79;
+      }
+      50% {
+        --yf-ghost-brightness: 1.76;
+        --yf-ghost-art-opacity: .87;
+      }
     }
     #${APP.ids.rarityToggle} {
       position: absolute !important;
@@ -423,7 +468,10 @@
       const enabled = Boolean(this.getSettings()?.enabled && this.getSettings()?.rarityOverlaysEnabled);
       if (!root || !enabled) {
         document.querySelectorAll(".yf-rarity-overlay,.yf-secret-rare-overlay").forEach((overlay) => overlay.remove());
-        document.querySelectorAll(".cardfront.yf-rarity-artwork-effect").forEach((cardFront) => this.#applyArtworkFilter(cardFront, null));
+        document.querySelectorAll(".cardfront.yf-rarity-artwork-effect,.cardfront[data-yf-rarity]").forEach((cardFront) => {
+          delete cardFront.dataset.yfRarity;
+          this.#applyArtworkFilter(cardFront, null);
+        });
         if (this.rarityButton) this.rarityButton.hidden = true;
         if (this.rarityMenu) this.rarityMenu.hidden = true;
         return;
@@ -510,12 +558,15 @@
       await this.storage.set(RARITY_STORAGE_KEY, selections);
     }
 
-    #applyArtworkFilter(cardFront, filter) {
+    #applyArtworkFilter(cardFront, filter, opacity = null) {
       const active = Boolean(filter);
       if (cardFront.classList.contains("yf-rarity-artwork-effect") !== active) cardFront.classList.toggle("yf-rarity-artwork-effect", active);
       const current = cardFront.style.getPropertyValue("--yf-rarity-artwork-filter");
       if (filter && current !== filter) cardFront.style.setProperty("--yf-rarity-artwork-filter", filter);
       else if (!filter && current) cardFront.style.removeProperty("--yf-rarity-artwork-filter");
+      const currentOpacity = cardFront.style.getPropertyValue("--yf-rarity-artwork-opacity");
+      if (active && opacity != null && currentOpacity !== String(opacity)) cardFront.style.setProperty("--yf-rarity-artwork-opacity", String(opacity));
+      else if ((!active || opacity == null) && currentOpacity) cardFront.style.removeProperty("--yf-rarity-artwork-opacity");
     }
 
     #applySelectionToCardFront(cardFront) {
@@ -525,10 +576,12 @@
       const existing = cardFront.querySelector(":scope > .yf-rarity-overlay");
       if (!definition) {
         existing?.remove();
+        delete cardFront.dataset.yfRarity;
         this.#applyArtworkFilter(cardFront, null);
         return;
       }
-      this.#applyArtworkFilter(cardFront, definition.artworkFilter ?? null);
+      cardFront.dataset.yfRarity = selection.rarity;
+      this.#applyArtworkFilter(cardFront, definition.artworkFilter ?? null, definition.artworkOpacity ?? null);
       if (existing?.dataset.rarity === selection.rarity) return;
       existing?.remove();
       const overlay = document.createElement("img");
@@ -554,6 +607,7 @@
       for (const cardFront of document.querySelectorAll("#duel .cardfront")) {
         if (eligible.has(cardFront)) continue;
         cardFront.querySelector(":scope > .yf-rarity-overlay")?.remove();
+        delete cardFront.dataset.yfRarity;
         this.#applyArtworkFilter(cardFront, null);
       }
     }

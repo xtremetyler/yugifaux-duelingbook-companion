@@ -99,6 +99,9 @@ assert(rarityOverlaysSource.includes("https://duelingnexus.com/assets/rarity/sec
 assert(rarityOverlaysSource.includes("https://duelingnexus.com/assets/rarity/super-rare.webp"), "Dueling Nexus Super Rare animation is missing");
 assert(rarityOverlaysSource.includes("grand-master-rare-overframe.webp") && rarityTestContext.rarityTests.RARITY_DEFINITIONS["grand-master-rare"].overframeOnly === true, "Grand Master Rare must use only its overframe asset");
 assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].opacity < 1 && rarityTestContext.rarityTests.RARITY_DEFINITIONS["super-rare"].blendMode === "screen", "Super Rare must use a softened screen blend");
+assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["ghost-rare"].artworkOpacity < 1, "Ghost Rare must wash out the printed artwork");
+assert(rarityTestContext.rarityTests.RARITY_DEFINITIONS["ghost-rare"].artworkFilter.includes("grayscale(1)"), "Ghost Rare must use a fully spectral artwork treatment");
+assert(rarityOverlaysSource.includes("yf-ghost-rare-breathe") && rarityOverlaysSource.includes('data-yf-rarity="ghost-rare"'), "Ghost Rare must use its dedicated animated spectral treatment");
 assert(rarityOverlaysSource.includes("pointer-events: none !important"), "rarity artwork must not block native card interaction");
 assert(rarityOverlaysSource.includes("yf-rarity-artwork-effect") && rarityOverlaysSource.includes("#applyArtworkFilter"), "per-rarity artwork filters are missing");
 assert(rarityOverlaysSource.includes('document.querySelectorAll("#duel #field .card")') && rarityOverlaysSource.includes("#refreshDuelCards"), "rarity presentation must scan duel field cards");
