@@ -234,6 +234,9 @@ assert(parseCustomMacroAction("${waitInMs(500)}").name === "waitInMs", "Custom m
 assert(parseCustomMacroDefinitions("Bad | ${notAllowed(x)}").errors.some((error) => error.includes("unknown function")), "Unknown custom macro functions must be rejected");
 assert(CUSTOM_MACRO_FUNCTIONS.includes("specialFromDeckInAtk") && CUSTOM_MACRO_FUNCTIONS.includes("overlayMonsters"), "Gameplay macro function registry is incomplete");
 assert(CUSTOM_MACRO_FUNCTIONS.includes("specialFromHandInAtk") && CUSTOM_MACRO_FUNCTIONS.includes("specialFromHandInDefToZone"), "Hand Special Summon macro functions are missing");
+assert(CUSTOM_MACRO_FUNCTIONS.includes("moveXyzWithMaterials"), "Xyz material-preserving move macro is missing");
+assert(customMacrosSource.includes('this.#cardData(target, "xyz_arr")') && customMacrosSource.includes("#findById"), "Xyz move macro must preserve exact attached-card IDs");
+assert(customMacrosSource.includes("DuelingBook rejected reattaching") && customMacrosSource.includes("materials are still in the GY"), "Xyz move macro must fail visibly when cross-zone Overlay is rejected");
 assert(parseCustomMacroDefinitions("SS Hand | ${specialFromHandInAtk(Test Monster)}").errors.length === 0, "Hand Special Summon macros must parse");
 for (const functionName of CUSTOM_MACRO_FUNCTIONS) assert(customMacrosSource.includes(`case "${functionName}"`), `Custom macro function ${functionName} is registered but has no implementation`);
 assert(CUSTOM_MACRO_VARIABLES.includes("currentLP") && CUSTOM_MACRO_VARIABLES.includes("atkAllFaceUpMonsters"), "Custom DB-compatible variables are incomplete");

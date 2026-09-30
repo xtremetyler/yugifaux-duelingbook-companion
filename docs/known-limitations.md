@@ -30,6 +30,7 @@
 - The parser supports Custom DB's `-- Category` and `Button | action | action` format, the documented variables, `~` argument separator, and the allowlisted functions shown in the editor. It does not execute arbitrary JavaScript.
 - Functions that open DuelingBook's native zone chooser end the remaining macro sequence so the player can finish that interactive action safely.
 - Player-created macros can move multiple cards immediately. Test new gameplay macros in a consenting unrated room before league use.
+- `moveXyzWithMaterials(Card Name~S1~S2...)` is experimental. It records exact material IDs, moves the Xyz card, and attempts to reattach the cards after DuelingBook sends them to the GY. DuelingBook may reject `Overlay` when its target occupies a Spell/Trap Zone; the macro reports that rejection and leaves unaccepted materials in the GY rather than displaying fake materials.
 
 # Marker limitations
 

@@ -12,7 +12,7 @@ Thinking | Thinking...`;
     "banishFromGY", "banishFromHand", "banishFromDeck", "activateSpellTrapFromDeck", "activateSpellTrapFromDeckToZone",
     "specialFromGYInAtk", "specialFromGYInDef", "specialFromGYInAtkRandomZone", "specialFromGYInDefRandomZone", "specialFromGYInAtkToZone", "specialFromGYInDefToZone",
     "discard", "addFromGYToHand", "fromBanishToTopOfDeck", "fromGYToTopOfDeck", "fromFieldToTopOfDeck", "returnAllFromHandToTopOfDeck", "shuffleDeck",
-    "moveZone", "overlayMonsters", "flipDownMonsters", "flipUpMonsters", "changeToAtk", "changeToDef",
+    "moveZone", "moveXyzWithMaterials", "overlayMonsters", "flipDownMonsters", "flipUpMonsters", "changeToAtk", "changeToDef",
     "normalSetToRandomZone", "normalSetToZone", "normalSummonToRandomZone", "normalSummonToZone",
     "addCountersToCards", "removeCountersFromCards", "setCardsFromDeckToSpellTrapZone",
     "banishCardsFromTopOfDeckFD", "returnRandomBanishedCardToHand", "waitInMs"
@@ -211,6 +211,7 @@ Thinking | Thinking...`;
         case "returnAllFromHandToTopOfDeck": return this.#sendAll(this.#player()?.hand_arr, "To T Deck", 80);
         case "shuffleDeck": return this.#shuffleDeck();
         case "moveZone": return this.#moveZone(args);
+        case "moveXyzWithMaterials": return this.#moveXyzWithMaterials(args);
         case "overlayMonsters": return this.#overlay(args);
         case "flipDownMonsters": return this.#actNames(this.#ownMonsters(), param, "Set monster");
         case "flipUpMonsters": return this.#actNames(this.#ownMonsters(), param, "Flip");
@@ -237,6 +238,10 @@ Thinking | Thinking...`;
     #find(cards, name, used = new Set()) {
       const wanted = String(name ?? "").toLowerCase();
       return [...(cards ?? [])].find((card) => this.#cardName(card).toLowerCase() === wanted && !used.has(this.#cardId(card))) ?? null;
+    }
+
+    #findById(cards, id) {
+      return [...(cards ?? [])].find((card) => String(this.#cardId(card)) === String(id)) ?? null;
     }
 
     async #actNames(cards, names, play) {
@@ -421,6 +426,52 @@ Thinking | Thinking...`;
       this.#send("Move", { card: this.#cardId(card), zone });
     }
 
+    async #moveXyzWithMaterials(args) {
+      if (args.length < 2) throw new Error("moveXyzWithMaterials requires an Xyz card name and at least one S1-S5 zone.");
+      const target = this.#find(this.#ownMonsters(), args[0]);
+      if (!target) throw new Error(`Xyz card not found in your Monster Zone: ${args[0]}`);
+      const requestedZones = args.slice(1).map((value) => this.#normalizeZone(value)).filter((zone) => /^S-[1-5]$/.test(zone ?? ""));
+      if (!requestedZones.length) throw new Error("moveXyzWithMaterials accepts only Spell/Trap Zones S1-S5.");
+      const zone = requestedZones.find((candidate) => this.#zoneEmpty(candidate));
+      if (!zone) throw new Error("None of the requested Spell/Trap Zones is available.");
+
+      // DuelingBook sends attached materials to the GY when their host crosses into
+      // a Spell/Trap Zone. Preserve their exact instance IDs before issuing Move so
+      // duplicate card names cannot cause the wrong cards to be reattached.
+      const targetId = this.#cardId(target);
+      const materials = [...(this.#cardData(target, "xyz_arr") ?? [])].map((card) => ({
+        id: this.#cardId(card),
+        name: this.#cardName(card) || "Xyz Material"
+      })).filter((material) => material.id != null);
+      if (!materials.length) throw new Error(`${args[0]} has no attached materials to preserve.`);
+
+      this.#send("Move", { card: targetId, zone });
+      const moved = await this.#waitUntil(() => Boolean(this.#findById(this.#ownSpellTraps(), targetId)), 3500);
+      if (!moved) throw new Error("DuelingBook did not confirm the Xyz card's move into the Spell/Trap Zone.");
+      const materialsReachedGY = await this.#waitUntil(
+        () => materials.every((material) => Boolean(this.#findById(this.#player()?.grave_arr, material.id))),
+        3500
+      );
+      if (!materialsReachedGY) throw new Error("DuelingBook did not place every recorded Xyz Material in the GY, so reattachment was stopped.");
+
+      let restored = 0;
+      for (const material of materials) {
+        if (!this.#findById(this.#player()?.grave_arr, material.id)) {
+          throw new Error(`Material state changed before ${material.name} could be restored (${restored}/${materials.length} restored).`);
+        }
+        this.#send("Overlay", { start_card: targetId, end_card: material.id });
+        const accepted = await this.#waitUntil(
+          () => !this.#findById(this.#player()?.grave_arr, material.id),
+          2500
+        );
+        if (!accepted) {
+          throw new Error(`DuelingBook rejected reattaching ${material.name} to a Spell/Trap-zone card (${restored}/${materials.length} restored). The remaining materials are still in the GY.`);
+        }
+        restored++;
+      }
+      return { wait: 0 };
+    }
+
     async #overlay(args) {
       if (args.length < 2) throw new Error("overlayMonsters requires a target and at least one material.");
       const cards = this.#ownMonsters();
@@ -491,6 +542,16 @@ Thinking | Thinking...`;
         };
         tick();
       });
+    }
+
+    async #waitUntil(predicate, timeout = 2500) {
+      const deadline = Date.now() + Math.max(0, Number(timeout) || 0);
+      while (Date.now() <= deadline) {
+        if (this.cancelled) throw new Error("Macro stopped.");
+        try { if (predicate()) return true; } catch {}
+        await this.#wait(100);
+      }
+      return false;
     }
   }
 
@@ -585,6 +646,7 @@ Thinking | Thinking...`;
         document.createTextNode("Variables: "), this.#code(CUSTOM_MACRO_VARIABLES.map((name) => `\${${name}}`).join(", ")), document.createElement("br"),
         document.createTextNode("Zones: M1–M5, S1–S5, OM1–OM5, EL, ER"), document.createElement("br"),
         document.createTextNode("Hand summon examples: "), this.#code("${specialFromHandInAtk(Card Name)} or ${specialFromHandInDefToZone(Card Name~M1~M2)}"), document.createElement("br"),
+        document.createTextNode("Xyz move example: "), this.#code("${moveXyzWithMaterials(Card Name~S1~S2~S3)} (experimental; DuelingBook must accept cross-zone Overlay)"), document.createElement("br"),
         document.createTextNode("Functions: "), this.#code(CUSTOM_MACRO_FUNCTIONS.map((name) => `${name}()`).join(", "))
       );
       guide.append(summary, help);

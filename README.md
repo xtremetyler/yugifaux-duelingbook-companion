@@ -56,6 +56,10 @@ Hand Special Summon examples:
 - `SS Hand Preferred | ${specialFromHandInDefToZone(Card Name~M3~M2~M4)}` uses the first available listed zone.
 - Add `RandomZone` before the parentheses—for example, `${specialFromHandInAtkRandomZone(Card Name)}`—to let DuelingBook choose an available zone.
 
+Experimental Xyz move example:
+
+- `Move Xyz to Back Row | ${moveXyzWithMaterials(Card Name~S1~S2~S3~S4~S5)}` records the card's exact attached material IDs, moves it to the first available listed Spell/Trap Zone, then asks DuelingBook to reattach those cards after its native move sends them to the GY. If DuelingBook rejects an Overlay target in the Spell/Trap Zone, the macro stops with a visible error and leaves the unaccepted materials in the GY.
+
 Tampermonkey checks the repository's built userscript for core updates. League configuration loads independently from the versioned JSON in `config/companion.sample.json`, allowing data changes without reinstalling the script.
 
 ## For league testers
